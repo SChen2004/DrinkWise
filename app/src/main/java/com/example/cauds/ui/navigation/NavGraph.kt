@@ -24,18 +24,22 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.SignUp.route) { SignUpScreen(navController) }
 
         // Onboarding
-        composable(Screen.OnboardingAud.route) { AudScreen(navController, onboardingViewModel) }
+        composable(Screen.AudTest.route) { AudScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingInfo.route) { InfoScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingGoals.route) { GoalScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingPrivacy.route) { PrivacyScreen(navController, onboardingViewModel) }
 
-        // Dashboard
+        // Dashboard / Home
         composable(Screen.Dashboard.route) { DashboardScreen(navController) }
 
-        // Sub Features (Placeholders)
-        composable(Screen.Tracking.route) { Text("Tracking Screen") }
-        composable(Screen.Insight.route) { Text("Insight Screen") }
-        composable(Screen.Account.route) { Text("Account Screen") }
+        // Main Sections (Accessible from Dashboard or Bottom Nav)
+        composable(Screen.Tracking.route) { Text("Drink Tracking Screen") }
+        composable(Screen.Journal.route) { Text("Journal Screen") }
+        composable(Screen.Calendar.route) { Text("Calendar Screen") }
         composable(Screen.Support.route) { Text("Support Screen") }
+        composable(Screen.Account.route) { Text("Account Screen") }
+
+        // Secondary Features
+        // Not yet decide
     }
 }

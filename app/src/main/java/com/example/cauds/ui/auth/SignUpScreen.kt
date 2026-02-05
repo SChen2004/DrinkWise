@@ -98,7 +98,7 @@ fun SignUpScreen(
                     onSuccess = {
                         isLoading = false
                         // sign up success go to AUD test
-                        navController.navigate(Screen.OnboardingAud.route) {
+                        navController.navigate(Screen.AudTest.route) {
                             popUpTo(Screen.Login.route) { inclusive = true } // forbid user to return to login
                         }
                     },

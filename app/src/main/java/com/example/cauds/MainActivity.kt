@@ -4,27 +4,52 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.cauds.ui.navigation.AppBottomNavigation
 import com.example.cauds.ui.navigation.NavGraph
+import com.example.cauds.ui.navigation.Screen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            // using default theme for now, replace with our design theme later
             MaterialTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
 
-                    NavGraph(navController = navController)
+                // Show bottom bar for all "main" screens
+                val bottomBarScreens = listOf(
+                    Screen.Dashboard.route,
+                    Screen.Journal.route,
+                    Screen.Tracking.route,
+                    Screen.Calendar.route,
+                    Screen.Support.route,
+                    Screen.Account.route
+                )
+                val showBottomBar = currentRoute in bottomBarScreens
+
+                Scaffold(
+                    bottomBar = {
+                        if (showBottomBar) {
+                            AppBottomNavigation(navController = navController)
+                        }
+                    }
+                ) { innerPadding ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        NavGraph(navController = navController)
+                    }
                 }
             }
         }
