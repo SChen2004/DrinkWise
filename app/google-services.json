@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "393664903894",
+    "project_id": "cauds-6d903",
+    "storage_bucket": "cauds-6d903.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393664903894:android:7a0bb0124f5a184b5ba777",
+        "android_client_info": {
+          "package_name": "com.example.cauds"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAISj6HOA0MyDejKjdbtu-oXiNdjSBmLQI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
