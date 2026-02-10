@@ -5,7 +5,8 @@ import com.google.firebase.Timestamp
 
 data class LogData(
     val userId: String = "",            
-    val timestamp: Timestamp? = null,             
+    val timestamp: Timestamp? = null,  
+    val date: String = "",           
     val updatedAt: Long = 0L,
 
     val drinkType: String = "",
