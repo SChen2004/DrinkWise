@@ -24,6 +24,45 @@ fun SignUpScreen(
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    // Configure Google Sign In
+    val gso = remember {
+        com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(com.example.cauds.R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+    }
+    val googleSignInClient = remember { com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(context, gso) }
+
+    val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val task = com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
+                account.idToken?.let { idToken ->
+                    isLoading = true
+                    viewModel.signInWithGoogle(idToken,
+                        onSuccess = {
+                            isLoading = false
+                            // Sign up with Google success -> Onboarding
+                            navController.navigate(Screen.AudTest.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
+                        },
+                        onError = {
+                            isLoading = false
+                            errorMessage = it
+                        }
+                    )
+                }
+            } catch (e: com.google.android.gms.common.api.ApiException) {
+                errorMessage = "Google Sign-In failed: ${e.message}"
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -116,6 +155,23 @@ fun SignUpScreen(
             } else {
                 Text("SIGN UP")
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Google Sign In Button
+        Button(
+            onClick = {
+                launcher.launch(googleSignInClient.signInIntent)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.White,
+                contentColor = Color.Black
+            )
+        ) {
+            Text("Sign up with Google")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
