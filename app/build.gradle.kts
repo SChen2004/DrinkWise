@@ -83,4 +83,7 @@ dependencies {
     // Database using Firestore
     implementation("com.google.firebase:firebase-firestore")
 
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
 }

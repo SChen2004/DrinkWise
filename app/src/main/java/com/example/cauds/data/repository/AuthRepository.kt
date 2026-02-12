@@ -1,6 +1,7 @@
 package com.example.cauds.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
@@ -21,6 +22,14 @@ class AuthRepository {
     // Sign up
     fun signUp(email: String, pass: String, onResult: (Boolean, String?) -> Unit) {
         auth.createUserWithEmailAndPassword(email, pass)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    // Google Sign In
+    fun signInWithGoogle(idToken: String, onResult: (Boolean, String?) -> Unit) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
