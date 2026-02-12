@@ -10,6 +10,7 @@ import com.example.cauds.ui.auth.SignUpScreen
 import com.example.cauds.ui.dashboard.DashboardScreen
 import com.example.cauds.ui.onboarding.*
 import androidx.compose.material3.Text
+import com.example.cauds.ui.account.AccountScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 
 @Composable
@@ -36,7 +37,7 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Journal.route) { Text("Journal Screen") }
         composable(Screen.Calendar.route) { Text("Calendar Screen") }
         composable(Screen.Support.route) { Text("Support Screen") }
-        composable(Screen.Account.route) { Text("Account Screen") }
+        composable(Screen.Account.route) { AccountScreen(navController) }
 
         // Secondary Features
         // Not yet decide
