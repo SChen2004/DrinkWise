@@ -26,7 +26,6 @@ fun NavGraph(navController: NavHostController) {
         // Onboarding
         composable(Screen.AudTest.route) { AudScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingInfo.route) { InfoScreen(navController, onboardingViewModel) }
-        composable(Screen.OnboardingGoals.route) { GoalScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingPrivacy.route) { PrivacyScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home

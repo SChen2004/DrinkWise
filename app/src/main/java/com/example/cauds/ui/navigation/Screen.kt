@@ -8,7 +8,6 @@ sealed class Screen(val route: String) {
     // Onboarding
     object AudTest : Screen("onboard_aud")
     object OnboardingInfo : Screen("onboard_info")
-    object OnboardingGoals : Screen("onboard_goals")
     object OnboardingPrivacy : Screen("onboard_privacy")
 
     // Dashboard / Journal

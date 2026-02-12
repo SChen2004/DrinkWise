@@ -12,7 +12,7 @@ class OnboardingViewModel : ViewModel() {
     // Temp store data
     var audScore = ""
     var name = ""
-    var goals = ""
+
 
     // Upload the data
     fun submitData(onSuccess: () -> Unit, onError: (String) -> Unit) {
@@ -20,7 +20,7 @@ class OnboardingViewModel : ViewModel() {
             onError("User not logged in!")
             return
         }
-        val data = OnboardingData(audScore, name, goals)
+        val data = OnboardingData(audScore, name)
 
         storageRepo.saveOnboarding(userId, data) { success, errorMsg ->
             if (success) onSuccess() else onError(errorMsg ?: "Unknown Firestore error")

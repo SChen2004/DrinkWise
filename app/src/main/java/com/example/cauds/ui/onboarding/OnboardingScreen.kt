@@ -41,36 +41,13 @@ fun InfoScreen(navController: NavController, vm: OnboardingViewModel = viewModel
         )
         
         Spacer(modifier = Modifier.height(16.dp))
-        
-        Button(onClick = {
-            navController.navigate(Screen.OnboardingGoals.route)
-        }) { Text("Next: Goals") }
-    }
-}
 
-// Goals
-@Composable
-fun GoalScreen(navController: NavController, vm: OnboardingViewModel = viewModel()) {
-    var goals by remember { mutableStateOf(vm.goals) }
-    
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Your Goals", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = goals,
-            onValueChange = { goals = it; vm.goals = it },
-            label = { Text("What are your goals?") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
         Button(onClick = {
             navController.navigate(Screen.OnboardingPrivacy.route)
         }) { Text("Next: Privacy") }
     }
 }
+
 
 @Composable
 fun PrivacyScreen(navController: NavController, vm: OnboardingViewModel = viewModel()) {
