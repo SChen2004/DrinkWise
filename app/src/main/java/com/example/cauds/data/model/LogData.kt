@@ -2,7 +2,6 @@ package com.example.cauds.data.model
 
 import com.google.firebase.Timestamp
 
-
 data class LogData(
     val userId: String = "",            
     val timestamp: Timestamp? = null,  
@@ -14,4 +13,9 @@ data class LogData(
     val drinkCount: Long = 0,
     val drinkCost: Long = 0,
     val alcoholByVolume: Long = 0,
+)
+
+data class LogItem(
+    val id: String,
+    val data: LogData
 )
