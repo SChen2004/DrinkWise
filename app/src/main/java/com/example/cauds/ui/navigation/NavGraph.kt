@@ -14,11 +14,11 @@ import com.example.cauds.ui.account.AccountScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, startDestination: String) {
     // Share the onboarding view model
     val onboardingViewModel: OnboardingViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+    NavHost(navController = navController, startDestination = startDestination) {
 
         // Auth
         composable(Screen.Login.route) { LoginScreen(navController) }

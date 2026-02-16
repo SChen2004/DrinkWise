@@ -1,8 +1,6 @@
 package com.example.cauds.ui.auth
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import com.example.cauds.data.repository.AuthRepository
 
 // Functions for UI to call on when authenticating
@@ -26,4 +24,6 @@ class AuthViewModel : ViewModel() {
             if (success) onSuccess() else onError(message ?: "Unknown error")
         }
     }
+
+    fun isLoggedIn(): Boolean = repo.isUserLoggedIn()
 }
