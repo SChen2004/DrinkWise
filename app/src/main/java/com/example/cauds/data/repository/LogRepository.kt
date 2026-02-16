@@ -8,9 +8,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 const val LOGS = "logs"
 const val USER_ID = "userId"
 
-class LogRepository {
-
-    private val db = FirebaseFirestore.getInstance()
+class LogRepository (
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+) {
 
     fun saveLog(userId: String, logData: LogData, onResult: (Boolean, String?, String?) -> Unit) { // success, errorMsg, docId {
         val logWithMetadata = logData.copy(
