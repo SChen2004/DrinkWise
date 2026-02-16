@@ -6,8 +6,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 class AuthRepository {
     private val auth = FirebaseAuth.getInstance()
 
-    // Check if user login yet
-    // fun isUserLoggedIn(): Boolean = auth.currentUser != null
+
+    fun isUserLoggedIn(): Boolean = auth.currentUser != null
 
     // Get user ID
     fun getUserId(): String? = auth.currentUser?.uid
