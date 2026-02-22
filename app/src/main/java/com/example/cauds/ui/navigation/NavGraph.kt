@@ -11,6 +11,7 @@ import com.example.cauds.ui.dashboard.DashboardScreen
 import com.example.cauds.ui.onboarding.*
 import androidx.compose.material3.Text
 import com.example.cauds.ui.onboarding.OnboardingViewModel
+import com.example.cauds.ui.drinklog.DrinkLogScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -32,7 +33,7 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Dashboard.route) { DashboardScreen(navController) }
 
         // Main Sections (Accessible from Dashboard or Bottom Nav)
-        composable(Screen.Tracking.route) { Text("Drink Tracking Screen") }
+        composable(Screen.Tracking.route) { DrinkLogScreen(navController) }
         composable(Screen.Journal.route) { Text("Journal Screen") }
         composable(Screen.Calendar.route) { Text("Calendar Screen") }
         composable(Screen.Support.route) { Text("Support Screen") }
