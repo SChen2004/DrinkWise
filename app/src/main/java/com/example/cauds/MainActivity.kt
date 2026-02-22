@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.cauds.ui.auth.AuthViewModel
 import com.example.cauds.ui.navigation.AppBottomNavigation
 import com.example.cauds.ui.navigation.NavGraph
 import com.example.cauds.ui.navigation.Screen
@@ -20,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
+
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -47,7 +50,15 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        NavGraph(navController = navController)
+                        val authViewModel: AuthViewModel = viewModel()
+
+                        val startDestination =
+                            if (authViewModel.isLoggedIn())
+                                Screen.Dashboard.route
+                            else
+                                Screen.Login.route
+
+                        NavGraph(navController = navController, startDestination = startDestination)
                     }
                 }
             }

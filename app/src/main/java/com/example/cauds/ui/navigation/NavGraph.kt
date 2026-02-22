@@ -10,15 +10,16 @@ import com.example.cauds.ui.auth.SignUpScreen
 import com.example.cauds.ui.dashboard.DashboardScreen
 import com.example.cauds.ui.onboarding.*
 import androidx.compose.material3.Text
+import com.example.cauds.ui.account.AccountScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(navController: NavHostController, startDestination: String) {
     // Share the onboarding view model
     val onboardingViewModel: OnboardingViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = Screen.Login.route) {
+    NavHost(navController = navController, startDestination = startDestination) {
 
         // Auth
         composable(Screen.Login.route) { LoginScreen(navController) }
@@ -37,7 +38,7 @@ fun NavGraph(navController: NavHostController) {
         composable(Screen.Journal.route) { Text("Journal Screen") }
         composable(Screen.Calendar.route) { Text("Calendar Screen") }
         composable(Screen.Support.route) { Text("Support Screen") }
-        composable(Screen.Account.route) { Text("Account Screen") }
+        composable(Screen.Account.route) { AccountScreen(navController) }
 
         // Secondary Features
         // Not yet decide
