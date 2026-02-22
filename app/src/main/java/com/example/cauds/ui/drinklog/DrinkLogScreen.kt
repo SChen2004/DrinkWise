@@ -64,10 +64,10 @@ fun DrinkLogScreen(
     // Scaffold provides the standard Material structural layout (topBar, bottomBar, content)
     Scaffold(
         topBar = {
-            // The Top navigation bar containing the Back button and summary of drink and price
+            // The Top navigation bar containing the Back button and Red Dot Chips
             TopAppBar(
                 title = {
-                    if (hasLogs) {
+                    if (uiState.editModeId == null && hasLogs) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
@@ -81,7 +81,13 @@ fun DrinkLogScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { 
+                        if (uiState.editModeId != null) {
+                            viewModel.cancelEdit()
+                        } else {
+                            navController.popBackStack() 
+                        }
+                    }) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_back), 
                             contentDescription = "Back",
@@ -102,16 +108,20 @@ fun DrinkLogScreen(
                     .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Fixed "ADD" or "SAVE" Button
                 Button(
-                    onClick = { viewModel.addDrink() },
+                    onClick = { 
+                        if (uiState.editModeId != null) viewModel.saveDrink()
+                        else viewModel.addDrink()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .height(52.dp),
-                    shape = RoundedCornerShape(2.dp), // Sharp corners
+                    shape = RoundedCornerShape(2.dp), // Styled with sharp corners per Figma
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
-                    Text("ADD", color = Color.White, fontSize = 16.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+                    Text(if (uiState.editModeId != null) "SAVE" else "ADD", color = Color.White, fontSize = 16.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
                 }
             }
         }
@@ -131,30 +141,46 @@ fun DrinkLogScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
             
-            // 1. Date Selector < Month Day >
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_left), 
-                    contentDescription = "Prev", 
-                    modifier = Modifier.size(16.dp).clickable { /* TODO prev day */ }
-                )
-                Spacer(modifier = Modifier.width(32.dp))
-                Text(
-                    text = uiState.selectedDate, 
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.Monospace
-                )
-                Spacer(modifier = Modifier.width(32.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_right), 
-                    contentDescription = "Next", 
-                    modifier = Modifier.size(16.dp).clickable { /* TODO next day */ }
-                )
+            // 1. Date Selector (Arrows + "Feb 16") or Edit Title
+            if (uiState.editModeId != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Edit", 
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.Monospace,
+                        color = Color.Black
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_left), 
+                        contentDescription = "Prev", 
+                        modifier = Modifier.size(16.dp).clickable { /* TODO prev day */ }
+                    )
+                    Spacer(modifier = Modifier.width(32.dp))
+                    Text(
+                        text = uiState.selectedDate, 
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.Monospace
+                    )
+                    Spacer(modifier = Modifier.width(32.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_arrow_right), 
+                        contentDescription = "Next", 
+                        modifier = Modifier.size(16.dp).clickable { /* TODO next day */ }
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -263,46 +289,7 @@ fun DrinkLogScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 4. Added Drinks List (Only visible if the user has added at least 1 drink)
-            if (hasLogs) {
-                // Groups entries together based on name + container size (e.g. "Ale_PINT")
-                val groupedLogs = uiState.addedDrinks.groupBy { "${it.type}_${it.containerName}" }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .border(1.dp, Color(0xFFE0E0E0)) // Bounding box stroke around the list
-                ) {
-                    groupedLogs.values.forEach { logs ->
-                        val firstLog = logs.first()
-                        val groupTotal = logs.sumOf { it.cost }
-                        
-                        // Render Top Header for grouping (showing combined metrics)
-                        BatchHeaderRow(
-                            type = firstLog.type,
-                            containerName = firstLog.containerName,
-                            totalCost = groupTotal,
-                            deletable = true,
-                            onRemove = { viewModel.removeBatch(logs.map { it.id }) }
-                        )
-                        HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
-                        
-                        if (logs.size > 1) {
-                            logs.forEach { log ->
-                                LogItemRow(
-                                    log = log,
-                                    onRemove = { viewModel.removeDrink(log.id) }
-                                )
-                                HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // 5. Quantity Stepper & Cost Input Text Field Forms
+            // 4. Quantity Stepper & Cost Input Text Field Forms
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -380,7 +367,48 @@ fun DrinkLogScreen(
             }
 
             Spacer(modifier = Modifier.height(32.dp))
-            
+            // 5. Added Drinks List (Visible if not editing and has logs)
+            if (uiState.editModeId == null && hasLogs) {
+                // Groups entries together based on name + container size (e.g. "Ale_PINT")
+                val groupedLogs = uiState.addedDrinks.groupBy { "${it.type}_${it.containerName}" }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .border(1.dp, Color(0xFFE0E0E0)) // Bounding box stroke around the list
+                ) {
+                    groupedLogs.values.forEach { logs ->
+                        val firstLog = logs.first()
+                        val groupTotal = logs.sumOf { it.cost }
+                        
+                        // Render Top Header for grouping (showing combined metrics)
+                        BatchHeaderRow(
+                            type = firstLog.type,
+                            containerName = firstLog.containerName,
+                            totalCost = groupTotal,
+                            deletable = true,
+                            onClick = { if (logs.size == 1) viewModel.enterEditMode(firstLog.id) },
+                            onRemove = { viewModel.removeBatch(logs.map { it.id }) }
+                        )
+                        HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+                        
+                        if (logs.size > 1) {
+                            logs.forEach { log ->
+                                LogItemRow(
+                                    log = log,
+                                    onClick = { viewModel.enterEditMode(log.id) },
+                                    onRemove = { viewModel.removeDrink(log.id) }
+                                )
+                                HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+                            }
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
             // Manage Drinks Section (scrollable with content)
             Text(
                 text = "Drink not here? Add your own.",
@@ -405,8 +433,10 @@ fun DrinkLogScreen(
             Spacer(modifier = Modifier.height(32.dp))
         }
 
-            // Toast overlay for after delete a drink
-            if (uiState.showDeletedToast) {
+            // Toast overlay
+            val toastMessage = if (uiState.showLoggedToast) "Drinks logged." else if (uiState.showDeletedToast) "Drink deleted." else if (uiState.showSavedToast) "Drink saved." else null
+            
+            if (toastMessage != null) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -418,7 +448,7 @@ fun DrinkLogScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Drink deleted.", color = Color.Black, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+                    Text(toastMessage, color = Color.Black, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
                     Icon(
                         Icons.Default.Close, 
                         contentDescription = "Close", 
@@ -509,7 +539,7 @@ fun DrinkTypeWheel(selectedType: String, onDrinkSelected: (String) -> Unit) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BatchHeaderRow(type: String, containerName: String, totalCost: Double, deletable: Boolean, onRemove: () -> Unit) {
+fun BatchHeaderRow(type: String, containerName: String, totalCost: Double, deletable: Boolean, onClick: () -> Unit = {}, onRemove: () -> Unit) {
     var showDelete by remember { mutableStateOf(false) }
 
     Row(
@@ -520,7 +550,10 @@ fun BatchHeaderRow(type: String, containerName: String, totalCost: Double, delet
             .then(
                 if (deletable) {
                     Modifier.combinedClickable(
-                        onClick = { if (showDelete) showDelete = false },
+                        onClick = { 
+                            if (showDelete) showDelete = false 
+                            else onClick() 
+                        },
                         onLongClick = { showDelete = true }
                     )
                 } else Modifier
@@ -581,7 +614,7 @@ fun BatchHeaderRow(type: String, containerName: String, totalCost: Double, delet
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LogItemRow(log: LogDataWrapper, onRemove: () -> Unit) {
+fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit) {
     var showDelete by remember { mutableStateOf(false) }
 
     Row(
@@ -590,7 +623,10 @@ fun LogItemRow(log: LogDataWrapper, onRemove: () -> Unit) {
             .height(IntrinsicSize.Min)
             .background(Color(0xFFFAFAFA))
             .combinedClickable(
-                onClick = { if (showDelete) showDelete = false },
+                onClick = { 
+                    if (showDelete) showDelete = false 
+                    else onClick() 
+                },
                 onLongClick = { showDelete = true }
             ),
         verticalAlignment = Alignment.CenterVertically,

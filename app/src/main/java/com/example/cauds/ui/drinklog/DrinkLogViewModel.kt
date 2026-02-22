@@ -50,7 +50,10 @@ data class DrinkLogUiState(
     val quantity: Int = 1, // The number shown in the '-' and '+' stepper
     val costInput: String = "", // The raw String typed into the cost text field
     val cost: Double = 0.0, // The parsed numerical value of the costInput
+    val editModeId: String? = null, // If non-null, the screen is in Edit mode for this log ID
+    val showLoggedToast: Boolean = false, // Controls the visibility of the "Drink logged." top overlay
     val showDeletedToast: Boolean = false, // Controls the visibility of the "Drink deleted." top overlay
+    val showSavedToast: Boolean = false, // Controls the visibility of the "Drink saved." top overlay
     val addedDrinks: List<LogDataWrapper> = emptyList() // The list of successfully logged drinks appearing above the inputs
 )
 
@@ -129,7 +132,89 @@ class DrinkLogViewModel : ViewModel() {
             addedDrinks = newLogs + current.addedDrinks, // Insert at top of list
             quantity = 1, // Reset stepper
             costInput = "", // Reset input field text
-            cost = 0.0 // Reset internal cost metric
+            cost = 0.0, // Reset internal cost metric
+            showLoggedToast = true
+        )
+        
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.value = _uiState.value.copy(showLoggedToast = false)
+        }
+    }
+
+    /**
+     * Finds the targeted log and copies its data directly into the active UI state parameters.
+     * Transitions the UI into Edit Mode where the "ADD" button becomes "SAVE".
+     */
+    fun enterEditMode(logId: String) {
+        val log = _uiState.value.addedDrinks.find { it.id == logId } ?: return
+        val container = availableContainers.find { it.name == log.containerName } ?: availableContainers[1]
+        
+        _uiState.value = _uiState.value.copy(
+            editModeId = logId,
+            selectedDrinkType = log.type,
+            selectedContainer = container,
+            quantity = 1, // Edit targets instances 1 at a time initially
+            costInput = if (log.cost > 0) {
+                if (log.cost % 1.0 == 0.0) log.cost.toInt().toString() else log.cost.toString()
+            } else "",
+            cost = log.cost
+        )
+    }
+
+    /**
+     * Swaps out the original logged drink matching `editModeId` with the newly modified parameters.
+     * Functions effectively identical to adding a new drink but strictly replacing the old ID.
+     */
+    fun saveDrink() {
+        val current = _uiState.value
+        val editId = current.editModeId ?: return
+        
+        // Supports multiplying edited single items into sets (if quantity was updated > 1 during edit mode)
+        val newLogsList = List(current.quantity) { index ->
+            LogDataWrapper(
+                // Retains the original ID for the very first item, ensuring stable tracking.
+                id = if (index == 0) editId else java.util.UUID.randomUUID().toString(),
+                type = current.selectedDrinkType,
+                containerName = current.selectedContainer.name,
+                cost = current.cost
+            )
+        }
+        
+        val baseIndex = current.addedDrinks.indexOfFirst { it.id == editId }
+        val updatedAddedDrinks = current.addedDrinks.toMutableList()
+        
+        if (baseIndex != -1) {
+            updatedAddedDrinks.removeAt(baseIndex) // Remove original entry
+            updatedAddedDrinks.addAll(baseIndex, newLogsList) // Patch directly into same spot
+        } else {
+            updatedAddedDrinks.addAll(0, newLogsList) // Fallback pushing to top
+        }
+
+        _uiState.value = current.copy(
+            addedDrinks = updatedAddedDrinks,
+            editModeId = null, // Escape Edit Mode
+            quantity = 1,
+            costInput = "",
+            cost = 0.0,
+            showSavedToast = true
+        )
+        
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.value = _uiState.value.copy(showSavedToast = false)
+        }
+    }
+
+    /**
+     * Explicitly escapes edit mode without saving changes, reverting input variables back to defaults.
+     */
+    fun cancelEdit() {
+        _uiState.value = _uiState.value.copy(
+            editModeId = null,
+            quantity = 1,
+            costInput = "",
+            cost = 0.0
         )
     }
 
@@ -171,6 +256,10 @@ class DrinkLogViewModel : ViewModel() {
 
     // Allows manual dismissal of the toast by clicking the little 'X' on it.
     fun hideToast() {
-        _uiState.value = _uiState.value.copy(showDeletedToast = false)
+        _uiState.value = _uiState.value.copy(
+            showLoggedToast = false,
+            showDeletedToast = false,
+            showSavedToast = false
+        )
     }
 }
