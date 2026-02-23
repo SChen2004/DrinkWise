@@ -4,7 +4,6 @@ import com.example.cauds.data.model.LogData
 import com.example.cauds.data.model.LogItem
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 
 const val LOGS = "logs"
 const val USER_ID = "userId"
