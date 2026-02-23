@@ -11,17 +11,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
-data class MonthSummary(
-    val totalDrinks: Int,
-    val totalMoneySpent: Int,
-    val avgDrinksPerDay: Double
-)
 
 /**
  * Front-end calendar for any month.
@@ -30,40 +26,35 @@ data class MonthSummary(
  * - a set of days that have logs (loggedDays)
  * - or a map of LocalDate -> count/sum/etc.
  */
+
 @Composable
 fun CalendarScreen(
     modifier: Modifier = Modifier,
-    initialMonth: YearMonth = YearMonth.now(),
-    loggedDays: Set<LocalDate> = emptySet(), // hook for your log data later
+    viewModel: CalendarViewModel = viewModel(),
     onDayClick: (LocalDate) -> Unit = {}
 ) {
-
-
-    var currentMonth by remember { mutableStateOf(initialMonth) }
+    val currentMonth = viewModel.currentMonth
+    val loggedDays = viewModel.loggedDays
+    val summary = viewModel.monthSummary
 
     Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
 
-        // ---- Header (Month + nav) ----
         MonthHeader(
             yearMonth = currentMonth,
-            onPrev = { currentMonth = currentMonth.minusMonths(1) },
-            onNext = { currentMonth = currentMonth.plusMonths(1) }
+            onPrev = { viewModel.goPrevMonth() },
+            onNext = { viewModel.goNextMonth() }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        // ---- Weekday labels ----
         WeekdayRow()
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ---- Day grid ----
         val cells = remember(currentMonth) { buildMonthCells(currentMonth) }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             modifier = Modifier.fillMaxWidth(),
-            userScrollEnabled = false, // feels nicer for a calendar month view
+            userScrollEnabled = false,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
@@ -80,14 +71,17 @@ fun CalendarScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // TEMP: fake data for now
-        MonthSummaryCard(
-            summary = MonthSummary(
-                totalDrinks = 0,
-                totalMoneySpent = 0,
-                avgDrinksPerDay = 0.0
-            )
-        )
+        if (viewModel.isLoading) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        viewModel.errorMessage?.let { msg ->
+            Text(msg, color = MaterialTheme.colorScheme.error)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        MonthSummaryCard(summary = summary)
     }
 }
 
@@ -225,7 +219,7 @@ private fun DayCell(
 }
 
 @Composable
-private fun MonthSummaryCard(summary: MonthSummary, modifier: Modifier = Modifier) {
+private fun MonthSummaryCard(summary: CalendarViewModel.MonthSummary, modifier: Modifier = Modifier) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Month summary", style = MaterialTheme.typography.titleMedium)
