@@ -4,9 +4,11 @@ import com.example.cauds.data.model.LogData
 import com.example.cauds.data.model.LogItem
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 
 const val LOGS = "logs"
 const val USER_ID = "userId"
+const val TIMESTAMP = "timestamp"
 
 class LogRepository (
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -44,6 +46,30 @@ class LogRepository (
                     }
                 }
 
+                onResult(true, logs, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, null, e.message)
+            }
+    }
+
+    fun fetchLogsInRange(
+        userId: String,
+        start: Timestamp,
+        end: Timestamp,
+        onResult: (Boolean, List<LogItem>?, String?) -> Unit
+    ) {
+        db.collection(LOGS)
+            .whereEqualTo(USER_ID, userId)
+            .whereGreaterThanOrEqualTo(TIMESTAMP, start)
+            .whereLessThan(TIMESTAMP, end) // end-exclusive is nice
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val logs = snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(LogData::class.java)?.let { data ->
+                        LogItem(id = doc.id, data = data)
+                    }
+                }
                 onResult(true, logs, null)
             }
             .addOnFailureListener { e ->
