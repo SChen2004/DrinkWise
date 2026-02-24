@@ -1,6 +1,8 @@
 package com.example.cauds.ui.calendar
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -183,8 +185,7 @@ private fun DayCell(
 ) {
     val date = cell.date
     val isBlank = date == null
-
-    // Visual states
+    
     val containerColor =
         if (isBlank) MaterialTheme.colorScheme.surface
         else if (hasLog) MaterialTheme.colorScheme.secondaryContainer
@@ -197,12 +198,15 @@ private fun DayCell(
     Surface(
         color = containerColor,
         shape = MaterialTheme.shapes.medium,
-        tonalElevation = if (hasLog) 2.dp else 0.dp,
+        tonalElevation = if (hasLog) 8.dp else 0.dp,
         modifier = Modifier
             .aspectRatio(1f) // makes it square
             .fillMaxWidth()
             .then(
-                if (!isBlank) Modifier.clickable { onClick(date) } else Modifier
+                if (!isBlank) Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = LocalIndication.current
+                ) { onClick(date) } else Modifier
             )
     ) {
         Box(
