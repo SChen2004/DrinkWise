@@ -1,0 +1,376 @@
+package com.example.cauds.ui.drinklog
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.cauds.data.model.LogData
+import com.example.cauds.data.repository.AuthRepository
+import com.example.cauds.data.repository.LogRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+/**
+ * Represents a physical container size (e.g., FLIGHT, PINT, PITCHER).
+ * Previously held volume data, but the app no longer tracks total volume intake.
+ */
+data class ContainerType(val name: String)
+
+// Hardcoded list of available containers to be displayed in the HorizontalPager
+val availableContainers = listOf(
+    ContainerType("FLIGHT"),
+    ContainerType("PINT"),
+    ContainerType("PITCHER")
+)
+
+/**
+ * Represents a specific type of alcoholic beverage.
+ * Used in the VerticalPager (Wheel Picker) below the containers.
+ */
+data class DrinkType(val name: String)
+
+// Hardcoded list of default drinks a user can select (TO DO: Show more drinks from database)
+val availableDrinks = listOf(
+    DrinkType("Ale"),
+    DrinkType("Cider"),
+    DrinkType("Rum"),
+    DrinkType("Sauvignon"),
+    DrinkType("Seltzer"),
+    DrinkType("Whiskey")
+)
+
+/**
+ * Holds the current state of the Drink Log UI.
+ * Every time a user interacts with the UI (changes date, selects a drink, enters a cost),
+ * this state is updated, which triggers the UI to automatically recompose (redraw).
+ */
+data class DrinkLogUiState(
+    val selectedDateObj: LocalDate = LocalDate.now(), // Internal tracking of the date
+    val selectedDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d")),
+
+    val selectedDrinkType: String = availableDrinks[0].name, // The drink currently centered in the vertical wheel
+    val selectedContainer: ContainerType = availableContainers[1], // The container currently centered in the horizontal pager (Default: PINT)
+    val quantity: Int = 1, // The number shown in the '-' and '+' stepper
+    val costInput: String = "", // The raw String typed into the cost text field
+    val cost: Double = 0.0, // The parsed numerical value of the costInput
+    val editModeId: String? = null, // If non-null, the screen is in Edit mode for this log ID
+    val showLoggedToast: Boolean = false, // Controls the visibility of the "Drink logged." top overlay
+    val showDeletedToast: Boolean = false, // Controls the visibility of the "Drink deleted." top overlay
+    val showSavedToast: Boolean = false, // Controls the visibility of the "Drink saved." top overlay
+    val addedDrinks: List<LogDataWrapper> = emptyList() // The list of successfully logged drinks appearing above the inputs
+)
+
+/**
+ * A data model representing a single successfully logged drink entry.
+ * When a user adds multiple quantities at once, multiple wrappers are created to allow individual deletion later.
+ */
+data class LogDataWrapper(
+    val id: String = java.util.UUID.randomUUID().toString(), // Unique ID for safe deletion capability
+    val type: String,
+    val drinkSize: String,
+    val cost: Double
+)
+
+class DrinkLogViewModel(
+    private val logRepository: LogRepository = LogRepository(),
+    private val authRepository: AuthRepository = AuthRepository()
+) : ViewModel() {
+
+    // Internal mutable state flow backing the UI state.
+    private val _uiState = MutableStateFlow(DrinkLogUiState())
+    // Public read-only state flow exposed to the Compose UI components.
+    val uiState: StateFlow<DrinkLogUiState> = _uiState.asStateFlow()
+
+    init {
+        val initialIsoDate = _uiState.value.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        loadLogsForDate(initialIsoDate)
+    }
+
+    // Public method to manually trigger a refresh (e.g., from a LaunchedEffect in the UI)
+    fun refreshLogs() {
+        val isoDateStr = _uiState.value.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        loadLogsForDate(isoDateStr)
+    }
+
+    private fun loadLogsForDate(isoDateStr: String) {
+        val userId = authRepository.getUserId() ?: return
+        logRepository.fetchLogs(userId) { success, logs, _ ->
+            if (success && logs != null) {
+                // Filter by the matching selected date
+                val dayLogs = logs.filter { it.data.date == isoDateStr }.map {
+                    LogDataWrapper(
+                        id = it.id,
+                        type = it.data.drinkType,
+                        drinkSize = it.data.drinkSize,
+                        cost = it.data.drinkCost
+                    )
+                }
+                
+                // Keep things ordered (newest first or just rely on fetch order)
+                _uiState.update { state ->
+                    state.copy(addedDrinks = dayLogs)
+                }
+            }
+        }
+    }
+
+    // Updates the currently selected date.
+    fun selectDate(dateObj: LocalDate) {
+        val formatted = dateObj.format(DateTimeFormatter.ofPattern("MMM d"))
+        val isoDateStr = dateObj.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        _uiState.update { it.copy(selectedDateObj = dateObj, selectedDate = formatted) }
+        loadLogsForDate(isoDateStr)
+    }
+
+    fun previousDay() {
+        val newDate = _uiState.value.selectedDateObj.minusDays(1)
+        val formatted = newDate.format(DateTimeFormatter.ofPattern("MMM d"))
+        val isoDateStr = newDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        _uiState.update { it.copy(selectedDateObj = newDate, selectedDate = formatted) }
+        loadLogsForDate(isoDateStr)
+    }
+
+    fun nextDay() {
+        val newDate = _uiState.value.selectedDateObj.plusDays(1)
+        val formatted = newDate.format(DateTimeFormatter.ofPattern("MMM d"))
+        val isoDateStr = newDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        _uiState.update { it.copy(selectedDateObj = newDate, selectedDate = formatted) }
+        loadLogsForDate(isoDateStr)
+    }
+
+    // Called automatically when the VerticalPager (drink type wheel) snaps to a new item.
+    fun selectDrink(type: String) {
+        _uiState.value = _uiState.value.copy(selectedDrinkType = type)
+    }
+
+    // Called automatically when the HorizontalPager (container carousel) snaps to a new item.
+    fun selectContainer(containerIndex: Int) {
+        if (containerIndex in availableContainers.indices) {
+            _uiState.value = _uiState.value.copy(
+                selectedContainer = availableContainers[containerIndex]
+            )
+        }
+    }
+
+    // Handles the '+' and '-' buttons on the quantity stepper. Ensure it doesn't drop below 1.
+    fun updateQuantity(delta: Int) {
+        val newQty = (_uiState.value.quantity + delta).coerceAtLeast(1)
+        _uiState.value = _uiState.value.copy(quantity = newQty)
+    }
+
+    // Handles typing in the cost input field. Binds to `costInput` (String) to allow fluid deletion of '0.00'.
+    fun updateCostInput(newInput: String) {
+        // Parse the input softly, falling back to 0.0 if empty or invalid.
+        val parsedCost = newInput.toDoubleOrNull() ?: 0.0
+        _uiState.value = _uiState.value.copy(
+            costInput = newInput,
+            cost = parsedCost
+        )
+    }
+
+    /**
+     * Triggered by the fixed "ADD" button at the bottom，save each drink log of the day to database.
+     */
+    fun addDrink() {
+        val current = _uiState.value
+        val userId = authRepository.getUserId() ?: return
+        
+        // If quantity is > 1, create identical individual entries so they can be deleted individually if needed.
+        val newLogs = List(current.quantity) {
+            LogDataWrapper(
+                type = current.selectedDrinkType,
+                drinkSize = current.selectedContainer.name,
+                cost = current.cost // Represents cost per single drink item
+            )
+        }
+
+        _uiState.value = current.copy(
+            addedDrinks = newLogs + current.addedDrinks, // Insert at top of list
+            quantity = 1, // Reset stepper
+            costInput = "", // Reset input field text
+            cost = 0.0, // Reset internal cost metric
+            showLoggedToast = true
+        )
+        
+        // Save to Firebase
+        newLogs.forEach { wrapper ->
+            val logData = LogData(
+                date = current.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                drinkType = wrapper.type,
+                drinkSize = wrapper.drinkSize,
+                drinkCost = wrapper.cost
+            )
+            logRepository.saveLog(userId, logData) { success, _, docId ->
+                if (success && docId != null) {
+                    _uiState.update { state -> 
+                        state.copy(
+                            addedDrinks = state.addedDrinks.map { 
+                                if (it.id == wrapper.id) it.copy(id = docId) else it 
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.value = _uiState.value.copy(showLoggedToast = false)
+        }
+    }
+
+    /**
+     * Finds the targeted log and copies its data directly into the active UI state parameters.
+     * Transitions the UI into Edit Mode where the "ADD" button becomes "SAVE".
+     */
+    fun enterEditMode(logId: String) {
+        val log = _uiState.value.addedDrinks.find { it.id == logId } ?: return
+        val container = availableContainers.find { it.name == log.drinkSize } ?: availableContainers[1]
+        
+        _uiState.value = _uiState.value.copy(
+            editModeId = logId,
+            selectedDrinkType = log.type,
+            selectedContainer = container,
+            quantity = 1, // Edit targets instances 1 at a time initially
+            costInput = if (log.cost > 0) {
+                if (log.cost % 1.0 == 0.0) log.cost.toInt().toString() else log.cost.toString()
+            } else "",
+            cost = log.cost
+        )
+    }
+
+    /**
+     * Swaps out the original logged drink matching `editModeId` with the newly modified parameters.
+     */
+    fun saveDrink() {
+        val current = _uiState.value
+        val editId = current.editModeId ?: return
+        val userId = authRepository.getUserId() ?: return
+        
+        // Supports multiplying edited single items into sets (if quantity was updated > 1 during edit mode)
+        val newLogsList = List(current.quantity) { index ->
+            LogDataWrapper(
+                id = java.util.UUID.randomUUID().toString(),
+                type = current.selectedDrinkType,
+                drinkSize = current.selectedContainer.name,
+                cost = current.cost
+            )
+        }
+        
+        val baseIndex = current.addedDrinks.indexOfFirst { it.id == editId }
+        val updatedAddedDrinks = current.addedDrinks.toMutableList()
+        
+        if (baseIndex != -1) {
+            updatedAddedDrinks.removeAt(baseIndex) // Remove original entry
+            updatedAddedDrinks.addAll(baseIndex, newLogsList) // Patch directly into same spot
+        } else {
+            updatedAddedDrinks.addAll(0, newLogsList) // Fallback pushing to top
+        }
+
+        _uiState.value = current.copy(
+            addedDrinks = updatedAddedDrinks,
+            editModeId = null, // Escape Edit Mode
+            quantity = 1,
+            costInput = "",
+            cost = 0.0,
+            showSavedToast = true
+        )
+        
+        // Delete old from Firebase
+        logRepository.deleteLog(editId) { _, _ -> }
+        
+        // Save new to Firebase
+        newLogsList.forEach { wrapper ->
+            val logData = LogData(
+                date = current.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                drinkType = wrapper.type,
+                drinkSize = wrapper.drinkSize,
+                drinkCost = wrapper.cost
+            )
+            logRepository.saveLog(userId, logData) { success, _, docId ->
+                if (success && docId != null) {
+                    _uiState.update { state -> 
+                        state.copy(
+                            addedDrinks = state.addedDrinks.map { 
+                                if (it.id == wrapper.id) it.copy(id = docId) else it 
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.value = _uiState.value.copy(showSavedToast = false)
+        }
+    }
+
+    /**
+     * Explicitly escapes edit mode without saving changes, reverting input variables back to defaults.
+     */
+    fun cancelEdit() {
+        _uiState.value = _uiState.value.copy(
+            editModeId = null,
+            quantity = 1,
+            costInput = "",
+            cost = 0.0
+        )
+    }
+
+    // Triggered by the trailing "X" icon on an individual drink row.
+    fun removeDrink(logId: String) {
+        val current = _uiState.value
+        // Filters out the matched log ID, leaving the rest.
+        val newLogs = current.addedDrinks.filter { it.id != logId }
+        
+        _uiState.value = current.copy(
+            addedDrinks = newLogs
+        )
+        triggerToast()
+        
+        logRepository.deleteLog(logId) { _, _ -> }
+    }
+
+    // Triggered by the trailing "X" icon on the grouped Batch Header row to delete all identical items at once.
+    fun removeBatch(type: String, drinkSize: String) {
+        val current = _uiState.value
+        val batchIds = current.addedDrinks.filter { it.type == type && it.drinkSize == drinkSize }.map { it.id }
+        // Filters out any logs whose IDs match the batch IDs provided.
+        val newLogs = current.addedDrinks.filter { it.id !in batchIds }
+        
+        _uiState.value = current.copy(
+            addedDrinks = newLogs
+        )
+        triggerToast()
+        
+        batchIds.forEach { logId ->
+            logRepository.deleteLog(logId) { _, _ -> }
+        }
+    }
+
+    /**
+     * Activates the top overlay toast "Drink deleted."
+     * Uses a coroutine to automatically hide the toast after exactly 3000ms (3 seconds).
+     */
+    private fun triggerToast() {
+        _uiState.value = _uiState.value.copy(showDeletedToast = true)
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.value = _uiState.value.copy(showDeletedToast = false)
+        }
+    }
+
+    // Allows manual dismissal of the toast by clicking the little 'X' on it.
+    fun hideToast() {
+        _uiState.value = _uiState.value.copy(
+            showLoggedToast = false,
+            showDeletedToast = false,
+            showSavedToast = false
+        )
+    }
+}

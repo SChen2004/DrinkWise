@@ -31,7 +31,6 @@ class MainActivity : ComponentActivity() {
                 val bottomBarScreens = listOf(
                     Screen.Dashboard.route,
                     Screen.Journal.route,
-                    Screen.Tracking.route,
                     Screen.Calendar.route,
                     Screen.Support.route,
                     Screen.Account.route

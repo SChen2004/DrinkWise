@@ -11,7 +11,8 @@ data class LogData(
     val drinkType: String = "",
     val drinkAmount: Long = 0,
     val drinkCount: Long = 0,
-    val drinkCost: Long = 0,
+    val drinkCost: Double = 0.0,
+    val drinkSize: String = "",
     val alcoholByVolume: Long = 0,
 )
 
