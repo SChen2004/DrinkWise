@@ -20,7 +20,7 @@ sealed class Screen(val route: String) {
 
     // -----    Calendar    -----
     object Calendar : Screen("calendar")
-
+    object DaySummary : Screen("day_summary/{date}")
 
     // -----    Support    -----
     object Support : Screen("support")

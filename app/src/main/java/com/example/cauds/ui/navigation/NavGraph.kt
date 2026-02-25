@@ -10,7 +10,11 @@ import com.example.cauds.ui.auth.SignUpScreen
 import com.example.cauds.ui.dashboard.DashboardScreen
 import com.example.cauds.ui.onboarding.*
 import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
 import com.example.cauds.ui.account.AccountScreen
+import com.example.cauds.ui.calendar.CalendarScreen
+import com.example.cauds.ui.calendar.CalendarViewModel
+import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
 
@@ -36,11 +40,29 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         // Main Sections (Accessible from Dashboard or Bottom Nav)
         composable(Screen.Tracking.route) { DrinkLogScreen(navController) }
         composable(Screen.Journal.route) { Text("Journal Screen") }
-        composable(Screen.Calendar.route) { Text("Calendar Screen") }
+        composable(Screen.Calendar.route) { CalendarScreen(
+            onDayClick = { date -> navController.navigate("day_summary/${date}") }
+        ) }
         composable(Screen.Support.route) { Text("Support Screen") }
         composable(Screen.Account.route) { AccountScreen(navController) }
 
         // Secondary Features
-        // Not yet decide
+        composable(Screen.DaySummary.route) { backStackEntry ->
+
+            val dateStr = backStackEntry.arguments?.getString("date") ?: return@composable
+
+
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.Calendar.route)
+            }
+
+            val sharedCalendarViewModel: CalendarViewModel = viewModel(parentEntry)
+
+            DaySummaryScreen(
+                date = dateStr,
+                calendarViewModel = sharedCalendarViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }
