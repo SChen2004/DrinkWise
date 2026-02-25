@@ -264,4 +264,110 @@ class LogRepositoryTest {
         verify { collection.whereEqualTo(USER_ID, "u1") }
         verify { query.get() }
     }
+
+    // -------------------------
+// fetchLogsInRange tests
+// -------------------------
+
+    @Test
+    fun `fetchLogsInRange failure returns error`() {
+        val task = mockk<Task<QuerySnapshot>>(relaxed = true)
+
+        val q1 = mockk<Query>() // after whereEqualTo
+        val q2 = mockk<Query>() // after timestamp filters
+
+        val start = com.google.firebase.Timestamp.now()
+        val end = com.google.firebase.Timestamp.now()
+
+        every { collection.whereEqualTo(USER_ID, "u1") } returns q1
+        every { q1.whereGreaterThanOrEqualTo(TIMESTAMP, start) } returns q2
+        every { q2.whereLessThan(TIMESTAMP, end) } returns q2
+        every { q2.get() } returns task
+
+        val failureSlot = slot<OnFailureListener>()
+        every { task.addOnFailureListener(capture(failureSlot)) } returns task
+        every { task.addOnSuccessListener(any()) } returns task
+
+        var ok: Boolean? = null
+        var logs: List<LogItem>? = listOf()
+        var err: String? = null
+
+        repo.fetchLogsInRange("u1", start, end) { success, list, error ->
+            ok = success
+            logs = list
+            err = error
+        }
+
+        failureSlot.captured.onFailure(RuntimeException("range boom"))
+
+        Assert.assertEquals(false, ok)
+        Assert.assertEquals(null, logs)
+        Assert.assertEquals("range boom", err)
+
+        verify { collection.whereEqualTo(USER_ID, "u1") }
+        verify { q1.whereGreaterThanOrEqualTo(TIMESTAMP, start) }
+        verify { q2.whereLessThan(TIMESTAMP, end) }
+        verify { q2.get() }
+    }
+
+    @Test
+    fun `fetchLogsInRange success maps documents into LogItems`() {
+        val task = mockk<Task<QuerySnapshot>>(relaxed = true)
+        val snapshot = mockk<QuerySnapshot>()
+        val doc1 = mockk<DocumentSnapshot>()
+        val doc2 = mockk<DocumentSnapshot>()
+
+        val data1 = mockk<LogData>(relaxed = true)
+        val data2 = mockk<LogData>(relaxed = true)
+
+        val q1 = mockk<Query>() // after whereEqualTo
+        val q2 = mockk<Query>() // after timestamp filters
+
+        val start = com.google.firebase.Timestamp.now()
+        val end = com.google.firebase.Timestamp.now()
+
+        every { collection.whereEqualTo(USER_ID, "u1") } returns q1
+        every { q1.whereGreaterThanOrEqualTo(TIMESTAMP, start) } returns q2
+        every { q2.whereLessThan(TIMESTAMP, end) } returns q2
+        every { q2.get() } returns task
+
+        every { snapshot.documents } returns listOf(doc1, doc2)
+
+        every { doc1.id } returns "id1"
+        every { doc2.id } returns "id2"
+
+        every { doc1.toObject(LogData::class.java) } returns data1
+        every { doc2.toObject(LogData::class.java) } returns data2
+
+        val successSlot = slot<OnSuccessListener<QuerySnapshot>>()
+        every { task.addOnSuccessListener(capture(successSlot)) } returns task
+        every { task.addOnFailureListener(any()) } returns task
+
+        var ok: Boolean? = null
+        var logs: List<LogItem>? = null
+        var err: String? = "placeholder"
+
+        repo.fetchLogsInRange("u1", start, end) { success, list, error ->
+            ok = success
+            logs = list
+            err = error
+        }
+
+        // simulate success callback:
+        successSlot.captured.onSuccess(snapshot)
+
+        Assert.assertEquals(true, ok)
+        Assert.assertEquals(null, err)
+        Assert.assertNotNull(logs)
+        Assert.assertEquals(2, logs!!.size)
+        Assert.assertEquals("id1", logs!![0].id)
+        Assert.assertEquals(data1, logs!![0].data)
+        Assert.assertEquals("id2", logs!![1].id)
+        Assert.assertEquals(data2, logs!![1].data)
+
+        verify { collection.whereEqualTo(USER_ID, "u1") }
+        verify { q1.whereGreaterThanOrEqualTo(TIMESTAMP, start) }
+        verify { q2.whereLessThan(TIMESTAMP, end) }
+        verify { q2.get() }
+    }
 }
