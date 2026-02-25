@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import java.time.format.DateTimeFormatter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,6 +61,11 @@ fun DrinkLogScreen(
     
     // Derived state to quickly check if any drinks have been logged today
     val hasLogs = uiState.addedDrinks.isNotEmpty()
+
+    // Ensure logs are fetched every time the screen navigated to
+    LaunchedEffect(Unit) {
+        viewModel.refreshLogs()
+    }
     
     // Scaffold provides the standard Material structural layout (topBar, bottomBar, content)
     Scaffold(
@@ -165,11 +171,11 @@ fun DrinkLogScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_left), 
                         contentDescription = "Prev", 
-                        modifier = Modifier.size(16.dp).clickable { /* TODO prev day */ }
+                        modifier = Modifier.size(16.dp).clickable { viewModel.previousDay() }
                     )
                     Spacer(modifier = Modifier.width(32.dp))
                     Text(
-                        text = uiState.selectedDate, 
+                        text = uiState.selectedDate,
                         fontWeight = FontWeight.Medium,
                         fontSize = 16.sp,
                         fontFamily = FontFamily.Monospace
@@ -178,7 +184,7 @@ fun DrinkLogScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_right), 
                         contentDescription = "Next", 
-                        modifier = Modifier.size(16.dp).clickable { /* TODO next day */ }
+                        modifier = Modifier.size(16.dp).clickable { viewModel.nextDay() }
                     )
                 }
             }
@@ -370,7 +376,7 @@ fun DrinkLogScreen(
             // 5. Added Drinks List (Visible if not editing and has logs)
             if (uiState.editModeId == null && hasLogs) {
                 // Groups entries together based on name + container size (e.g. "Ale_PINT")
-                val groupedLogs = uiState.addedDrinks.groupBy { "${it.type}_${it.containerName}" }
+                val groupedLogs = uiState.addedDrinks.groupBy { "${it.type}_${it.drinkSize}" }
 
                 Column(
                     modifier = Modifier
@@ -385,11 +391,11 @@ fun DrinkLogScreen(
                         // Render Top Header for grouping (showing combined metrics)
                         BatchHeaderRow(
                             type = firstLog.type,
-                            containerName = firstLog.containerName,
+                            drinkSize = firstLog.drinkSize,
                             totalCost = groupTotal,
                             deletable = true,
                             onClick = { if (logs.size == 1) viewModel.enterEditMode(firstLog.id) },
-                            onRemove = { viewModel.removeBatch(logs.map { it.id }) }
+                            onRemove = { viewModel.removeBatch(firstLog.type, firstLog.drinkSize) }
                         )
                         HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
                         
@@ -539,7 +545,7 @@ fun DrinkTypeWheel(selectedType: String, onDrinkSelected: (String) -> Unit) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BatchHeaderRow(type: String, containerName: String, totalCost: Double, deletable: Boolean, onClick: () -> Unit = {}, onRemove: () -> Unit) {
+fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable: Boolean, onClick: () -> Unit = {}, onRemove: () -> Unit) {
     var showDelete by remember { mutableStateOf(false) }
 
     Row(
@@ -574,7 +580,7 @@ fun BatchHeaderRow(type: String, containerName: String, totalCost: Double, delet
             Text(text = type, fontSize = 16.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = containerName.uppercase(),
+                text = drinkSize.uppercase(),
                 color = Color.LightGray,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,

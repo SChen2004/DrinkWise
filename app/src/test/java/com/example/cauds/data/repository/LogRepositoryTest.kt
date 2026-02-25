@@ -104,14 +104,15 @@ class LogRepositoryTest {
     fun `saveLog success returns docId and sets userId`() {
 
         val original = LogData(
-            userId = "",        // or just omit userId entirely if it has a default
+            userId = "",
             timestamp = null,
             date = "",
             updatedAt = 0L,
             drinkType = "",
             drinkAmount = 0L,
             drinkCount = 0L,
-            drinkCost = 0L,
+            drinkCost = 0.0,
+            drinkSize = "",
             alcoholByVolume = 0L
         )
 
