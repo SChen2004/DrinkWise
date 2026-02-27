@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.data.model.AUDRisk
 
 // AUD test
 @Composable
@@ -18,7 +19,7 @@ fun AudScreen(navController: NavController, vm: OnboardingViewModel = viewModel(
         Text("Placeholder for AUD questions. For now, we'll mark as 'Moderate Risk'.")
         
         Button(onClick = {
-            vm.audScore = "Moderate Risk"
+            vm.audScore = AUDRisk.MODERATE_RISK
             navController.navigate(Screen.OnboardingInfo.route)
         }) { Text("Next: Personal Info") }
     }

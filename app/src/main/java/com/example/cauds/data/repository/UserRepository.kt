@@ -1,17 +1,18 @@
 package com.example.cauds.data.repository
 
-import com.example.cauds.data.model.OnboardingData
+import com.example.cauds.data.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 
-class StorageRepository {
+const val USERS = "users"
+
+class UserRepository {
     private val db = FirebaseFirestore.getInstance()
 
     // Save onboarding data
-    fun saveOnboarding(userId: String, data: OnboardingData, onResult: (Boolean, String?) -> Unit) {
-        db.collection("users").document(userId).set(data)
+    fun saveOnboarding(userId: String, data: User, onResult: (Boolean, String?) -> Unit) {
+        db.collection(USERS).document(userId).set(data)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
-
 
 }
