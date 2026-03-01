@@ -17,6 +17,7 @@ import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
+import com.example.cauds.ui.onboarding.AudQuizScreen
 
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String) {
@@ -33,6 +34,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.AudTest.route) { AudScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingInfo.route) { InfoScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingPrivacy.route) { PrivacyScreen(navController, onboardingViewModel) }
+        composable(Screen.AudQuiz.route) { AudQuizScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home
         composable(Screen.Dashboard.route) { DashboardScreen(navController) }
