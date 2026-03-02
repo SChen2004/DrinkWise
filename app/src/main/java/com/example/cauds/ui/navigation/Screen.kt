@@ -18,6 +18,8 @@ sealed class Screen(val route: String) {
 
     // -----    Tracker     -----
     object Tracking : Screen("tracking")
+    object ManageDrinks : Screen("manage_drinks")
+    object AddNewDrink : Screen("add_new_drink")
 
     // -----    Calendar    -----
     object Calendar : Screen("calendar")

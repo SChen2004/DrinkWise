@@ -52,6 +52,8 @@ data class DrinkLogUiState(
     val selectedDateObj: LocalDate = LocalDate.now(), // Internal tracking of the date
     val selectedDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d")),
 
+    val availableDrinkTypes: List<DrinkType> = availableDrinks, // Dynamic list of available drinks
+
     val selectedDrinkType: String = availableDrinks[0].name, // The drink currently centered in the vertical wheel
     val selectedContainer: ContainerType = availableContainers[1], // The container currently centered in the horizontal pager (Default: PINT)
     val quantity: Int = 1, // The number shown in the '-' and '+' stepper
@@ -77,7 +79,8 @@ data class LogDataWrapper(
 
 class DrinkLogViewModel(
     private val logRepository: LogRepository = LogRepository(),
-    private val authRepository: AuthRepository = AuthRepository()
+    private val authRepository: AuthRepository = AuthRepository(),
+    private val drinkRepository: com.example.cauds.data.repository.DrinkRepository = com.example.cauds.data.repository.DrinkRepository()
 ) : ViewModel() {
 
     // Internal mutable state flow backing the UI state.
@@ -88,12 +91,37 @@ class DrinkLogViewModel(
     init {
         val initialIsoDate = _uiState.value.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE)
         loadLogsForDate(initialIsoDate)
+        loadAvailableDrinks()
+    }
+
+    private fun loadAvailableDrinks() {
+        val userId = authRepository.getUserId() ?: return
+        drinkRepository.fetchDrinks(userId) { success, drinks, _ ->
+            if (success && drinks != null) {
+                val selectedDrinks = drinks.filter { it.data.isSelected }
+                val types = if (selectedDrinks.isNotEmpty()) {
+                    selectedDrinks.map { DrinkType(it.data.name) }
+                } else {
+                    listOf(DrinkType("No Drinks Selected"))
+                }
+                
+                _uiState.update { state ->
+                    val currentType = state.selectedDrinkType
+                    val newType = if (types.any { it.name == currentType }) currentType else types.first().name
+                    state.copy(
+                        availableDrinkTypes = types,
+                        selectedDrinkType = newType
+                    )
+                }
+            }
+        }
     }
 
     // Public method to manually trigger a refresh (e.g., from a LaunchedEffect in the UI)
     fun refreshLogs() {
         val isoDateStr = _uiState.value.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE)
         loadLogsForDate(isoDateStr)
+        loadAvailableDrinks()
     }
 
     private fun loadLogsForDate(isoDateStr: String) {
@@ -231,6 +259,7 @@ class DrinkLogViewModel(
         val log = _uiState.value.addedDrinks.find { it.id == logId } ?: return
         val container = availableContainers.find { it.name == log.drinkSize } ?: availableContainers[1]
         
+        // Ensure the drink type exists in available types, otherwise add it temporarily or use it. It's fine since `selectedDrinkType` is just a string.
         _uiState.value = _uiState.value.copy(
             editModeId = logId,
             selectedDrinkType = log.type,

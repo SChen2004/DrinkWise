@@ -41,6 +41,17 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
         // Main Sections (Accessible from Dashboard or Bottom Nav)
         composable(Screen.Tracking.route) { DrinkLogScreen(navController) }
+        composable(Screen.ManageDrinks.route) { backStackEntry ->
+            val manageDrinksViewModel: com.example.cauds.ui.drinklog.ManageDrinksViewModel = viewModel()
+            com.example.cauds.ui.drinklog.ManageDrinksScreen(navController, viewModel = manageDrinksViewModel)
+        }
+        composable(Screen.AddNewDrink.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.ManageDrinks.route)
+            }
+            val manageDrinksViewModel: com.example.cauds.ui.drinklog.ManageDrinksViewModel = viewModel(parentEntry)
+            com.example.cauds.ui.drinklog.AddNewDrinkScreen(navController, viewModel = manageDrinksViewModel)
+        }
         composable(Screen.Journal.route) { Text("Journal Screen") }
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }

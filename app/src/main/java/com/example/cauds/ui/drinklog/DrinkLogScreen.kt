@@ -43,9 +43,13 @@ import androidx.compose.ui.text.font.FontFamily
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cauds.R
+import com.example.cauds.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
 /**
@@ -64,9 +68,18 @@ fun DrinkLogScreen(
     // Derived state to quickly check if any drinks have been logged today
     val hasLogs = uiState.addedDrinks.isNotEmpty()
 
-    // Ensure logs are fetched every time the screen navigated to
-    LaunchedEffect(Unit) {
-        viewModel.refreshLogs()
+    // Ensure logs are fetched every time the screen is resumed (e.g. coming back from Manage Drinks)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshLogs()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
     
     // Scaffold provides the standard Material structural layout (topBar, bottomBar, content)
@@ -97,7 +110,7 @@ fun DrinkLogScreen(
                         }
                     }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_back), 
+                            imageVector = Icons.Default.ArrowBack, 
                             contentDescription = "Back",
                             modifier = Modifier.size(24.dp),
                             tint = Color.Gray
@@ -292,6 +305,7 @@ fun DrinkLogScreen(
             // 3. Drink Type Wheel Picker (Scrollable text: Ale, Cider, etc.)
             DrinkTypeWheel(
                 selectedType = uiState.selectedDrinkType,
+                availableDrinkTypes = uiState.availableDrinkTypes,
                 onDrinkSelected = { viewModel.selectDrink(it) }
             )
 
@@ -430,7 +444,7 @@ fun DrinkLogScreen(
             Spacer(modifier = Modifier.height(8.dp))
             
             OutlinedButton(
-                onClick = { /* TODO: Manage Drinks */ },
+                onClick = { navController.navigate(Screen.ManageDrinks.route) },
                 shape = RoundedCornerShape(50),
                 border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
@@ -502,16 +516,20 @@ fun CustomRedDotChip(text: String) {
  * Uses a fixed height showing approximately 3 items and lets users snap-scroll.
  */
 @Composable
-fun DrinkTypeWheel(selectedType: String, onDrinkSelected: (String) -> Unit) {
-    val initialPage = remember {
-        availableDrinks.indexOfFirst { it.name == selectedType }.coerceAtLeast(0)
+fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, onDrinkSelected: (String) -> Unit) {
+    if (availableDrinkTypes.isEmpty()) return
+
+    val initialPage = remember(availableDrinkTypes, selectedType) {
+        availableDrinkTypes.indexOfFirst { it.name == selectedType }.coerceAtLeast(0)
     }
-    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { availableDrinks.size })
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { availableDrinkTypes.size })
     val coroutineScope = rememberCoroutineScope()
     
     // Automatically select the drink when scrolling dynamically changes the visible page
     LaunchedEffect(pagerState.currentPage) {
-        onDrinkSelected(availableDrinks[pagerState.currentPage].name)
+        if (pagerState.currentPage in availableDrinkTypes.indices) {
+            onDrinkSelected(availableDrinkTypes[pagerState.currentPage].name)
+        }
     }
 
     VerticalPager(
@@ -522,7 +540,7 @@ fun DrinkTypeWheel(selectedType: String, onDrinkSelected: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(vertical = 32.dp)
     ) { page ->
-        val drink = availableDrinks[page]
+        val drink = availableDrinkTypes[page]
         val isSelected = pagerState.currentPage == page
         
         Text(
