@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -147,7 +149,7 @@ fun DrinkLogScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
             
-            // 1. Date Selector (Arrows + "Feb 16") or Edit Title
+            // 1. Date Selector (< MTH dd >) or Edit Title
             if (uiState.editModeId != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
@@ -555,13 +557,18 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
             .background(Color.White)
             .then(
                 if (deletable) {
-                    Modifier.combinedClickable(
-                        onClick = { 
+                    Modifier
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { _, dragAmount ->
+                                // Swipe left to reveal, swipe right to hide
+                                if (dragAmount < -15) showDelete = true
+                                else if (dragAmount > 15) showDelete = false
+                            }
+                        }
+                        .clickable { 
                             if (showDelete) showDelete = false 
                             else onClick() 
-                        },
-                        onLongClick = { showDelete = true }
-                    )
+                        }
                 } else Modifier
             ),
         verticalAlignment = Alignment.CenterVertically,
@@ -628,13 +635,16 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit) {
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .background(Color(0xFFFAFAFA))
-            .combinedClickable(
-                onClick = { 
-                    if (showDelete) showDelete = false 
-                    else onClick() 
-                },
-                onLongClick = { showDelete = true }
-            ),
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { _, dragAmount ->
+                    if (dragAmount < -15) showDelete = true
+                    else if (dragAmount > 15) showDelete = false
+                }
+            }
+            .clickable { 
+                if (showDelete) showDelete = false 
+                else onClick() 
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
