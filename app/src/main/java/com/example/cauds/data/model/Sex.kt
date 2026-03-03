@@ -1,8 +1,7 @@
 package com.example.cauds.data.model
 
-enum class Sex {
-    MALE,
-    FEMALE,
-    PREFER_NOT_TO_SAY,
-    DEFAULT_SEX
+enum class Sex(val displayName: String) {
+    MALE("Male"),
+    FEMALE("Female"),
+    PREFER_NOT_TO_SAY("Prefer not to say")
 }

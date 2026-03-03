@@ -42,6 +42,13 @@ fun AccountScreen(
         }
         Spacer(modifier = Modifier.height(12.dp))
 
+        // onboarding debug
+        Button(
+            onClick = { navController.navigate(Screen.OnboardingName.route) }
+        ) {
+            Text("onboarding preview")
+        }
+
         // logout button
         Button(
             onClick = {

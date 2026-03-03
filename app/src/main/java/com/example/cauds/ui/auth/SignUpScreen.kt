@@ -47,7 +47,7 @@ fun SignUpScreen(
                         onSuccess = {
                             isLoading = false
                             // Sign up with Google success -> Onboarding
-                            navController.navigate(Screen.AudTest.route) {
+                            navController.navigate(Screen.OnboardingName.route) {
                                 popUpTo(Screen.Login.route) { inclusive = true }
                             }
                         },
@@ -137,7 +137,7 @@ fun SignUpScreen(
                     onSuccess = {
                         isLoading = false
                         // sign up success go to AUD test
-                        navController.navigate(Screen.AudTest.route) {
+                        navController.navigate(Screen.OnboardingName.route) {
                             popUpTo(Screen.Login.route) { inclusive = true } // forbid user to return to login
                         }
                     },
