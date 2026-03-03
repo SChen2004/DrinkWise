@@ -1,6 +1,8 @@
 package com.example.cauds.ui.auth
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import com.example.cauds.data.repository.AuthRepository
 
 // Functions for UI to call on when authenticating
@@ -21,6 +23,12 @@ class AuthViewModel : ViewModel() {
 
     fun signInWithGoogle(idToken: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         repo.signInWithGoogle(idToken) { success, message ->
+            if (success) onSuccess() else onError(message ?: "Unknown error")
+        }
+    }
+
+    fun signInWithFacebook(token: com.facebook.AccessToken, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        repo.signInWithFacebook(token) { success, message ->
             if (success) onSuccess() else onError(message ?: "Unknown error")
         }
     }
