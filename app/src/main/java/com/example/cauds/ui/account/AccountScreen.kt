@@ -49,6 +49,18 @@ fun AccountScreen(
             Text("onboarding preview")
         }
 
+        Button(
+            onClick = { navController.navigate(Screen.NotificationPreferences.route) }
+        ) {
+            Text("Notification Preferences")
+        }
+
+        Button(
+            onClick = { navController.navigate(Screen.FavouriteDrinks.route) }
+        ) {
+            Text("Favourite Drinks")
+        }
+
         // logout button
         Button(
             onClick = {
@@ -60,5 +72,14 @@ fun AccountScreen(
         ) {
             Text("Logout")
         }
+
+        LaunchedEffect(Unit) {
+            viewModel.loadUserDebug()
+        }
+
+        Text(
+            text = viewModel.userDebugInfo,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }

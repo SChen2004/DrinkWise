@@ -8,5 +8,7 @@ data class User(
     val name: String = "",                                    // Username
     val sex: Sex = Sex.PREFER_NOT_TO_SAY,                           // sex
     val notificationPreferences: NotificationPreferences = NotificationPreferences(),
-    val supportingFriend: Boolean = false
+    val supportingFriend: Boolean = false,
+    val onboardingCompleted: Boolean = false,
+    val favouriteDrinks: List<String> = emptyList()
 )

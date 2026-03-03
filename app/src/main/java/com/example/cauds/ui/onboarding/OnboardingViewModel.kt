@@ -8,14 +8,12 @@ import com.example.cauds.data.model.User
 import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.UserRepository
 import com.example.cauds.data.model.AudRisk
+import com.example.cauds.data.model.NotificationPreferences
 import com.example.cauds.data.model.Sex
 
 class OnboardingViewModel : ViewModel() {
     private val userRepo = UserRepository()
     private val authRepo = AuthRepository()
-
-    // Temp store data
-    var audScore = AudRisk.DEFAULT_RISK
 
     var name by mutableStateOf("")
         private set
@@ -24,6 +22,9 @@ class OnboardingViewModel : ViewModel() {
         private set
 
     var supportingFriend by mutableStateOf(false)
+        private set
+
+    var audRisk by mutableStateOf(AudRisk.DEFAULT_RISK)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)
@@ -35,6 +36,7 @@ class OnboardingViewModel : ViewModel() {
     fun updateName(value: String) { name = value }
     fun updateBiologicalSex(value: Sex) { biologicalSex = value }
     fun updateSupportingFriend(value: Boolean) { supportingFriend = value }
+    fun updateAudRisk(value: AudRisk) { audRisk = value }
 
     fun saveOnboardingData() {
         val userId = authRepo.getUserId()!!
@@ -76,6 +78,44 @@ class OnboardingViewModel : ViewModel() {
             if (!success) {
                 errorMessage = error ?: "Unknown error"
             }
+        }
+    }
+
+    fun saveNotificationPreferences(prefs: NotificationPreferences) {
+        val userId = authRepo.getUserId()!!
+        isLoading = true
+        errorMessage = null
+
+        userRepo.saveNotificationPreferences(userId, prefs) { success, error ->
+            isLoading = false
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
+        }
+    }
+
+    fun saveFavouriteDrinks(drinks: List<String>) {
+        val userId = authRepo.getUserId()!!
+        userRepo.saveFavouriteDrinks(userId, drinks) { success, error ->
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
+        }
+    }
+
+    fun completeOnboarding() {
+        val userId = authRepo.getUserId()!!
+        userRepo.completeOnboarding(userId) { success, error ->
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
+        }
+    }
+
+    fun getCompletedOnboarding(onResult: (Boolean) -> Unit) {
+        val userId = authRepo.getUserId()!!
+        userRepo.getCompletedOnboarding(userId) { completed ->
+            onResult(completed)
         }
     }
 }

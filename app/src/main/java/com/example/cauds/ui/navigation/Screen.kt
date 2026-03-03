@@ -10,6 +10,9 @@ sealed class Screen(val route: String) {
     object OnboardingSex : Screen("onboarding_sex")
     object OnboardingPurpose : Screen("onboarding_purpose")
     object AudQuiz : Screen("aud_quiz")
+    object QuizResult : Screen("quiz_result")
+    object NotificationPreferences : Screen("notification_preferences")
+    object FavouriteDrinks : Screen("favourite_drinks")
 
     // Dashboard / Journal
     object Dashboard : Screen("dashboard")

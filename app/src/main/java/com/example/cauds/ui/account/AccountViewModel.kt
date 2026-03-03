@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 
 class AccountViewModel : ViewModel() {
     private val authRepo = AuthRepository()
-    private val userRepository = UserRepository()
+    private val userRepo = UserRepository()
 
     var errorMessage by mutableStateOf<String?>(null)
         private set
@@ -26,12 +26,37 @@ class AccountViewModel : ViewModel() {
     fun getAudRiskLevel() {
         val userId = authRepo.getUserId()!!
 
-        userRepository.getAudRiskLevel(userId) { success, result, error ->
+        userRepo.getAudRiskLevel(userId) { success, result, error ->
             if (success) {
                 audRisk = result
             } else {
                 errorMessage = error ?: "Unknown error"
             }
+        }
+    }
+
+    /// DEBUG
+
+    var userDebugInfo by mutableStateOf("")
+        private set
+
+    fun loadUserDebug() {
+        val userId = authRepo.getUserId()!!
+        userRepo.getUser(userId) { user ->
+            userDebugInfo = """
+            name: ${user.name}
+            sex: ${user.sex.name}
+            audScore: ${user.audScore.name}
+            favouriteDrinks: ${user.favouriteDrinks}
+            joinDate: ${user.joinDate.toDate()}
+            onboardingCompleted: ${user.onboardingCompleted}
+            supportingFriend: ${user.supportingFriend}
+            notificationPreferences:
+              dailyCheckin: ${user.notificationPreferences.dailyCheckin}
+              dailyEncouragement: ${user.notificationPreferences.dailyEncouragement}
+              weeklyReflection: ${user.notificationPreferences.weeklyReflection}
+              monthlyProgress: ${user.notificationPreferences.monthlyProgress}
+        """.trimIndent()
         }
     }
 

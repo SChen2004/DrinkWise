@@ -17,9 +17,12 @@ import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
 import com.example.cauds.ui.onboarding.AudQuizScreen
+import com.example.cauds.ui.onboarding.FavouriteDrinksScreen
+import com.example.cauds.ui.onboarding.NotificationPreferencesScreen
 import com.example.cauds.ui.onboarding.OnboardingNameScreen
 import com.example.cauds.ui.onboarding.OnboardingPurposeScreen
 import com.example.cauds.ui.onboarding.OnboardingSexScreen
+import com.example.cauds.ui.onboarding.QuizResultScreen
 
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String) {
@@ -34,9 +37,13 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
         // Onboarding
         composable(Screen.AudQuiz.route) { AudQuizScreen(navController, onboardingViewModel) }
+        composable(Screen.QuizResult.route) { QuizResultScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingName.route) { OnboardingNameScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingSex.route) { OnboardingSexScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingPurpose.route) { OnboardingPurposeScreen(navController, onboardingViewModel) }
+        composable(Screen.NotificationPreferences.route) { NotificationPreferencesScreen(navController, onboardingViewModel)}
+        composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
+
 
 
         // Dashboard / Home
