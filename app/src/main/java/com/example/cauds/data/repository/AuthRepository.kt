@@ -11,7 +11,11 @@ class AuthRepository {
     // Get user ID
     fun getUserId(): String? = auth.currentUser?.uid
 
-    // Login
+    /**
+     * Login Function
+     * Attempts to authenticate a user using Firebase's email/password provider.
+     * This function also catches Firebase exception types (like InvalidUser or InvalidCredentials)
+     */
     fun login(email: String, pass: String, onResult: (Boolean, String?) -> Unit) {
         auth.signInWithEmailAndPassword(email, pass)
             .addOnSuccessListener { onResult(true, null) }
@@ -26,7 +30,12 @@ class AuthRepository {
             }
     }
 
-    // Sign up
+    /**
+     * Sign Up Function
+     * Registers a new user with Firebase using an email and password.
+     * Crucially, it catches FirebaseAuthUserCollisionException to explicitly notify the user
+     * if the email they are trying to register is already in the database ("Email already exists").
+     */
     fun signUp(email: String, pass: String, onResult: (Boolean, String?) -> Unit) {
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnSuccessListener { onResult(true, null) }
@@ -53,6 +62,18 @@ class AuthRepository {
         auth.signInWithCredential(credential)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    /**
+     * Forgot Password Function
+     * Triggers the native Firebase password reset flow. Firebase will automatically send
+     * a secure, limited-time link to the provided email address for the user to reset their password
+     * on a secure web page.
+     */
+    fun sendPasswordResetEmail(email: String, onResult: (Boolean, String?) -> Unit) {
+        auth.sendPasswordResetEmail(email)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { e -> onResult(false, e.message ?: "Unknown error") }
     }
 
     // Log out

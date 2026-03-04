@@ -259,7 +259,11 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // SIGN UP Button
+        // SIGN UP Submission & Validation Logic
+        // Performs strict local validation before contacting Firebase to save network calls:
+        // 1. Checks for empty email and malformed email strings.
+        // 2. Checks for empty password.
+        // 3. Runs Regex on the password (>= 8 chars, 1 number, 1 upper, 1 lower, 1 special character).
         Button(
             onClick = {
                 var hasError = false

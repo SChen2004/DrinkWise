@@ -263,7 +263,7 @@ fun LoginScreen(
         // Forgot Password Link
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
             TextButton(
-                onClick = { /* Handle Forgot Password */ },
+                onClick = { navController.navigate(Screen.ForgotPassword.route) },
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Text(
@@ -279,7 +279,12 @@ fun LoginScreen(
 
 
 
-        // SIGN IN Button
+        // SIGN IN Submission & Validation Logic
+        // Before making a network request to Firebase, we perform immediate local validation:
+        // 1. Empty email check -> specific empty error
+        // 2. Format email check -> specific invalid format error
+        // 3. Empty password check
+        // If all local checks pass, we call `viewModel.performLogin()`, loading state starts.
         Button(
             onClick = {
                 var hasError = false

@@ -9,13 +9,23 @@ import com.example.cauds.data.repository.AuthRepository
 class AuthViewModel : ViewModel() {
     private val repo = AuthRepository()
 
-    // check for email format
+    /**
+     * Validates email format using a standard Regex pattern.
+     * This ensures the user input looks like a valid email string (e.g., name@domain.com)
+     */
     fun isValidEmail(email: String): Boolean {
         val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[a-z]+$".toRegex()
         return emailRegex.matches(email)
     }
 
-    // check for password format
+    /**
+     * Validates password complexity against these rules:
+     * 1. At least 8 characters long
+     * 2. Contains at least one digit (0-9)
+     * 3. Contains at least one lowercase letter (a-z)
+     * 4. Contains at least one uppercase letter (A-Z)
+     * 5. Contains at least one special character (@#$%!^&+=_*-)
+     */
     fun isValidPassword(password: String): Boolean {
         // At least 8 characters, 1 number, 1 uppercase, 1 lowercase, 1 special character
         val passwordRegex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!^&+=_*-]).{8,}$".toRegex()
@@ -43,6 +53,12 @@ class AuthViewModel : ViewModel() {
     fun signInWithFacebook(token: com.facebook.AccessToken, onSuccess: () -> Unit, onError: (String) -> Unit) {
         repo.signInWithFacebook(token) { success, message ->
             if (success) onSuccess() else onError(message ?: "Unknown error")
+        }
+    }
+
+    fun sendPasswordResetEmail(email: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        repo.sendPasswordResetEmail(email) { success, errorMsg ->
+            if (success) onSuccess() else onError(errorMsg ?: "Unknown error")
         }
     }
 
