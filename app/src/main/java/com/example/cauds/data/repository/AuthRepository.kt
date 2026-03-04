@@ -15,14 +15,28 @@ class AuthRepository {
     fun login(email: String, pass: String, onResult: (Boolean, String?) -> Unit) {
         auth.signInWithEmailAndPassword(email, pass)
             .addOnSuccessListener { onResult(true, null) }
-            .addOnFailureListener { onResult(false, it.message) }
+            .addOnFailureListener { e ->
+                // Email enumeration protection is enabled, disable it to show invalid user error message
+                val errorMessage = when (e) {
+                    is com.google.firebase.auth.FirebaseAuthInvalidUserException -> "Email does not exist"
+                    is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException -> "Invalid password"
+                    else -> e.message ?: "Unknown error"
+                }
+                onResult(false, errorMessage)
+            }
     }
 
     // Sign up
     fun signUp(email: String, pass: String, onResult: (Boolean, String?) -> Unit) {
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnSuccessListener { onResult(true, null) }
-            .addOnFailureListener { onResult(false, it.message) }
+            .addOnFailureListener { e ->
+                val errorMessage = when (e) {
+                    is com.google.firebase.auth.FirebaseAuthUserCollisionException -> "Email already exists"
+                    else -> e.message ?: "Unknown error"
+                }
+                onResult(false, errorMessage)
+            }
     }
 
     // Google Sign In

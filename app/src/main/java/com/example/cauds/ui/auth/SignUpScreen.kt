@@ -45,7 +45,8 @@ fun SignUpScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -72,14 +73,20 @@ fun SignUpScreen(
                             isLoading = false
                             navController.navigate(Screen.AudTest.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                         },
-                        onError = {
+                        onError = { error ->
                             isLoading = false
-                            errorMessage = it
+                            if (error == "Email already exists") {
+                                emailError = error
+                                passwordError = ""
+                            } else {
+                                emailError = error
+                                passwordError = ""
+                            }
                         }
                     )
                 }
             } catch (e: ApiException) {
-                errorMessage = "Google Sign-In failed: ${e.message}"
+                emailError = "Google Sign-In failed: ${e.message}"
             }
         }
     }
@@ -99,7 +106,7 @@ fun SignUpScreen(
                     },
                     onError = {
                         isLoading = false
-                        errorMessage = it
+                        emailError = it
                     }
                 )
             }
@@ -107,7 +114,7 @@ fun SignUpScreen(
                 // Do nothing
             }
             override fun onError(error: FacebookException) {
-                errorMessage = "Facebook Sign-In failed: ${error.message}"
+                emailError = "Facebook Sign-In failed: ${error.message}"
             }
         })
         onDispose {
@@ -154,50 +161,28 @@ fun SignUpScreen(
         // Email Input
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { 
+                email = it
+                emailError = "" // Clear error on typing
+            },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = emailError.isNotEmpty(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Black,
                 unfocusedBorderColor = Color.Gray,
                 errorBorderColor = Color.Red,
                 errorLabelColor = Color.Red
-            ),
-            isError = errorMessage.contains("Email", ignoreCase = true)
+            )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Password Input
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "Toggle password visibility")
-                }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Gray,
-                errorBorderColor = Color.Red,
-                errorLabelColor = Color.Red
-            ),
-            isError = errorMessage.isNotEmpty() && !errorMessage.contains("Email", ignoreCase = true)
-        )
-
-        // Error message
-        if (errorMessage.isNotEmpty()) {
+        // Email error message
+        if (emailError.isNotEmpty()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = 4.dp),
                 verticalAlignment = Alignment.Top
             ) {
                 Icon(
@@ -210,7 +195,61 @@ fun SignUpScreen(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = errorMessage,
+                    text = emailError,
+                    color = Color.Red,
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Password Input
+        OutlinedTextField(
+            value = password,
+            onValueChange = { 
+                password = it
+                passwordError = "" // Clear error on typing
+            },
+            label = { Text("Password") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            isError = passwordError.isNotEmpty(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = "Toggle password visibility")
+                }
+            },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Black,
+                unfocusedBorderColor = Color.Gray,
+                errorBorderColor = Color.Red,
+                errorLabelColor = Color.Red
+            )
+        )
+
+        // Password error message mapped exactly like Figma
+        if (passwordError.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Warning,
+                    contentDescription = "Error",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .size(14.dp)
+                        .padding(top = 2.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = passwordError,
                     color = Color.Red,
                     fontSize = 10.sp,
                     lineHeight = 14.sp
@@ -223,12 +262,30 @@ fun SignUpScreen(
         // SIGN UP Button
         Button(
             onClick = {
-                if (email.isBlank() || password.isBlank()) {
-                    errorMessage = "Please fill in all fields."
-                    return@Button
+                var hasError = false
+                emailError = ""
+                passwordError = ""
+                
+                if (email.isBlank()) {
+                    emailError = "Please enter an email address"
+                    hasError = true
+                } else if (!viewModel.isValidEmail(email)) {
+                    emailError = "Please enter a valid email address"
+                    hasError = true
                 }
+
+                if (password.isBlank()) {
+                    passwordError = "Please enter a password"
+                    hasError = true
+                } else if (!viewModel.isValidPassword(password)) {
+                    passwordError = "Must be at least 8 characters and contain 1 number, 1 uppercase, 1 lowercase, 1 special character"
+                    hasError = true
+                }
+
+                if (hasError) return@Button
+
                 isLoading = true
-                errorMessage = ""
+
                 viewModel.performSignUp(
                     email = email,
                     pass = password,
@@ -236,9 +293,13 @@ fun SignUpScreen(
                         isLoading = false
                         navController.navigate(Screen.AudTest.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                     },
-                    onError = { msg ->
+                    onError = { errorMsg ->
                         isLoading = false
-                        errorMessage = msg
+                        if (errorMsg == "Email already exists") {
+                            emailError = errorMsg
+                        } else {
+                            emailError = errorMsg
+                        }
                     }
                 )
             },
@@ -316,7 +377,7 @@ fun SignUpScreen(
 
         // Login Link
         Row(
-            modifier = Modifier.padding(bottom = 32.dp),
+            modifier = Modifier.padding(bottom = 48.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "Already have an account? ", color = Color.Black, fontSize = 12.sp)

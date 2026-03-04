@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,7 +44,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -70,14 +72,24 @@ fun LoginScreen(
                             isLoading = false
                             navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                         },
-                        onError = {
+                        onError = { error ->
                             isLoading = false
-                            errorMessage = it
+                            if (error == "Email does not exist") {
+                                emailError = error
+                                passwordError = ""
+                            } else if (error == "Invalid password") {
+                                passwordError = error
+                                emailError = ""
+                            } else {
+                                // Default broad error
+                                emailError = error
+                                passwordError = ""
+                            }
                         }
                     )
                 }
             } catch (e: ApiException) {
-                errorMessage = "Google Sign-In failed: ${e.message}"
+                emailError = "Google Sign-In failed: ${e.message}"
             }
         }
     }
@@ -97,7 +109,7 @@ fun LoginScreen(
                     },
                     onError = {
                         isLoading = false
-                        errorMessage = it
+                        emailError = it
                     }
                 )
             }
@@ -105,7 +117,7 @@ fun LoginScreen(
                 // Do nothing
             }
             override fun onError(error: FacebookException) {
-                errorMessage = "Facebook Sign-In failed: ${error.message}"
+                emailError = "Facebook Sign-In failed: ${error.message}"
             }
         })
         onDispose {
@@ -152,10 +164,14 @@ fun LoginScreen(
         // Email Input
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { 
+                email = it
+                emailError = "" // Clear error on typing
+            },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = emailError.isNotEmpty(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Black,
                 unfocusedBorderColor = Color.Gray,
@@ -164,15 +180,45 @@ fun LoginScreen(
             )
         )
 
+        // Email error message under field
+        if (emailError.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Warning,
+                    contentDescription = "Error",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .size(14.dp)
+                        .padding(top = 2.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = emailError,
+                    color = Color.Red,
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Password Input, hide and show
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { 
+                password = it
+                passwordError = "" // Clear error on typing
+            },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
+            isError = passwordError.isNotEmpty(),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
@@ -187,6 +233,32 @@ fun LoginScreen(
                 errorLabelColor = Color.Red
             )
         )
+
+        // Password error message under field
+        if (passwordError.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Warning,
+                    contentDescription = "Error",
+                    tint = Color.Red,
+                    modifier = Modifier
+                        .size(14.dp)
+                        .padding(top = 2.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = passwordError,
+                    color = Color.Red,
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                )
+            }
+        }
 
         // Forgot Password Link
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
@@ -205,21 +277,32 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Error message
-        if (errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, color = Color.Red, fontSize = 12.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+
 
         // SIGN IN Button
         Button(
             onClick = {
-                if (email.isBlank() || password.isBlank()) {
-                    errorMessage = "Please fill in all fields."
-                    return@Button
+                var hasError = false
+                emailError = ""
+                passwordError = ""
+                
+                if (email.isBlank()) {
+                    emailError = "Please enter an email address"
+                    hasError = true
+                } else if (!viewModel.isValidEmail(email)) {
+                    emailError = "Please enter a valid email address"
+                    hasError = true
                 }
+
+                if (password.isBlank()) {
+                    passwordError = "Please enter a password"
+                    hasError = true
+                }
+
+                if (hasError) return@Button
+
                 isLoading = true
-                errorMessage = ""
+
                 viewModel.performLogin(
                     email = email,
                     pass = password,
@@ -227,9 +310,15 @@ fun LoginScreen(
                         isLoading = false
                         navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
                     },
-                    onError = { msg ->
+                    onError = { errorMsg ->
                         isLoading = false
-                        errorMessage = msg
+                        if (errorMsg == "Email does not exist") {
+                            emailError = errorMsg
+                        } else if (errorMsg == "Invalid password") {
+                            passwordError = errorMsg
+                        } else {
+                            emailError = errorMsg // catch other errors
+                        }
                     }
                 )
             },
