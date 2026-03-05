@@ -105,7 +105,10 @@ fun SignUpScreen(
                 viewModel.signInWithFacebook(result.accessToken,
                     onSuccess = {
                         isLoading = false
-                        navController.navigate(Screen.AudTest.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                        // Sign up with Facebook success -> Onboarding
+                        navController.navigate(Screen.OnboardingName.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
                     },
                     onError = {
                         isLoading = false
@@ -234,7 +237,7 @@ fun SignUpScreen(
             )
         )
 
-        // Password error message mapped exactly like Figma
+        // Password error message
         if (passwordError.isNotEmpty()) {
             Row(
                 modifier = Modifier
@@ -298,9 +301,9 @@ fun SignUpScreen(
                     pass = password,
                     onSuccess = {
                         isLoading = false
-                        // sign up success go to AUD test
+                        // Sign up with email success -> Onboarding
                         navController.navigate(Screen.OnboardingName.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true } // forbid user to return to login
+                            popUpTo(Screen.Login.route) { inclusive = true }
                         }
                     },
                     onError = { errorMsg ->
