@@ -7,6 +7,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 const val USERS = "users"
 const val AUDSCORE = "audScore"
+const val ONBOARDING_COMPLETED = "onboardingCompleted"
+const val NOTIFICATION_PREFERENCES = "notificationPreferences"
+const val FAVOURITE_DRINKS = "favouriteDrinks"
+
 
 class UserRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -21,7 +25,7 @@ class UserRepository {
     fun getCompletedOnboarding(userId: String, onResult: (Boolean) -> Unit) {
         db.collection(USERS).document(userId).get()
             .addOnSuccessListener { doc ->
-                val completed = doc.getBoolean("onboardingCompleted") ?: false
+                val completed = doc.getBoolean(ONBOARDING_COMPLETED) ?: false
                 onResult(completed)
             }
             .addOnFailureListener {
@@ -52,20 +56,20 @@ class UserRepository {
 
     fun saveNotificationPreferences(userId: String, prefs: NotificationPreferences, onResult: (Boolean, String?) -> Unit) {
         db.collection(USERS).document(userId)
-            .update("notificationPreferences", prefs)
+            .update(NOTIFICATION_PREFERENCES, prefs)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
     fun saveFavouriteDrinks(userId: String, drinks: List<String>, onResult: (Boolean, String?) -> Unit) {
         db.collection(USERS).document(userId)
-            .update("favouriteDrinks", drinks)
+            .update(FAVOURITE_DRINKS, drinks)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
 
     fun completeOnboarding(userId: String, onResult: (Boolean, String?) -> Unit) {
         db.collection(USERS).document(userId)
-            .update("onboardingCompleted", true)
+            .update(ONBOARDING_COMPLETED, true)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }

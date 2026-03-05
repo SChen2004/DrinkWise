@@ -243,8 +243,8 @@ fun OnboardingPurposeScreen(
             onClick = {
                 if (selectedOption == "Supporting someone else") {
                     viewModel.updateSupportingFriend(true)
-                    viewModel.completeOnboarding()
                     viewModel.saveOnboardingData()
+                    viewModel.completeOnboarding()
                     navController.navigate(Screen.Dashboard.route) // TODO: Change route to knowledge page
                 } else {
                     viewModel.updateSupportingFriend(false)
