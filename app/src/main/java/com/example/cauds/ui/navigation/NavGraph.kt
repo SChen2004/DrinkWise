@@ -8,7 +8,6 @@ import androidx.navigation.compose.composable
 import com.example.cauds.ui.auth.LoginScreen
 import com.example.cauds.ui.auth.SignUpScreen
 import com.example.cauds.ui.dashboard.DashboardScreen
-import com.example.cauds.ui.onboarding.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import com.example.cauds.ui.account.AccountScreen
@@ -18,6 +17,12 @@ import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
 import com.example.cauds.ui.onboarding.AudQuizScreen
+import com.example.cauds.ui.onboarding.FavouriteDrinksScreen
+import com.example.cauds.ui.onboarding.NotificationPreferencesScreen
+import com.example.cauds.ui.onboarding.OnboardingNameScreen
+import com.example.cauds.ui.onboarding.OnboardingPurposeScreen
+import com.example.cauds.ui.onboarding.OnboardingSexScreen
+import com.example.cauds.ui.onboarding.QuizResultScreen
 
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String) {
@@ -32,10 +37,15 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.ForgotPassword.route) { com.example.cauds.ui.auth.ForgotPasswordScreen(navController) }
 
         // Onboarding
-        composable(Screen.AudTest.route) { AudScreen(navController, onboardingViewModel) }
-        composable(Screen.OnboardingInfo.route) { InfoScreen(navController, onboardingViewModel) }
-        composable(Screen.OnboardingPrivacy.route) { PrivacyScreen(navController, onboardingViewModel) }
         composable(Screen.AudQuiz.route) { AudQuizScreen(navController, onboardingViewModel) }
+        composable(Screen.QuizResult.route) { QuizResultScreen(navController, onboardingViewModel) }
+        composable(Screen.OnboardingName.route) { OnboardingNameScreen(navController, onboardingViewModel) }
+        composable(Screen.OnboardingSex.route) { OnboardingSexScreen(navController, onboardingViewModel) }
+        composable(Screen.OnboardingPurpose.route) { OnboardingPurposeScreen(navController, onboardingViewModel) }
+        composable(Screen.NotificationPreferences.route) { NotificationPreferencesScreen(navController, onboardingViewModel)}
+        composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
+
+
 
         // Dashboard / Home
         composable(Screen.Dashboard.route) { DashboardScreen(navController) }

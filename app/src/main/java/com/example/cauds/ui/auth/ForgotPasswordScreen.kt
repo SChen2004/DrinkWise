@@ -56,7 +56,7 @@ fun ForgotPasswordScreen(
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
-            // App Icon Placeholder (matching Figma's grey box)
+            // App Icon Placeholder
             Image(
                 painter = painterResource(id = com.example.cauds.R.drawable.ic_launcher_foreground),
                 contentDescription = "App Logo",
@@ -175,7 +175,7 @@ fun ForgotPasswordScreen(
                         .fillMaxWidth()
                         .height(48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-                    shape = RoundedCornerShape(0.dp) // Sharp corners matching Figma
+                    shape = RoundedCornerShape(0.dp)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)

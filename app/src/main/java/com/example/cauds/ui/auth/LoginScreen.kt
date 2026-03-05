@@ -331,7 +331,7 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .height(48.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(0.dp) // Sharp corners matching Figma
+            shape = RoundedCornerShape(0.dp)
         ) {
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)

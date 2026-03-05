@@ -1,6 +1,7 @@
 package com.example.cauds.data.repository
 
 import com.example.cauds.data.model.AudRisk
+import com.example.cauds.data.model.NotificationPreferences
 import com.example.cauds.data.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -15,6 +16,17 @@ class UserRepository {
         db.collection(USERS).document(userId).set(data)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun getCompletedOnboarding(userId: String, onResult: (Boolean) -> Unit) {
+        db.collection(USERS).document(userId).get()
+            .addOnSuccessListener { doc ->
+                val completed = doc.getBoolean("completedOnboarding") ?: false
+                onResult(completed)
+            }
+            .addOnFailureListener {
+                onResult(false)  // Default to false if something goes wrong
+            }
     }
 
     fun getAudRiskLevel(userId: String, onResult: (Boolean, AudRisk, String?) -> Unit) {
@@ -37,5 +49,34 @@ class UserRepository {
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
+
+    fun saveNotificationPreferences(userId: String, prefs: NotificationPreferences, onResult: (Boolean, String?) -> Unit) {
+        db.collection(USERS).document(userId)
+            .update("notificationPreferences", prefs)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+    fun saveFavouriteDrinks(userId: String, drinks: List<String>, onResult: (Boolean, String?) -> Unit) {
+        db.collection(USERS).document(userId)
+            .update("favouriteDrinks", drinks)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun completeOnboarding(userId: String, onResult: (Boolean, String?) -> Unit) {
+        db.collection(USERS).document(userId)
+            .update("onboardingCompleted", true)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun getUser(userId: String, onResult: (User) -> Unit) {
+        db.collection(USERS).document(userId).get()
+            .addOnSuccessListener { doc ->
+                val user = doc.toObject(User::class.java) ?: User()
+                onResult(user)
+            }
+    }
+
 
 }

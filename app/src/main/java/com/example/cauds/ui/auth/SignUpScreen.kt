@@ -71,7 +71,10 @@ fun SignUpScreen(
                     viewModel.signInWithGoogle(idToken,
                         onSuccess = {
                             isLoading = false
-                            navController.navigate(Screen.AudTest.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                            // Sign up with Google success -> Onboarding
+                            navController.navigate(Screen.OnboardingName.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
                         },
                         onError = { error ->
                             isLoading = false
@@ -102,7 +105,10 @@ fun SignUpScreen(
                 viewModel.signInWithFacebook(result.accessToken,
                     onSuccess = {
                         isLoading = false
-                        navController.navigate(Screen.AudTest.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                        // Sign up with Facebook success -> Onboarding
+                        navController.navigate(Screen.OnboardingName.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
                     },
                     onError = {
                         isLoading = false
@@ -231,7 +237,7 @@ fun SignUpScreen(
             )
         )
 
-        // Password error message mapped exactly like Figma
+        // Password error message
         if (passwordError.isNotEmpty()) {
             Row(
                 modifier = Modifier
@@ -295,7 +301,10 @@ fun SignUpScreen(
                     pass = password,
                     onSuccess = {
                         isLoading = false
-                        navController.navigate(Screen.AudTest.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                        // Sign up with email success -> Onboarding
+                        navController.navigate(Screen.OnboardingName.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
                     },
                     onError = { errorMsg ->
                         isLoading = false

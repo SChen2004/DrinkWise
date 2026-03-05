@@ -121,7 +121,7 @@ fun DrinkLogScreen(
             )
         },
         bottomBar = {
-            // The bottom of the screen withthe "ADD" button
+            // The bottom of the screen with the "ADD" button
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,7 +139,7 @@ fun DrinkLogScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .height(52.dp),
-                    shape = RoundedCornerShape(2.dp), // Styled with sharp corners per Figma
+                    shape = RoundedCornerShape(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
                     Text(if (uiState.editModeId != null) "SAVE" else "ADD", color = Color.White, fontSize = 16.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
@@ -237,7 +237,7 @@ fun DrinkLogScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Bottom // Aligns bottles to the bottom baseline
                     ) {
-                        // Icon height base on figma prototype
+                        // Fixed icon height base on figma wireframe, may need to change to fix different phone size
                         val absoluteHeight = when (container.name) {
                             "FLIGHT" -> 100.dp
                             "PINT" -> 160.dp
