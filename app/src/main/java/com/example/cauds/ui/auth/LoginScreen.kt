@@ -69,8 +69,14 @@ fun LoginScreen(
                     isLoading = true
                     viewModel.signInWithGoogle(idToken,
                         onSuccess = {
-                            isLoading = false
-                            navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                            viewModel.checkOnboardingStatus { completed ->
+                                isLoading = false
+                                if (completed) {
+                                    navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                                } else {
+                                    navController.navigate(Screen.OnboardingName.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                                }
+                            }
                         },
                         onError = { error ->
                             isLoading = false
@@ -104,8 +110,14 @@ fun LoginScreen(
                 isLoading = true
                 viewModel.signInWithFacebook(result.accessToken,
                     onSuccess = {
-                        isLoading = false
-                        navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                        viewModel.checkOnboardingStatus { completed ->
+                            isLoading = false
+                            if (completed) {
+                                navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                            } else {
+                                navController.navigate(Screen.OnboardingName.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                            }
+                        }
                     },
                     onError = {
                         isLoading = false
@@ -312,8 +324,14 @@ fun LoginScreen(
                     email = email,
                     pass = password,
                     onSuccess = {
-                        isLoading = false
-                        navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                        viewModel.checkOnboardingStatus { completed ->
+                            isLoading = false
+                            if (completed) {
+                                navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                            } else {
+                                navController.navigate(Screen.OnboardingName.route) { popUpTo(Screen.Login.route) { inclusive = true } }
+                            }
+                        }
                     },
                     onError = { errorMsg ->
                         isLoading = false

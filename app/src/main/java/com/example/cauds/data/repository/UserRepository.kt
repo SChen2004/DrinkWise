@@ -21,7 +21,7 @@ class UserRepository {
     fun getCompletedOnboarding(userId: String, onResult: (Boolean) -> Unit) {
         db.collection(USERS).document(userId).get()
             .addOnSuccessListener { doc ->
-                val completed = doc.getBoolean("completedOnboarding") ?: false
+                val completed = doc.getBoolean("onboardingCompleted") ?: false
                 onResult(completed)
             }
             .addOnFailureListener {

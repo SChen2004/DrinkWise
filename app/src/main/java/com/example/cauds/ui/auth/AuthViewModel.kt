@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import com.example.cauds.data.repository.AuthRepository
+import com.example.cauds.data.repository.UserRepository
 
 // Functions for UI to call on when authenticating
 class AuthViewModel : ViewModel() {
     private val repo = AuthRepository()
+    private val userRepo = UserRepository()
 
     /**
      * Validates email format using a standard Regex pattern.
@@ -59,6 +61,17 @@ class AuthViewModel : ViewModel() {
     fun sendPasswordResetEmail(email: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         repo.sendPasswordResetEmail(email) { success, errorMsg ->
             if (success) onSuccess() else onError(errorMsg ?: "Unknown error")
+        }
+    }
+
+    fun checkOnboardingStatus(onResult: (Boolean) -> Unit) {
+        val userId = repo.getUserId()
+        if (userId != null) {
+            userRepo.getCompletedOnboarding(userId) { completed ->
+                onResult(completed)
+            }
+        } else {
+            onResult(false)
         }
     }
 
