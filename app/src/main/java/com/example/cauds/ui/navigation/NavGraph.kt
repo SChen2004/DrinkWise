@@ -34,6 +34,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         // Auth
         composable(Screen.Login.route) { LoginScreen(navController) }
         composable(Screen.SignUp.route) { SignUpScreen(navController) }
+        composable(Screen.ForgotPassword.route) { com.example.cauds.ui.auth.ForgotPasswordScreen(navController) }
 
         // Onboarding
         composable(Screen.AudQuiz.route) { AudQuizScreen(navController, onboardingViewModel) }
