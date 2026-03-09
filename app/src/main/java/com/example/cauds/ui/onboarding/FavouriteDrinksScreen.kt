@@ -8,12 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cauds.ui.navigation.Screen
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavouriteDrinksScreen(
     navController: NavController,
@@ -22,25 +24,33 @@ fun FavouriteDrinksScreen(
     val options = listOf("Wine", "Beer", "Liquor", "Mixed", "Cider / Seltzer")
     var selectedOptions by remember { mutableStateOf(setOf<String>()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 48.dp)
+                .padding(bottom = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Almost done.",
@@ -95,9 +105,14 @@ fun FavouriteDrinksScreen(
         Button(
             onClick = {
                 viewModel.saveFavouriteDrinks(selectedOptions.toList())
-                viewModel.completeOnboarding()
-                navController.navigate(Screen.Dashboard.route) {
-                    popUpTo("onboarding_name") { inclusive = true }
+                val isFromAccount = navController.previousBackStackEntry?.destination?.route == Screen.Account.route
+                if (isFromAccount) {
+                    navController.popBackStack()
+                } else {
+                    viewModel.completeOnboarding()
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo("onboarding_name") { inclusive = true }
+                    }
                 }
             },
             enabled = selectedOptions.isNotEmpty(),
@@ -108,14 +123,20 @@ fun FavouriteDrinksScreen(
 
         TextButton(
             onClick = {
-                viewModel.completeOnboarding()
-                navController.navigate(Screen.Dashboard.route) {
-                    popUpTo("onboarding_name") { inclusive = true }
+                val isFromAccount = navController.previousBackStackEntry?.destination?.route == Screen.Account.route
+                if (isFromAccount) {
+                    navController.popBackStack()
+                } else {
+                    viewModel.completeOnboarding()
+                    navController.navigate(Screen.Dashboard.route) {
+                        popUpTo("onboarding_name") { inclusive = true }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("SKIP")
         }
+    }
     }
 }

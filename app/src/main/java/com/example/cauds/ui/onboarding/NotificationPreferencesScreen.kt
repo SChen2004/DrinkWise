@@ -8,12 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cauds.data.model.NotificationPreferences
 import com.example.cauds.ui.navigation.Screen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationPreferencesScreen(
     navController: NavController,
@@ -40,28 +42,33 @@ fun NotificationPreferencesScreen(
         Triple("Monthly progress", "A summary of patterns and changes over time.", monthlyProgress) to { v: Boolean -> monthlyProgress = v }
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(24.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 24.dp),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "How would you like to stay on track?",
@@ -119,17 +126,17 @@ fun NotificationPreferencesScreen(
                     monthlyProgress = monthlyProgress
                 )
                 viewModel.saveNotificationPreferences(prefs)
-                if (completedOnboarding) {
+                val isFromAccount = navController.previousBackStackEntry?.destination?.route == Screen.Account.route
+                if (isFromAccount || completedOnboarding) {
                     navController.popBackStack()
                 } else {
-                    navController.navigate(Screen.FavouriteDrinks.route) {
-                        popUpTo("onboarding_name") { inclusive = true }
-                    }
+                    navController.navigate(Screen.FavouriteDrinks.route)
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("CONTINUE")
         }
+    }
     }
 }
