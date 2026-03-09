@@ -1,5 +1,6 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -76,12 +77,13 @@ fun NotificationPreferencesScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { onToggle(!checked) }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.Top
             ) {
                 Checkbox(
                     checked = checked,
-                    onCheckedChange = onToggle
+                    onCheckedChange = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {

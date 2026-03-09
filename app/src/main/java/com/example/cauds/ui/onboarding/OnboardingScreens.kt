@@ -1,5 +1,6 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
@@ -125,13 +126,14 @@ fun OnboardingSexScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { selectedOption = option }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = selectedOption == option,
-                    onClick = { selectedOption = option }
+                    onClick = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -221,13 +223,14 @@ fun OnboardingPurposeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { selectedOption = option }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = selectedOption == option,
-                    onClick = { selectedOption = option }
+                    onClick = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
