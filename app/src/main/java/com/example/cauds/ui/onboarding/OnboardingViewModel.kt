@@ -61,8 +61,8 @@ class OnboardingViewModel : ViewModel() {
     fun scoreToAudRisk(score: Int): AudRisk {
         return when {
             score <= 1 -> AudRisk.NO_RISK
-            score <= 4 -> AudRisk.LOW_RISK
-            score <= 8 -> AudRisk.MODERATE_RISK
+            score <= 11 -> AudRisk.LOW_RISK
+            score <= 33 -> AudRisk.MODERATE_RISK
             else -> AudRisk.HIGH_RISK
         }
     }
