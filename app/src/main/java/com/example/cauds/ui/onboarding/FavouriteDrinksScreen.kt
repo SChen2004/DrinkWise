@@ -24,7 +24,7 @@ fun FavouriteDrinksScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -59,7 +59,7 @@ fun FavouriteDrinksScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start
             ) {
                 Checkbox(
                     checked = selectedOptions.contains(option),
