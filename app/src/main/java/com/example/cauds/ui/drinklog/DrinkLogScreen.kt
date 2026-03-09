@@ -225,13 +225,14 @@ fun DrinkLogScreen(
                 }
             }
 
+            // Fixed height boundary so the scrollable Column knows exactly how much space to allocate
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
             ) {
-                val pageWidth = 200.dp
-                val horizontalPadding = ((maxWidth - pageWidth) / 2).coerceAtLeast(0.dp)
+                val pageWidth = 120.dp 
+                val horizontalPadding = (maxWidth - pageWidth) / 2
                 
                 HorizontalPager(
                     state = pagerState,
@@ -250,8 +251,7 @@ fun DrinkLogScreen(
                         // Dynamic rendering rules based on Category
                         val currentDrink = uiState.availableDrinkTypes.find { it.name == uiState.selectedDrinkType }
                         val category = currentDrink?.category ?: "Beer"
-
-                        // Icon height base on figma prototype
+                        
                         val absoluteHeight = when (container.name) {
                             "FLIGHT", "TASTING" -> 120.dp
                             "PINT", "AVERAGE", "STANDARD", "REGULAR" -> 150.dp
@@ -267,7 +267,7 @@ fun DrinkLogScreen(
                             "Mixed Drinks" -> R.drawable.ic_mixed_drinks
                             else -> R.drawable.ic_beer
                         }
-
+                        
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -284,8 +284,7 @@ fun DrinkLogScreen(
                                     .fillMaxWidth()
                                     // Ghosting transparency effect for unselected side containers
                                     .alpha(if (isSelected) 1f else 0.15f), 
-                                contentScale = ContentScale.FillHeight,
-                                alignment = Alignment.BottomCenter
+                                contentScale = ContentScale.Fit
                             )
                         }
                         
@@ -719,3 +718,4 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit) {
         }
     }
 }
+

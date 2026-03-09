@@ -11,7 +11,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 sealed class BottomNavItem(val route: String, val icon: ImageVector, val label: String) {
     object Dashboard : BottomNavItem(Screen.Dashboard.route, Icons.Default.Home, "Dashboard")
     object Journal : BottomNavItem(Screen.Journal.route, Icons.Default.Book, "Journal")
-    object Account : BottomNavItem(Screen.Account.route, Icons.Default.Person, "Account")
+    object AccountTest : BottomNavItem(Screen.AccountTest.route, Icons.Default.Person, "AccountTest")
 }
 
 @Composable
@@ -19,7 +19,7 @@ fun AppBottomNavigation(navController: NavController) {
     val items = listOf(
         BottomNavItem.Dashboard,
         BottomNavItem.Journal,
-        BottomNavItem.Account
+        BottomNavItem.AccountTest
     )
 
     NavigationBar {

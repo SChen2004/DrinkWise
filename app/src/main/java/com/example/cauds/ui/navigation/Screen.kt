@@ -34,7 +34,7 @@ sealed class Screen(val route: String) {
 
 
     // -----    Account/Setting    -----
-    object Account : Screen("account")
+    object AccountTest : Screen("account_test")
 
 
 }

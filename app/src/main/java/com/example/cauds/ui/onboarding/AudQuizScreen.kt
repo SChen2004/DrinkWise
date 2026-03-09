@@ -144,7 +144,7 @@ fun QuizResultScreen(
             onClick = {
                 viewModel.getCompletedOnboarding { completed ->
                     if (completed) {
-                        navController.navigate(Screen.Account.route)
+                        navController.navigate(Screen.AccountTest.route)
                     } else {
                         navController.navigate(Screen.NotificationPreferences.route)
                     }

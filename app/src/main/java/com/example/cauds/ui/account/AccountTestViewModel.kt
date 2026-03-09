@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 
 
-class AccountViewModel : ViewModel() {
+class AccountTestViewModel : ViewModel() {
     private val authRepo = AuthRepository()
     private val userRepo = UserRepository()
 

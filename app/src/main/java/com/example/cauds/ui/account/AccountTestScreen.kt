@@ -11,9 +11,9 @@ import com.example.cauds.data.model.AudRisk
 import com.example.cauds.ui.navigation.Screen
 
 @Composable
-fun AccountScreen(
+fun AccountTestScreen(
     navController: NavController,
-    viewModel: AccountViewModel = viewModel()
+    viewModel: AccountTestViewModel = viewModel()
 ) {
     val errorMessage = viewModel.errorMessage
 
