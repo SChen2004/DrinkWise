@@ -39,12 +39,9 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
     var drinkName by remember { mutableStateOf("") }
     
 
-    val sizes = listOf("FLIGHT", "PINT", "PITCHER")
-
     val categories = listOf("Select Category", "Beer", "Fermented Drinks", "Wine", "Hard Liquor", "Mixed Drinks")
     
     val categoryPagerState = rememberPagerState(pageCount = { categories.size })
-    val sizePagerState = rememberPagerState(initialPage = 1, pageCount = { sizes.size })
 
     var toastMessage by remember { mutableStateOf<String?>(null) }
 
@@ -78,14 +75,20 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                 Button(
                     onClick = {
                         val selectedCategory = categories[categoryPagerState.currentPage]
-                        val selectedSize = sizes[sizePagerState.currentPage]
+                        val defaultSize = when (selectedCategory) {
+                            "Beer" -> "PINT"
+                            "Wine" -> "STANDARD"
+                            "Fermented Drinks", "Hard Liquor" -> "AVERAGE"
+                            "Mixed Drinks" -> "REGULAR"
+                            else -> "REGULAR"
+                        }
                         
                         if (drinkName.isBlank()) {
                             showToast("Please input name.")
                         } else if (selectedCategory == "Select Category") {
                             showToast("Please select category.")
                         } else {
-                            viewModel.addCustomDrink(drinkName, selectedCategory, selectedSize) {
+                            viewModel.addCustomDrink(drinkName, selectedCategory, defaultSize) {
                                 navController.popBackStack()
                             }
                         }
@@ -138,85 +141,30 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                BoxWithConstraints(
+                val currentCategory = categories[categoryPagerState.currentPage]
+                val iconRes = when (currentCategory) {
+                    "Beer" -> R.drawable.ic_beer
+                    "Fermented Drinks" -> R.drawable.ic_fermented_drinks
+                    "Wine" -> R.drawable.ic_wine
+                    "Hard Liquor" -> R.drawable.ic_hard_liquor
+                    "Mixed Drinks" -> R.drawable.ic_mixed_drinks
+                    else -> R.drawable.ic_beer 
+                }
+
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+                        .height(200.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    val pageWidth = 120.dp 
-                    val horizontalPadding = (maxWidth - pageWidth) / 2
-                    
-                    HorizontalPager(
-                        state = sizePagerState,
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = horizontalPadding),
-                        pageSpacing = 48.dp
-                    ) { page ->
-                        val sizeName = sizes[page]
-                        val isSelected = sizePagerState.currentPage == page
-                        
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Bottom
-                        ) {
-                            val absoluteHeight = when (sizeName) {
-                                "FLIGHT" -> 100.dp
-                                "PINT" -> 160.dp
-                                "PITCHER" -> 200.dp
-                                else -> 160.dp 
-                            }
-                            
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
-                                contentAlignment = Alignment.BottomCenter
-                            ) {
-                                Image(
-                                    painter = painterResource(
-                                        id = when (sizeName) {
-                                            "FLIGHT" -> R.drawable.ic_flight
-                                            "PINT" -> R.drawable.ic_pint
-                                            "PITCHER" -> R.drawable.ic_pitcher
-                                            else -> R.drawable.ic_pint
-                                        }
-                                    ),
-                                    contentDescription = sizeName,
-                                    modifier = Modifier
-                                        .height(absoluteHeight)
-                                        .fillMaxWidth()
-                                        .alpha(if (isSelected) 1f else 0.15f), 
-                                    contentScale = ContentScale.Fit,
-                                    colorFilter = ColorFilter.tint(
-                                        if (isSelected) Color(0xFF6595DD) else Color(0xFFD9D9D9)
-                                    )
-                                )
-                            }
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            // Small blue indicator block + Text Name label below the bottle
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.height(24.dp)
-                            ) {
-                                if (isSelected) {
-                                    Box(modifier = Modifier.size(8.dp).background(Color(0xFF5A90DE)))
-                                    Spacer(Modifier.width(8.dp))
-                                }
-                                Text(
-                                    text = sizeName,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (isSelected) Color.Black else Color(0xFFD9D9D9),
-                                    fontFamily = FontFamily.Monospace,
-                                    modifier = Modifier.alpha(if (isSelected) 1f else 0.5f)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
-                    }
+                    Image(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = currentCategory,
+                        modifier = Modifier
+                            .size(160.dp)
+                            .alpha(if (currentCategory == "Select Category") 0.2f else 1f), 
+                        contentScale = ContentScale.Fit
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
