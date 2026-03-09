@@ -2,10 +2,13 @@ package com.example.cauds.ui.onboarding
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,22 +45,53 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
 
             }
         },
-        onBack = if (currentIndex > 0) ({ currentIndex-- }) else null
+        onBack = {
+            if (currentIndex > 0) {
+                currentIndex--
+            } else {
+                navController.popBackStack()
+            }
+        }
     )
 
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizQuestion(
     question: Question,
     selectedOption: Option?,
     onOptionSelected: (Option) -> Unit,
     onNext: () -> Unit,
-    onBack: (() -> Unit)?,  // null if first question
+    onBack: (() -> Unit),  // null if first question
 ) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(question.text, style = MaterialTheme.typography.headlineSmall)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(question.text, style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
         question.options.forEach { option ->
@@ -80,29 +114,47 @@ fun QuizQuestion(
         Spacer(modifier = Modifier.height(24.dp))
 
         Row {
-            if (onBack != null) {
-                Button(onClick = onBack) { Text("Back") }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
             Button(onClick = onNext, enabled = selectedOption != null) {
                 Text("Next")
             }
         }
     }
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizResultScreen(
     navController: NavController,
     viewModel: OnboardingViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Results",
@@ -162,5 +214,6 @@ fun QuizResultScreen(
         ) {
             Text("CONTINUE")
         }
+    }
     }
 }
