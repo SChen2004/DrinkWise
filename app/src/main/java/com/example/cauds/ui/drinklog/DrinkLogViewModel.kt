@@ -20,27 +20,43 @@ import java.time.format.DateTimeFormatter
  */
 data class ContainerType(val name: String)
 
-// Hardcoded list of available containers to be displayed in the HorizontalPager
-val availableContainers = listOf(
-    ContainerType("FLIGHT"),
-    ContainerType("PINT"),
-    ContainerType("PITCHER")
-)
+data class DrinkType(val name: String, val category: String = "Beer")
 
-/**
- * Represents a specific type of alcoholic beverage.
- * Used in the VerticalPager (Wheel Picker) below the containers.
- */
-data class DrinkType(val name: String)
+// Global helper for sizing rules
+fun getSizesForDrink(drinkName: String, category: String): List<ContainerType> {
+    return when (category) {
+        "Beer" -> listOf(ContainerType("FLIGHT"), ContainerType("PINT"), ContainerType("PITCHER"))
+        "Wine" -> listOf(ContainerType("TASTING"), ContainerType("STANDARD"), ContainerType("LARGE"))
+        "Fermented Drinks", "Hard Liquor" -> listOf(ContainerType("AVERAGE"), ContainerType("LARGE"))
+        "Mixed Drinks" -> {
+            if (drinkName.equals("Daiquiri", ignoreCase = true) || drinkName.equals("Margarita", ignoreCase = true)) {
+                listOf(ContainerType("REGULAR"), ContainerType("FROZEN"))
+            } else {
+                listOf(ContainerType("REGULAR"))
+            }
+        }
+        else -> listOf(ContainerType("STANDARD"))
+    }
+}
+
+fun getDefaultSizeForDrink(drinkName: String, category: String): String {
+    return when (category) {
+        "Beer" -> "PINT"
+        "Wine" -> "STANDARD"
+        "Fermented Drinks", "Hard Liquor" -> "AVERAGE"
+        "Mixed Drinks" -> "REGULAR"
+        else -> "STANDARD"
+    }
+}
 
 // Hardcoded list of default drinks a user can select (TO DO: Show more drinks from database)
 val availableDrinks = listOf(
-    DrinkType("Ale"),
-    DrinkType("Cider"),
-    DrinkType("Rum"),
-    DrinkType("Sauvignon"),
-    DrinkType("Seltzer"),
-    DrinkType("Whiskey")
+    DrinkType("Ale", "Beer"),
+    DrinkType("Cider", "Fermented Drinks"), 
+    DrinkType("Rum", "Hard Liquor"),
+    DrinkType("Sauvignon", "Wine"),
+    DrinkType("Seltzer", "Fermented Drinks"),
+    DrinkType("Whiskey", "Hard Liquor")
 )
 
 /**
@@ -55,7 +71,12 @@ data class DrinkLogUiState(
     val availableDrinkTypes: List<DrinkType> = availableDrinks, // Dynamic list of available drinks
 
     val selectedDrinkType: String = availableDrinks[0].name, // The drink currently centered in the vertical wheel
-    val selectedContainer: ContainerType = availableContainers[1], // The container currently centered in the horizontal pager (Default: PINT)
+    val availableContainers: List<ContainerType> = getSizesForDrink(availableDrinks[0].name, availableDrinks[0].category),
+    val selectedContainer: ContainerType = getSizesForDrink(availableDrinks[0].name, availableDrinks[0].category).let { containers ->
+        val def = getDefaultSizeForDrink(availableDrinks[0].name, availableDrinks[0].category)
+        containers.find { it.name == def } ?: containers.first()
+    },
+
     val quantity: Int = 1, // The number shown in the '-' and '+' stepper
     val costInput: String = "", // The raw String typed into the cost text field
     val cost: Double = 0.0, // The parsed numerical value of the costInput
@@ -100,17 +121,22 @@ class DrinkLogViewModel(
             if (success && drinks != null) {
                 val selectedDrinks = drinks.filter { it.data.isSelected }
                 val types = if (selectedDrinks.isNotEmpty()) {
-                    selectedDrinks.map { DrinkType(it.data.name) }
+                    selectedDrinks.map { DrinkType(it.data.name, it.data.category) }
                 } else {
-                    listOf(DrinkType("No Drinks Selected"))
+                    listOf(DrinkType("No Drinks Selected", "Beer"))
                 }
                 
                 _uiState.update { state ->
                     val currentType = state.selectedDrinkType
-                    val newType = if (types.any { it.name == currentType }) currentType else types.first().name
+                    val newDrink = types.find { it.name == currentType } ?: types.first()
+                    val newContainers = getSizesForDrink(newDrink.name, newDrink.category)
+                    val defSize = getDefaultSizeForDrink(newDrink.name, newDrink.category)
+                    
                     state.copy(
                         availableDrinkTypes = types,
-                        selectedDrinkType = newType
+                        selectedDrinkType = newDrink.name,
+                        availableContainers = newContainers,
+                        selectedContainer = newContainers.find { it.name == defSize } ?: newContainers.first()
                     )
                 }
             }
@@ -172,14 +198,24 @@ class DrinkLogViewModel(
 
     // Called automatically when the VerticalPager (drink type wheel) snaps to a new item.
     fun selectDrink(type: String) {
-        _uiState.value = _uiState.value.copy(selectedDrinkType = type)
+        val drinkType = _uiState.value.availableDrinkTypes.find { it.name == type }
+        val category = drinkType?.category ?: "Beer"
+        val newContainers = getSizesForDrink(type, category)
+        val defSize = getDefaultSizeForDrink(type, category)
+        val selectedContainer = newContainers.find { it.name == defSize } ?: newContainers.first()
+        _uiState.value = _uiState.value.copy(
+            selectedDrinkType = type,
+            availableContainers = newContainers,
+            selectedContainer = selectedContainer
+        )
     }
 
     // Called automatically when the HorizontalPager (container carousel) snaps to a new item.
     fun selectContainer(containerIndex: Int) {
-        if (containerIndex in availableContainers.indices) {
+        val currentContainers = _uiState.value.availableContainers
+        if (containerIndex in currentContainers.indices) {
             _uiState.value = _uiState.value.copy(
-                selectedContainer = availableContainers[containerIndex]
+                selectedContainer = currentContainers[containerIndex]
             )
         }
     }
@@ -257,12 +293,17 @@ class DrinkLogViewModel(
      */
     fun enterEditMode(logId: String) {
         val log = _uiState.value.addedDrinks.find { it.id == logId } ?: return
-        val container = availableContainers.find { it.name == log.drinkSize } ?: availableContainers[1]
+        
+        // Find if this drink matches an existing available drink to get its correct sizes, or fallback to typical sizes
+        val matchDrink = _uiState.value.availableDrinkTypes.find { it.name == log.type }
+        val containersForEdit = if (matchDrink != null) getSizesForDrink(matchDrink.name, matchDrink.category) else getSizesForDrink(log.type, "Beer")
+        val container = containersForEdit.find { it.name == log.drinkSize } ?: (containersForEdit.getOrNull(1) ?: containersForEdit.first())
         
         // Ensure the drink type exists in available types, otherwise add it temporarily or use it. It's fine since `selectedDrinkType` is just a string.
         _uiState.value = _uiState.value.copy(
             editModeId = logId,
             selectedDrinkType = log.type,
+            availableContainers = containersForEdit,
             selectedContainer = container,
             quantity = 1, // Edit targets instances 1 at a time initially
             costInput = if (log.cost > 0) {

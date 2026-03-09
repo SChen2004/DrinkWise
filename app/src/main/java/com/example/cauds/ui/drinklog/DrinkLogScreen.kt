@@ -121,7 +121,7 @@ fun DrinkLogScreen(
             )
         },
         bottomBar = {
-            // The bottom of the screen withthe "ADD" button
+            // The bottom of the screen with the "ADD" button
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,7 +139,7 @@ fun DrinkLogScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .height(52.dp),
-                    shape = RoundedCornerShape(2.dp), // Styled with sharp corners per Figma
+                    shape = RoundedCornerShape(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
                 ) {
                     Text(if (uiState.editModeId != null) "SAVE" else "ADD", color = Color.White, fontSize = 16.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
@@ -206,28 +206,38 @@ fun DrinkLogScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 2. Container Pager (FLIGHT / PINT / PITCHER carousel)
-            val pagerState = rememberPagerState(initialPage = 1, pageCount = { availableContainers.size })
+            // 2. Container Pager Carousel
+            val availableContainers = uiState.availableContainers
+            val pagerState = rememberPagerState(pageCount = { availableContainers.size })
             
-            // Automatically selects the container in the ViewModel when the pager settles on a new page
-            LaunchedEffect(pagerState.currentPage) {
-                viewModel.selectContainer(pagerState.currentPage)
+            // Sync Pager visually when ViewModel state changes internally (e.g. changing drinks/categories)
+            LaunchedEffect(uiState.selectedContainer, availableContainers) {
+                val targetIndex = availableContainers.indexOf(uiState.selectedContainer).coerceAtLeast(0)
+                if (pagerState.currentPage != targetIndex) {
+                    pagerState.scrollToPage(targetIndex)
+                }
             }
 
-            // Fixed height boundary so the scrollable Column knows exactly how much space to allocate
+            // Sync ViewModel when Pager settles on a new swipe
+            LaunchedEffect(pagerState.currentPage) {
+                if (pagerState.currentPage in availableContainers.indices) {
+                    viewModel.selectContainer(pagerState.currentPage)
+                }
+            }
+
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
             ) {
-                val pageWidth = 120.dp 
-                val horizontalPadding = (maxWidth - pageWidth) / 2
+                val pageWidth = 200.dp
+                val horizontalPadding = ((maxWidth - pageWidth) / 2).coerceAtLeast(0.dp)
                 
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = horizontalPadding), // Centers the selected item
-                    pageSpacing = 48.dp // Space between adjacent items
+                    pageSpacing = 36.dp // Space between adjacent items
                 ) { page ->
                     val container = availableContainers[page]
                     val isSelected = pagerState.currentPage == page
@@ -237,14 +247,27 @@ fun DrinkLogScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Bottom // Aligns bottles to the bottom baseline
                     ) {
+                        // Dynamic rendering rules based on Category
+                        val currentDrink = uiState.availableDrinkTypes.find { it.name == uiState.selectedDrinkType }
+                        val category = currentDrink?.category ?: "Beer"
+
                         // Icon height base on figma prototype
                         val absoluteHeight = when (container.name) {
-                            "FLIGHT" -> 100.dp
-                            "PINT" -> 160.dp
-                            "PITCHER" -> 200.dp
+                            "FLIGHT", "TASTING" -> 120.dp
+                            "PINT", "AVERAGE", "STANDARD", "REGULAR" -> 150.dp
+                            "PITCHER", "FROZEN", "LARGE" -> 180.dp
                             else -> 160.dp 
                         }
                         
+                        val iconRes = when (category) {
+                            "Beer" -> R.drawable.ic_beer
+                            "Fermented Drinks" -> R.drawable.ic_fermented_drinks
+                            "Wine" -> R.drawable.ic_wine
+                            "Hard Liquor" -> R.drawable.ic_hard_liquor
+                            "Mixed Drinks" -> R.drawable.ic_mixed_drinks
+                            else -> R.drawable.ic_beer
+                        }
+
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -253,12 +276,7 @@ fun DrinkLogScreen(
                         ) {
                             androidx.compose.foundation.Image(
                                 painter = painterResource(
-                                    id = when (container.name) {
-                                        "FLIGHT" -> R.drawable.ic_flight
-                                        "PINT" -> R.drawable.ic_pint
-                                        "PITCHER" -> R.drawable.ic_pitcher
-                                        else -> R.drawable.ic_pint
-                                    }
+                                    id = iconRes
                                 ),
                                 contentDescription = container.name,
                                 modifier = Modifier
@@ -266,11 +284,8 @@ fun DrinkLogScreen(
                                     .fillMaxWidth()
                                     // Ghosting transparency effect for unselected side containers
                                     .alpha(if (isSelected) 1f else 0.15f), 
-                                contentScale = ContentScale.Fit,
-                                colorFilter = ColorFilter.tint(
-                                    // Applies Blue tint when selected, Light Gray when unselected
-                                    if (isSelected) Color(0xFF6595DD) else Color(0xFFD9D9D9)
-                                )
+                                contentScale = ContentScale.FillHeight,
+                                alignment = Alignment.BottomCenter
                             )
                         }
                         
