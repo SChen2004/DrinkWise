@@ -2,6 +2,8 @@ package com.example.cauds.ui.onboarding
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,7 +44,13 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
 
             }
         },
-        onBack = if (currentIndex > 0) ({ currentIndex-- }) else null
+        onBack = {
+            if (currentIndex > 0) {
+                currentIndex--
+            } else {
+                navController.popBackStack()
+            }
+        }
     )
 
 
@@ -54,9 +62,26 @@ fun QuizQuestion(
     selectedOption: Option?,
     onOptionSelected: (Option) -> Unit,
     onNext: () -> Unit,
-    onBack: (() -> Unit)?,  // null if first question
+    onBack: (() -> Unit),  // null if first question
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
+        Spacer(modifier = Modifier.height(32.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 32.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(question.text, style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -80,10 +105,6 @@ fun QuizQuestion(
         Spacer(modifier = Modifier.height(24.dp))
 
         Row {
-            if (onBack != null) {
-                Button(onClick = onBack) { Text("Back") }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
             Button(onClick = onNext, enabled = selectedOption != null) {
                 Text("Next")
             }
@@ -102,7 +123,22 @@ fun QuizResultScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "Results",
