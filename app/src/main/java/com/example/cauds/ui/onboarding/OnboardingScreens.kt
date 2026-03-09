@@ -96,7 +96,7 @@ fun OnboardingSexScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -127,7 +127,7 @@ fun OnboardingSexScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = selectedOption == option,
@@ -184,7 +184,7 @@ fun OnboardingPurposeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
@@ -223,7 +223,7 @@ fun OnboardingPurposeScreen(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = selectedOption == option,
