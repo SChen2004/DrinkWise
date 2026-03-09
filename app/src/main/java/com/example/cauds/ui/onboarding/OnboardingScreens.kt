@@ -47,14 +47,15 @@ fun OnboardingNameScreen(
                 .padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.weight(1f))
 
         Text(
             text = "What should we call you?",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
         OutlinedTextField(
             value = name,
@@ -126,8 +127,8 @@ fun OnboardingSexScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 48.dp)
-                .padding(bottom = 48.dp),
+                .padding(horizontal = 24.dp)  // was 48.dp
+                .padding(bottom = 24.dp) ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -225,8 +226,8 @@ fun OnboardingPurposeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 48.dp)
-                .padding(bottom = 48.dp),
+                .padding(horizontal = 24.dp)  // was 48.dp
+                .padding(bottom = 24.dp) ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(16.dp))

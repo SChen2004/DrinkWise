@@ -1,5 +1,9 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -14,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cauds.ui.navigation.Screen
+import kotlinx.coroutines.launch
 
 @Composable
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
@@ -23,36 +28,43 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
     var currentIndex by remember { mutableIntStateOf(0) }
     var answers by remember { mutableStateOf(List<Option?>(questions.size) { null }) }
 
-    val question = questions[currentIndex]
-    val selectedOption = answers[currentIndex]
-
-    QuizQuestion(
-        question = question,
-        selectedOption = selectedOption,
-        onOptionSelected = { option ->
-            answers = answers.toMutableList().also { it[currentIndex] = option }
-        },
-        onNext = {
-            if (currentIndex < questions.size - 1) {
-                currentIndex++
-            } else {
-                val totalScore = answers.filterNotNull().sumOf { it.score }
-                val audRisk = viewModel.scoreToAudRisk(totalScore)
-                viewModel.updateAudRisk(audRisk)
-                viewModel.saveQuizResult(audRisk)
-
-                navController.navigate(Screen.QuizResult.route) { popUpTo("aud_quiz") { inclusive = true } } // show results
-
-            }
-        },
-        onBack = {
-            if (currentIndex > 0) {
-                currentIndex--
-            } else {
-                navController.popBackStack()
-            }
+    val handleNext = {
+        if (currentIndex < questions.size - 1) {
+            currentIndex++
+        } else {
+            val totalScore = answers.filterNotNull().sumOf { it.score }
+            val audRisk = viewModel.scoreToAudRisk(totalScore)
+            viewModel.updateAudRisk(audRisk)
+            viewModel.saveQuizResult(audRisk)
+            navController.navigate(Screen.QuizResult.route) { popUpTo("aud_quiz") { inclusive = true } }
         }
-    )
+    }
+
+    AnimatedContent(
+        targetState = currentIndex,
+        transitionSpec = {
+            fadeIn() togetherWith fadeOut()
+        },
+        label = "quiz_fade"
+    ) { index ->
+        val question = questions[index]
+        val selectedOption = answers[index]
+
+        QuizQuestion(
+            question = question,
+            selectedOption = selectedOption,
+            onOptionSelected = { option ->
+                answers = answers.toMutableList().also { it[index] = option }
+                kotlinx.coroutines.MainScope().launch {
+                    kotlinx.coroutines.delay(350)
+                    handleNext()
+                }
+            },
+            onBack = {
+                if (currentIndex > 0) currentIndex-- else navController.popBackStack()
+            }
+        )
+    }
 
 
 }
@@ -63,8 +75,7 @@ fun QuizQuestion(
     question: Question,
     selectedOption: Option?,
     onOptionSelected: (Option) -> Unit,
-    onNext: () -> Unit,
-    onBack: (() -> Unit),  // null if first question
+    onBack: (() -> Unit),
 ) {
     Scaffold(
         topBar = {
@@ -84,41 +95,42 @@ fun QuizQuestion(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
+            .padding(innerPadding)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Text(question.text, style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        question.options.forEach { option ->
-            Row(
+            // Title pinned to top
+            Text(
+                question.text,
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onOptionSelected(option) }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .align(Alignment.TopStart)
+                    .padding(top = 16.dp)
+            )
+
+            // Options pinned to true center
+            Column(
+                modifier = Modifier.align(Alignment.Center)
             ) {
-                RadioButton(
-                    selected = selectedOption == option,
-                    onClick = null
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(option.text)
+                question.options.forEach { option ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onOptionSelected(option) }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = selectedOption == option, onClick = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(option.text)
+                    }
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row {
-            Button(onClick = onNext, enabled = selectedOption != null) {
-                Text("Next")
-            }
-        }
-    }
     }
 }
 
