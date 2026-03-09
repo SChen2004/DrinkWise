@@ -1,5 +1,6 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -57,19 +58,21 @@ fun FavouriteDrinksScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Checkbox(
-                    checked = selectedOptions.contains(option),
-                    onCheckedChange = { checked ->
+                    .clickable {
+                        val checked = !selectedOptions.contains(option)
                         if (checked && selectedOptions.size < 3) {
                             selectedOptions = selectedOptions + option
                         } else if (!checked) {
                             selectedOptions = selectedOptions - option
                         }
                     }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Checkbox(
+                    checked = selectedOptions.contains(option),
+                    onCheckedChange = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(

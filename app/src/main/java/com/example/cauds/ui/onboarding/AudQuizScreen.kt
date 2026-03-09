@@ -1,5 +1,6 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -60,11 +61,18 @@ fun QuizQuestion(
         Spacer(modifier = Modifier.height(16.dp))
 
         question.options.forEach { option ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onOptionSelected(option) }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 RadioButton(
                     selected = selectedOption == option,
-                    onClick = { onOptionSelected(option) }
+                    onClick = null
                 )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(option.text)
             }
         }
