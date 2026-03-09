@@ -83,7 +83,7 @@ fun CalendarScreen(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        MonthSummaryCard(summary = summary)
+        // MonthSummaryCard(summary = summary)
     }
 }
 

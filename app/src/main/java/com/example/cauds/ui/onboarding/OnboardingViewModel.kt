@@ -8,14 +8,24 @@ import com.example.cauds.data.model.User
 import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.UserRepository
 import com.example.cauds.data.model.AudRisk
+import com.example.cauds.data.model.NotificationPreferences
+import com.example.cauds.data.model.Sex
 
 class OnboardingViewModel : ViewModel() {
     private val userRepo = UserRepository()
     private val authRepo = AuthRepository()
 
-    // Temp store data
-    var audScore = AudRisk.DEFAULT_RISK
-    var name = ""
+    var name by mutableStateOf("")
+        private set
+
+    var biologicalSex by mutableStateOf(Sex.PREFER_NOT_TO_SAY)
+        private set
+
+    var supportingFriend by mutableStateOf(false)
+        private set
+
+    var audRisk by mutableStateOf(AudRisk.DEFAULT_RISK)
+        private set
 
     var errorMessage by mutableStateOf<String?>(null)
         private set
@@ -23,17 +33,28 @@ class OnboardingViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
+    fun updateName(value: String) { name = value }
+    fun updateBiologicalSex(value: Sex) { biologicalSex = value }
+    fun updateSupportingFriend(value: Boolean) { supportingFriend = value }
+    fun updateAudRisk(value: AudRisk) { audRisk = value }
 
-    // Upload the data
-    fun submitData(onSuccess: () -> Unit, onError: (String) -> Unit) {
-        val userId = authRepo.getUserId() ?: run {
-            onError("User not logged in!")
-            return
-        }
-        val data = User(audScore, name=name)
+    fun saveOnboardingData() {
+        val userId = authRepo.getUserId()!!
 
-        userRepo.saveOnboarding(userId, data) { success, errorMsg ->
-            if (success) onSuccess() else onError(errorMsg ?: "Unknown Firestore error")
+        isLoading = true
+        errorMessage = null
+
+        val user = User(
+            name = name,
+            sex = biologicalSex,
+            supportingFriend = supportingFriend
+        )
+
+        userRepo.saveOnboarding(userId, user) { success, error ->
+            isLoading = false
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
         }
     }
 
@@ -57,6 +78,44 @@ class OnboardingViewModel : ViewModel() {
             if (!success) {
                 errorMessage = error ?: "Unknown error"
             }
+        }
+    }
+
+    fun saveNotificationPreferences(prefs: NotificationPreferences) {
+        val userId = authRepo.getUserId()!!
+        isLoading = true
+        errorMessage = null
+
+        userRepo.saveNotificationPreferences(userId, prefs) { success, error ->
+            isLoading = false
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
+        }
+    }
+
+    fun saveFavouriteDrinks(drinks: List<String>) {
+        val userId = authRepo.getUserId()!!
+        userRepo.saveFavouriteDrinks(userId, drinks) { success, error ->
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
+        }
+    }
+
+    fun completeOnboarding() {
+        val userId = authRepo.getUserId()!!
+        userRepo.completeOnboarding(userId) { success, error ->
+            if (!success) {
+                errorMessage = error ?: "Unknown error"
+            }
+        }
+    }
+
+    fun getCompletedOnboarding(onResult: (Boolean) -> Unit) {
+        val userId = authRepo.getUserId()!!
+        userRepo.getCompletedOnboarding(userId) { completed ->
+            onResult(completed)
         }
     }
 }

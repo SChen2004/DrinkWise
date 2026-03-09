@@ -7,6 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -52,13 +58,34 @@ class MainActivity : ComponentActivity() {
                     ) {
                         val authViewModel: AuthViewModel = viewModel()
 
-                        val startDestination =
-                            if (authViewModel.isLoggedIn())
-                                Screen.Dashboard.route
-                            else
-                                Screen.Login.route
+                        var startDestination by remember { mutableStateOf<String?>(null) }
 
-                        NavGraph(navController = navController, startDestination = startDestination)
+                        LaunchedEffect(Unit) {
+                            if (authViewModel.isLoggedIn()) {
+                                authViewModel.checkOnboardingStatus { completed ->
+                                    if (completed) {
+                                        startDestination = Screen.Dashboard.route
+                                    } else {
+                                        startDestination = Screen.OnboardingName.route
+                                    }
+                                }
+                            } else {
+                                startDestination = Screen.Login.route
+                            }
+                        }
+
+                        if (startDestination == null) {
+                            // Empty loading state while waiting for network check
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
+                            }
+                            return@Surface
+                        }
+
+                        NavGraph(
+    navController = navController,
+    startDestination = startDestination ?: "login"
+)
                     }
                 }
             }

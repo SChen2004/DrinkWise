@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">CAUDS</string>
     <string name="default_web_client_id">393664903894-qvjrlr8aipomcsqgsn8d41mdtl8p675i.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">847661634953136</string>
+    <string name="facebook_client_token">ce20dcf62d57fb4d40ee96c2ec22282e</string>
+    <string name="fb_login_protocol_scheme">fb847661634953136</string>
 </resources>
