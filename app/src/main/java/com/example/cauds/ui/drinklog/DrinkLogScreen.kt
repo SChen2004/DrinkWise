@@ -237,7 +237,7 @@ fun DrinkLogScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Bottom // Aligns bottles to the bottom baseline
                     ) {
-                        // Fixed icon height base on figma wireframe, may need to change to fix different phone size
+
                         val absoluteHeight = when (container.name) {
                             "FLIGHT" -> 100.dp
                             "PINT" -> 160.dp
