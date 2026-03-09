@@ -196,8 +196,8 @@ fun OnboardingPurposeScreen(
     val options = listOf(
         "Cut back on drinking",
         "Understand my habits",
-        "Just exploring",
-        "Supporting someone else"
+        "Just explore",
+        // "Supporting someone else"
     )
 
     var selectedOption by remember { mutableStateOf<String?>(null) }

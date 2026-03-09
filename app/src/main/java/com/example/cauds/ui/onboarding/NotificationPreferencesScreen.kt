@@ -21,8 +21,18 @@ fun NotificationPreferencesScreen(
     navController: NavController,
     viewModel: OnboardingViewModel
 ) {
-    var completedOnboarding by remember { mutableStateOf(false) }
+
+    var ready by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
+        navController.navigate(Screen.UserTestGreenScreen.route)
+        ready = true
+    }
+
+    if (!ready) return
+
+    var completedOnboarding by remember { mutableStateOf(false) }
+    LaunchedEffect("loadOnboarding") {
         viewModel.getCompletedOnboarding { completed ->
             completedOnboarding = completed
         }

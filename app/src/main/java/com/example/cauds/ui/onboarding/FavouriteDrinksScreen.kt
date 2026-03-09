@@ -21,6 +21,16 @@ fun FavouriteDrinksScreen(
     navController: NavController,
     viewModel: OnboardingViewModel
 ) {
+
+    var ready by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        navController.navigate(Screen.UserTestGreenScreen.route)
+        ready = true
+    }
+
+    if (!ready) return
+
     val options = listOf("Wine", "Beer", "Liquor", "Mixed", "Cider / Seltzer")
     var selectedOptions by remember { mutableStateOf(setOf<String>()) }
 
@@ -110,7 +120,7 @@ fun FavouriteDrinksScreen(
                     navController.popBackStack()
                 } else {
                     viewModel.completeOnboarding()
-                    navController.navigate(Screen.Dashboard.route) {
+                    navController.navigate(Screen.UserTestBeginScreen.route) {
                         popUpTo("onboarding_name") { inclusive = true }
                     }
                 }
@@ -128,7 +138,7 @@ fun FavouriteDrinksScreen(
                     navController.popBackStack()
                 } else {
                     viewModel.completeOnboarding()
-                    navController.navigate(Screen.Dashboard.route) {
+                    navController.navigate(Screen.UserTestBeginScreen.route) {
                         popUpTo("onboarding_name") { inclusive = true }
                     }
                 }

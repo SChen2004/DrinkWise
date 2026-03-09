@@ -23,6 +23,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
 
+    var ready by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        navController.navigate(Screen.UserTestGreenScreen.route)
+        ready = true
+    }
+
+    if (!ready) return
+
     // TODO: Drinking assessment intro page (see figma design file)
 
     var currentIndex by remember { mutableIntStateOf(0) }

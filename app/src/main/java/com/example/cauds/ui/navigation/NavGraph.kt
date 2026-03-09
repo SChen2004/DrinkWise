@@ -23,6 +23,8 @@ import com.example.cauds.ui.onboarding.OnboardingNameScreen
 import com.example.cauds.ui.onboarding.OnboardingPurposeScreen
 import com.example.cauds.ui.onboarding.OnboardingSexScreen
 import com.example.cauds.ui.onboarding.QuizResultScreen
+import com.example.cauds.ui.userTests.UserTestBeginScreen
+import com.example.cauds.ui.userTests.UserTestGreenScreen
 
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String) {
@@ -88,5 +90,9 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
                 onBack = { navController.popBackStack() }
             )
         }
+
+        // User Tests
+        composable(Screen.UserTestGreenScreen.route) { UserTestGreenScreen(navController) }
+        composable(Screen.UserTestBeginScreen.route) { UserTestBeginScreen(navController) }
     }
 }

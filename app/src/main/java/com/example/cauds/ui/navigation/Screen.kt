@@ -37,4 +37,7 @@ sealed class Screen(val route: String) {
     object Account : Screen("account")
 
 
+    // -----    User Testing    -----
+    object UserTestGreenScreen : Screen("userTestGreen")
+    object UserTestBeginScreen : Screen("userTestBegin")
 }
