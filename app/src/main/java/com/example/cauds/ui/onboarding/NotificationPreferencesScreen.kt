@@ -1,5 +1,6 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -23,26 +25,48 @@ fun NotificationPreferencesScreen(
 ) {
 
     var ready by remember { mutableStateOf(false) }
+    // State for each preference, matching your NotificationPreferences fields
+    var dailyCheckin by remember { mutableStateOf(false) }
+    var dailyEncouragement by remember { mutableStateOf(false) }
+    var weeklyReflection by remember { mutableStateOf(false) }
+    var monthlyProgress by remember { mutableStateOf(false) }
+    var completedOnboarding by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        navController.navigate(Screen.UserTestGreenScreen.route)
-        ready = true
+    var showGreen by remember { mutableStateOf(true) }
+
+    if (showGreen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Green)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+        ) {
+            Button(
+                onClick = { showGreen = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .align(Alignment.Center)
+            ) {
+                Text(
+                    "NEXT",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        return
     }
 
-    if (!ready) return
 
-    var completedOnboarding by remember { mutableStateOf(false) }
     LaunchedEffect("loadOnboarding") {
         viewModel.getCompletedOnboarding { completed ->
             completedOnboarding = completed
         }
     }
 
-    // State for each preference, matching your NotificationPreferences fields
-    var dailyCheckin by remember { mutableStateOf(false) }
-    var dailyEncouragement by remember { mutableStateOf(false) }
-    var weeklyReflection by remember { mutableStateOf(false) }
-    var monthlyProgress by remember { mutableStateOf(false) }
+
 
     // Pair each state with its label and description
     val options = listOf(

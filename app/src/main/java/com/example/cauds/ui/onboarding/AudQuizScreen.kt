@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -24,18 +25,9 @@ import kotlinx.coroutines.launch
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
 
     var ready by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        navController.navigate(Screen.UserTestGreenScreen.route)
-        ready = true
-    }
-
-    if (!ready) return
-
-    // TODO: Drinking assessment intro page (see figma design file)
-
     var currentIndex by remember { mutableIntStateOf(0) }
     var answers by remember { mutableStateOf(List<Option?>(questions.size) { null }) }
+
 
     val handleNext = {
         if (currentIndex < questions.size - 1) {
@@ -48,6 +40,37 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
             navController.navigate(Screen.QuizResult.route) { popUpTo("aud_quiz") { inclusive = true } }
         }
     }
+
+    var showGreen by remember { mutableStateOf(true) }
+
+    if (showGreen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Green)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+        ) {
+            Button(
+                onClick = { showGreen = false },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .align(Alignment.Center)
+            ) {
+                Text(
+                    "NEXT",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        return
+    }
+
+    // TODO: Drinking assessment intro page (see figma design file)
+
+
 
     AnimatedContent(
         targetState = currentIndex,
