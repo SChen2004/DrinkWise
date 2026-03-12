@@ -66,5 +66,27 @@ class JournalRepository (
             }
     }
 
+    fun getJournalEntries(
+        userId: String,
+        onResult: (Boolean, List<Pair<String, JournalData>>?, String?) -> Unit
+    ) {
+        db.collection(JOURNAL)
+            .whereEqualTo("userId", userId)
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(20)
+            .get()
+            .addOnSuccessListener { snapshot ->
+
+                val entries = snapshot.documents.mapNotNull { doc ->
+                    val data = doc.toObject(JournalData::class.java)
+                    if (data != null) Pair(doc.id, data) else null
+                }
+                onResult(true, entries, null)
+            }
+            .addOnFailureListener { e ->
+                onResult(false, null, e.message)
+            }
+    }
+
 
 }

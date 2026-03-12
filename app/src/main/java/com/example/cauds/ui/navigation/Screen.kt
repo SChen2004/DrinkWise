@@ -15,9 +15,12 @@ sealed class Screen(val route: String) {
     object NotificationPreferences : Screen("notification_preferences")
     object FavouriteDrinks : Screen("favourite_drinks")
 
-    // Dashboard / Journal
+    // Dashboard
     object Dashboard : Screen("dashboard")
+
+    // Journaling
     object Journal : Screen("journal")
+    object CreateEntry : Screen("create_entry")
 
 
     // -----    Tracker     -----

@@ -1,0 +1,105 @@
+package com.example.cauds.viewmodel
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.cauds.data.model.JournalData
+import com.example.cauds.data.repository.AuthRepository
+import com.example.cauds.data.repository.JournalRepository
+import kotlinx.coroutines.launch
+
+class JournalViewModel(
+    private val journalRepo: JournalRepository = JournalRepository(),
+    private val authRepo: AuthRepository = AuthRepository()
+) : ViewModel() {
+
+    // --- Load state ---
+    var entries by mutableStateOf<List<Pair<String, JournalData>>>(emptyList())
+        private set
+
+    var isLoading by mutableStateOf(false)
+        private set
+
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
+    // --- Delete state ---
+    var deleteError by mutableStateOf<String?>(null)
+        private set
+
+    // --- Save state ---
+    var isSaving by mutableStateOf(false)
+        private set
+
+    var saveError by mutableStateOf<String?>(null)
+        private set
+
+    // saveSuccess acts as a one-shot signal to the screen that the save worked.
+    // The screen watches this, navigates away when it flips to true, then calls
+    // onSaveHandled() to reset it back to false.
+    var saveSuccess by mutableStateOf(false)
+        private set
+
+    fun loadEntries() {
+        val userId = authRepo.getUserId() ?: return
+
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+
+            journalRepo.getJournalEntries(userId) { success, result, error ->
+                isLoading = false
+                if (success && result != null) {
+                    entries = result
+                } else {
+                    errorMessage = error ?: "Failed to load entries"
+                }
+            }
+        }
+    }
+
+    fun saveEntry(text: String) {
+        val userId = authRepo.getUserId() ?: return
+        if (text.isBlank()) return
+
+        viewModelScope.launch {
+            isSaving = true
+            saveError = null
+
+            val journalData = JournalData(entry = text)
+
+            journalRepo.saveJournalEntry(userId, journalData) { success, error, _ ->
+                isSaving = false
+                if (success) {
+                    saveSuccess = true
+                } else {
+                    saveError = error ?: "Failed to save entry"
+                }
+            }
+        }
+    }
+
+    // Called by the screen after it has reacted to saveSuccess, so the flag
+    // doesn't keep triggering on recomposition.
+    fun onSaveHandled() {
+        saveSuccess = false
+    }
+
+    fun deleteEntry(documentId: String) {
+        viewModelScope.launch {
+            journalRepo.deleteJournalEntry(documentId) { success, error ->
+                if (success) {
+                    entries = entries.filter { it.first != documentId }
+                } else {
+                    deleteError = error ?: "Failed to delete entry"
+                }
+            }
+        }
+    }
+
+    fun clearDeleteError() {
+        deleteError = null
+    }
+}
