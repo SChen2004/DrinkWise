@@ -19,101 +19,154 @@ import androidx.navigation.NavController
 import com.example.cauds.components.EmptyTodayCard
 import com.example.cauds.components.JournalEntry
 import com.example.cauds.components.JournalEntryCard
+import com.example.cauds.viewmodel.JournalUiState
+import com.example.cauds.viewmodel.JournalViewModel
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
-fun JournalScreen(navController: NavController) {
+fun JournalScreen(navController: NavController, viewModel: JournalViewModel) {
 
-    // `remember { mutableStateOf(...) }` creates state that survives recompositions.
-    // When state changes (e.g. you delete an entry), Compose re-draws only the parts
-    // of the UI that depend on it. This is the core of how Compose works.
+    // Get the current user's ID from Firebase Auth.
+    // The ?: "" is Kotlin's "elvis operator" — if currentUser is null, fall back to "".
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-    // We're using `mutableStateListOf` so that Compose notices when items are added/removed.
-    // A regular List wouldn't trigger a redraw when you call .remove() on it.
-    val entries = remember {
-        mutableStateListOf(
-            JournalEntry(1, "Feb 19", "Thursday", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan."),
-            JournalEntry(2, "Feb 17", "Tuesday", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan."),
-            JournalEntry(3, "Feb 16", "Monday", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus nec fringilla accumsan.")
-        )
+    // `collectAsState()` is how a Composable listens to a StateFlow.
+    // Every time the ViewModel pushes a new state, this value updates
+    // and the screen recomposes automatically.
+    val uiState by viewModel.uiState.collectAsState()
+    val deleteError by viewModel.deleteError.collectAsState()
+
+    var expandedEntryId by remember { mutableStateOf<String?>(null) }
+
+    // Today's date formatted the same way JournalEntry formats its dates,
+    // so we can compare them to detect whether today already has an entry.
+    val todayDate = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date())
+    val todayDayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
+
+    // LaunchedEffect(Unit) runs once when the screen first appears.
+    // This is where we kick off the initial data load. We use Unit as the key
+    // because we only want this to run once — not on every recomposition.
+    LaunchedEffect(Unit) {
+        viewModel.loadEntries(userId)
     }
 
-    // This tracks which card is currently expanded. We store the entry's id (Int?),
-    // and null means nothing is expanded. Only one can be expanded at a time.
-    var expandedEntryId by remember { mutableStateOf<Int?>(null) }
-
-    // "Feb 19" is today's date as per the design. We check if there's already an entry
-    // for today. If not, we show the EmptyTodayCard instead.
-    val todayDate = "Feb 19"
-    val todayDayOfWeek = "Thursday"
-    val hasTodayEntry = entries.any { it.date == todayDate }
-
-    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF5F5F5))) {
-
-        // Top header bar (dark background like in the design)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(horizontal = 20.dp, vertical = 24.dp)
-        ) {
-            Text("Journal", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+    // If there's a delete error, show a snackbar. The `deleteError` flow
+    // will be non-null only when a delete has just failed.
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(deleteError) {
+        if (deleteError != null) {
+            snackbarHostState.showSnackbar("Failed to delete entry: $deleteError")
+            viewModel.clearDeleteError()
         }
+    }
 
-        // LazyColumn is Compose's equivalent of RecyclerView — it only renders items
-        // currently visible on screen, which is efficient for long lists.
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF5F5F5))
+                .padding(paddingValues)
         ) {
-
-            // "Write an entry" button at the top
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { navController.navigate("dashboard") } // placeholder for CreateEntry
-                        .padding(vertical = 12.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Edit,
-                        contentDescription = "Write entry",
-                        tint = Color.Gray
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Write an entry", color = Color.Gray, fontSize = 15.sp)
-                }
+            // Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black)
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+            ) {
+                Text("Journal", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
             }
 
-            // If there's no entry for today, show the empty card first
-            if (!hasTodayEntry) {
-                item {
-                    EmptyTodayCard(
-                        date = todayDate,
-                        dayOfWeek = todayDayOfWeek,
-                        onClick = { navController.navigate("dashboard") } // placeholder for CreateEntry
-                    )
-                }
-            }
+            // Switch on the current UI state
+            when (val state = uiState) {
 
-            // Render each journal entry as a card.
-            // `items(entries)` is a LazyColumn helper that loops over the list efficiently.
-            items(entries, key = { it.id }) { entry ->
-                JournalEntryCard(
-                    entry = entry,
-                    isExpanded = expandedEntryId == entry.id,
-                    onClick = {
-                        // Toggle: if this card is already expanded, collapse it.
-                        // Otherwise, expand it (and collapse any other open card).
-                        expandedEntryId = if (expandedEntryId == entry.id) null else entry.id
-                    },
-                    onDelete = {
-                        entries.remove(entry)
-                        expandedEntryId = null  // collapse after deleting
+                is JournalUiState.Loading -> {
+                    // Center a spinner while entries are being fetched
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
-                )
+                }
+
+                is JournalUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = state.message, color = Color.Red)
+                    }
+                }
+
+                is JournalUiState.Success -> {
+                    // Convert the raw Firestore data (Pair<String, JournalData>) into
+                    // JournalEntry objects that the card composable knows how to display.
+                    // `mapNotNull` skips any entry where createdAt is null (shouldn't happen,
+                    // but Firestore fields are nullable so we handle it safely).
+                    val entries = state.entries.mapNotNull { (docId, data) ->
+                        val millis = data.createdAt?.toDate()?.time ?: return@mapNotNull null
+                        JournalEntry(
+                            documentId = docId,
+                            timestampMillis = millis,
+                            body = data.entry
+                        )
+                    }
+
+                    val hasTodayEntry = entries.any { it.date == todayDate }
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(vertical = 16.dp)
+                    ) {
+                        // "Write an entry" button
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { navController.navigate("dashboard") }
+                                    .padding(vertical = 12.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = "Write entry",
+                                    tint = Color.Gray
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Write an entry", color = Color.Gray, fontSize = 15.sp)
+                            }
+                        }
+
+                        // Empty today card if no entry exists for today yet
+                        if (!hasTodayEntry) {
+                            item {
+                                EmptyTodayCard(
+                                    date = todayDate,
+                                    dayOfWeek = todayDayOfWeek,
+                                    onClick = { navController.navigate("dashboard") }
+                                )
+                            }
+                        }
+
+                        items(entries, key = { it.documentId }) { entry ->
+                            JournalEntryCard(
+                                entry = entry,
+                                isExpanded = expandedEntryId == entry.documentId,
+                                onClick = {
+                                    expandedEntryId = if (expandedEntryId == entry.documentId) null else entry.documentId
+                                },
+                                onDelete = {
+                                    viewModel.deleteEntry(userId, entry.documentId)
+                                    expandedEntryId = null
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

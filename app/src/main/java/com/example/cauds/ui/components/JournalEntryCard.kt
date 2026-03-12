@@ -12,26 +12,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-// This data class represents a single journal entry.
-// A data class in Kotlin is just a simple container for storing related fields.
+// Updated to use a String documentId (Firestore's ID) instead of an Int,
+// and a Long timestamp (milliseconds) instead of pre-formatted date strings.
+// The card itself will handle formatting the timestamp for display.
 data class JournalEntry(
-    val id: Int,
-    val date: String,       // e.g. "Feb 19"
-    val dayOfWeek: String,  // e.g. "Thursday"
+    val documentId: String,
+    val timestampMillis: Long,
     val body: String
-)
+) {
+    // These are computed properties — they derive their value from timestampMillis
+    // automatically whenever you access them, so we don't have to store them separately.
+    val date: String
+        get() = SimpleDateFormat("MMM d", Locale.getDefault()).format(timestampMillis)
 
-// This is the reusable card composable. By accepting an `isExpanded` flag and
-// an `onDelete` callback, it can behave differently depending on context —
-// collapsed on the list, expanded when tapped. The dashboard can reuse this
-// same composable but pass isExpanded = false and no onDelete if it doesn't need those.
+    val dayOfWeek: String
+        get() = SimpleDateFormat("EEEE", Locale.getDefault()).format(timestampMillis)
+}
+
 @Composable
 fun JournalEntryCard(
     entry: JournalEntry,
     isExpanded: Boolean,
     onClick: () -> Unit,
-    onDelete: (() -> Unit)? = null,  // nullable — not every use case needs a delete button
+    onDelete: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -44,7 +50,6 @@ fun JournalEntryCard(
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
 
-            // Header row: date on the left, day of week on the right
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -55,8 +60,6 @@ fun JournalEntryCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Body text. When collapsed, maxLines = 2 so it truncates with "..."
-            // When expanded, maxLines is effectively unlimited (Int.MAX_VALUE).
             Text(
                 text = entry.body,
                 fontSize = 14.sp,
@@ -64,7 +67,6 @@ fun JournalEntryCard(
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
 
-            // Only show the delete button when the card is expanded AND a delete handler was provided
             if (isExpanded && onDelete != null) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -81,9 +83,6 @@ fun JournalEntryCard(
     }
 }
 
-// This is the "empty state" card shown when there's no entry for today yet.
-// It's a separate composable because its purpose and look are distinct —
-// it's a prompt to write, not a display of content.
 @Composable
 fun EmptyTodayCard(
     date: String,
@@ -110,7 +109,6 @@ fun EmptyTodayCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // The placeholder text input look
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

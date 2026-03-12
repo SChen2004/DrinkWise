@@ -24,11 +24,13 @@ import com.example.cauds.ui.onboarding.OnboardingNameScreen
 import com.example.cauds.ui.onboarding.OnboardingPurposeScreen
 import com.example.cauds.ui.onboarding.OnboardingSexScreen
 import com.example.cauds.ui.onboarding.QuizResultScreen
+import com.example.cauds.viewmodel.JournalViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String) {
     // Share the onboarding view model
     val onboardingViewModel: OnboardingViewModel = viewModel()
+    val journalViewModel: JournalViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = startDestination) {
 
@@ -62,7 +64,8 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
             val manageDrinksViewModel: com.example.cauds.ui.drinklog.ManageDrinksViewModel = viewModel(parentEntry)
             com.example.cauds.ui.drinklog.AddNewDrinkScreen(navController, viewModel = manageDrinksViewModel)
         }
-        composable(Screen.Journal.route) { JournalScreen(navController) }
+
+        composable(Screen.Journal.route) { JournalScreen(navController, journalViewModel) }
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }
         ) }
