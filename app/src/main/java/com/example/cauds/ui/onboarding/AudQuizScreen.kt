@@ -14,10 +14,24 @@ import com.example.cauds.ui.navigation.Screen
 @Composable
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
 
+    LaunchedEffect(Unit) {
+        viewModel.setAudTestInProgress(true)
+    }
+
     // TODO: Drinking assessment intro page (see figma design file)
 
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var answers by remember { mutableStateOf(List<Option?>(questions.size) { null }) }
+    // Initialize answers list in ViewModel if it's empty
+    LaunchedEffect(Unit) {
+        if (viewModel.quizAnswers.isEmpty() || viewModel.quizAnswers.size != questions.size) {
+            viewModel.quizAnswers = List(questions.size) { null }
+        }
+    }
+
+    val currentIndex = viewModel.currentQuizIndex
+    val answers = viewModel.quizAnswers
+
+    // Safety check while loading
+    if (answers.size != questions.size) return 
 
     val question = questions[currentIndex]
     val selectedOption = answers[currentIndex]
@@ -26,11 +40,11 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
         question = question,
         selectedOption = selectedOption,
         onOptionSelected = { option ->
-            answers = answers.toMutableList().also { it[currentIndex] = option }
+            viewModel.quizAnswers = answers.toMutableList().also { it[currentIndex] = option }
         },
         onNext = {
             if (currentIndex < questions.size - 1) {
-                currentIndex++
+                viewModel.currentQuizIndex++
             } else {
                 val totalScore = answers.filterNotNull().sumOf { it.score }
                 val audRisk = viewModel.scoreToAudRisk(totalScore)
@@ -41,7 +55,7 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
 
             }
         },
-        onBack = if (currentIndex > 0) ({ currentIndex-- }) else null
+        onBack = if (currentIndex > 0) ({ viewModel.currentQuizIndex-- }) else null
     )
 
 
@@ -144,7 +158,7 @@ fun QuizResultScreen(
             onClick = {
                 viewModel.getCompletedOnboarding { completed ->
                     if (completed) {
-                        navController.navigate(Screen.AccountTest.route)
+                        navController.navigate(Screen.Account.route)
                     } else {
                         navController.navigate(Screen.NotificationPreferences.route)
                     }

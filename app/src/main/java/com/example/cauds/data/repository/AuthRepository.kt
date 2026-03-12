@@ -11,6 +11,9 @@ class AuthRepository {
     // Get user ID
     fun getUserId(): String? = auth.currentUser?.uid
 
+    // Get user email
+    fun getUserEmail(): String? = auth.currentUser?.email
+
     /**
      * Login Function
      * Attempts to authenticate a user using Firebase's email/password provider.

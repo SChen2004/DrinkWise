@@ -11,6 +11,7 @@ import com.example.cauds.ui.dashboard.DashboardScreen
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import com.example.cauds.ui.account.AccountTestScreen
+import com.example.cauds.ui.account.AccountScreen
 import com.example.cauds.ui.calendar.CalendarScreen
 import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
@@ -69,6 +70,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         ) }
         composable(Screen.Support.route) { Text("Support Screen") }
         composable(Screen.AccountTest.route) { AccountTestScreen(navController) }
+        composable(Screen.Account.route) { AccountScreen(navController) }
 
         // Secondary Features
         composable(Screen.DaySummary.route) { backStackEntry ->

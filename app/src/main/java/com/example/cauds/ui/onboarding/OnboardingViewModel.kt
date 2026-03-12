@@ -20,6 +20,27 @@ class OnboardingViewModel : ViewModel() {
 
     var biologicalSex by mutableStateOf(Sex.PREFER_NOT_TO_SAY)
         private set
+        
+    // Tracks current quiz question
+    var currentQuizIndex by mutableStateOf(0)
+    
+    // Store user's selected options during the quiz
+    var quizAnswers by mutableStateOf<List<Option?>>(emptyList())
+    
+    init {
+        loadUserState()
+    }
+    
+    private fun loadUserState() {
+        val userId = authRepo.getUserId() ?: return
+        userRepo.getUser(userId) { user ->
+            audRisk = user.audScore
+            if (user.audTestInProgress) {
+                // If it was in progress, we don't have stored answers yet without another DB field,
+                // but we at least don't reset the risk. 
+            }
+        }
+    }
 
     var supportingFriend by mutableStateOf(false)
         private set
@@ -67,6 +88,11 @@ class OnboardingViewModel : ViewModel() {
         }
     }
 
+    fun setAudTestInProgress(inProgress: Boolean) {
+        val userId = authRepo.getUserId() ?: return
+        userRepo.setAudTestInProgress(userId, inProgress) { _, _ -> }
+    }
+
     fun saveQuizResult(audRisk: AudRisk) {
         val userId = authRepo.getUserId()!!
 
@@ -77,6 +103,9 @@ class OnboardingViewModel : ViewModel() {
             isLoading = false
             if (!success) {
                 errorMessage = error ?: "Unknown error"
+            } else {
+                // Successful completion not in progress anymore
+                setAudTestInProgress(false)
             }
         }
     }

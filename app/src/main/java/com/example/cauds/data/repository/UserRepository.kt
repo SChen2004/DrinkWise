@@ -10,7 +10,7 @@ const val AUDSCORE = "audScore"
 const val ONBOARDING_COMPLETED = "onboardingCompleted"
 const val NOTIFICATION_PREFERENCES = "notificationPreferences"
 const val FAVOURITE_DRINKS = "favouriteDrinks"
-
+const val AUD_TEST_IN_PROGRESS = "audTestInProgress"
 
 class UserRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -70,6 +70,13 @@ class UserRepository {
     fun completeOnboarding(userId: String, onResult: (Boolean, String?) -> Unit) {
         db.collection(USERS).document(userId)
             .update(ONBOARDING_COMPLETED, true)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun setAudTestInProgress(userId: String, inProgress: Boolean, onResult: (Boolean, String?) -> Unit) {
+        db.collection(USERS).document(userId)
+            .update(AUD_TEST_IN_PROGRESS, inProgress)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
