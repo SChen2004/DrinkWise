@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
                     Screen.Journal.route,
                     Screen.Calendar.route,
                     Screen.Support.route,
+                    Screen.AccountTest.route,
                     Screen.Account.route
                 )
                 val showBottomBar = currentRoute in bottomBarScreens

@@ -20,8 +20,38 @@ class OnboardingViewModel : ViewModel() {
 
     var biologicalSex by mutableStateOf(Sex.PREFER_NOT_TO_SAY)
         private set
+        
+    // Tracks current quiz question
+    var currentQuizIndex by mutableStateOf(0)
+    
+    // Store user's selected options during the quiz
+    var quizAnswers by mutableStateOf<List<Option?>>(emptyList())
+    
+    fun resetQuizState() {
+        currentQuizIndex = 0
+        quizAnswers = emptyList()
+    }
+    
+    init {
+        loadUserState()
+    }
+    
+    fun loadUserState() {
+        val userId = authRepo.getUserId() ?: return
+        userRepo.getUser(userId) { user ->
+            audRisk = user.audScore
+            notificationPreferences = user.notificationPreferences
+            if (user.audTestInProgress) {
+                // If it was in progress, we don't have stored answers yet without another DB field,
+                // but we at least don't reset the risk. 
+            }
+        }
+    }
 
     var supportingFriend by mutableStateOf(false)
+        private set
+
+    var notificationPreferences by mutableStateOf(NotificationPreferences())
         private set
 
     var audRisk by mutableStateOf(AudRisk.DEFAULT_RISK)
@@ -65,6 +95,11 @@ class OnboardingViewModel : ViewModel() {
             score <= 33 -> AudRisk.MODERATE_RISK
             else -> AudRisk.HIGH_RISK
         }
+    }
+
+    fun setAudTestInProgress(inProgress: Boolean) {
+        val userId = authRepo.getUserId() ?: return
+        userRepo.setAudTestInProgress(userId, inProgress) { _, _ -> }
     }
 
     fun saveQuizResult(audRisk: AudRisk) {

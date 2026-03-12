@@ -10,5 +10,6 @@ data class User(
     val notificationPreferences: NotificationPreferences = NotificationPreferences(),
     val supportingFriend: Boolean = false,
     val onboardingCompleted: Boolean = false,
+    val audTestInProgress: Boolean = false,
     val favouriteDrinks: List<String> = emptyList()
 )
