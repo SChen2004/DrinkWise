@@ -23,16 +23,17 @@ fun NotificationPreferencesScreen(
 ) {
     var completedOnboarding by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
+        viewModel.loadUserState()
         viewModel.getCompletedOnboarding { completed ->
             completedOnboarding = completed
         }
     }
 
     // State for each preference, matching your NotificationPreferences fields
-    var dailyCheckin by remember { mutableStateOf(false) }
-    var dailyEncouragement by remember { mutableStateOf(false) }
-    var weeklyReflection by remember { mutableStateOf(false) }
-    var monthlyProgress by remember { mutableStateOf(false) }
+    var dailyCheckin by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.dailyCheckin) }
+    var dailyEncouragement by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.dailyEncouragement) }
+    var weeklyReflection by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.weeklyReflection) }
+    var monthlyProgress by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.monthlyProgress) }
 
     // Pair each state with its label and description
     val options = listOf(

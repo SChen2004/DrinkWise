@@ -40,6 +40,7 @@ class OnboardingViewModel : ViewModel() {
         val userId = authRepo.getUserId() ?: return
         userRepo.getUser(userId) { user ->
             audRisk = user.audScore
+            notificationPreferences = user.notificationPreferences
             if (user.audTestInProgress) {
                 // If it was in progress, we don't have stored answers yet without another DB field,
                 // but we at least don't reset the risk. 
@@ -48,6 +49,9 @@ class OnboardingViewModel : ViewModel() {
     }
 
     var supportingFriend by mutableStateOf(false)
+        private set
+
+    var notificationPreferences by mutableStateOf(NotificationPreferences())
         private set
 
     var audRisk by mutableStateOf(AudRisk.DEFAULT_RISK)
