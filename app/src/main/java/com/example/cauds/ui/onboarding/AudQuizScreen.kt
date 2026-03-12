@@ -23,34 +23,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
 
-    LaunchedEffect(Unit) {
-        viewModel.setAudTestInProgress(true)
-    }
-
     // TODO: Drinking assessment intro page (see figma design file)
 
-    // Initialize answers list in ViewModel if it's empty
-    LaunchedEffect(Unit) {
-        if (viewModel.quizAnswers.isEmpty() || viewModel.quizAnswers.size != questions.size) {
-            viewModel.quizAnswers = List(questions.size) { null }
-        }
-    }
-
-    val currentIndex = viewModel.currentQuizIndex
-    val answers = viewModel.quizAnswers
-
-    // Safety check while loading
-    if (answers.size != questions.size) return 
+    var currentIndex by remember { mutableIntStateOf(0) }
+    var answers by remember { mutableStateOf(List<Option?>(questions.size) { null }) }
 
     val handleNext = {
         if (currentIndex < questions.size - 1) {
-            viewModel.currentQuizIndex++
+            currentIndex++
         } else {
             val totalScore = answers.filterNotNull().sumOf { it.score }
             val audRisk = viewModel.scoreToAudRisk(totalScore)
             viewModel.updateAudRisk(audRisk)
             viewModel.saveQuizResult(audRisk)
-            viewModel.resetQuizState()
             navController.navigate(Screen.QuizResult.route) { popUpTo("aud_quiz") { inclusive = true } }
         }
     }
@@ -69,14 +54,14 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
             question = question,
             selectedOption = selectedOption,
             onOptionSelected = { option ->
-                viewModel.quizAnswers = answers.toMutableList().also { it[index] = option }
+                answers = answers.toMutableList().also { it[index] = option }
                 kotlinx.coroutines.MainScope().launch {
                     kotlinx.coroutines.delay(350)
                     handleNext()
                 }
             },
             onBack = {
-                if (viewModel.currentQuizIndex > 0) viewModel.currentQuizIndex-- else navController.popBackStack()
+                if (currentIndex > 0) currentIndex-- else navController.popBackStack()
             }
         )
     }
@@ -155,11 +140,6 @@ fun QuizResultScreen(
     navController: NavController,
     viewModel: OnboardingViewModel
 ) {
-    // Reload data if coming directly to this screen (eg from Account screen instead of Quiz completion)
-    LaunchedEffect(Unit) {
-        viewModel.loadUserState()
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
