@@ -27,11 +27,16 @@ class OnboardingViewModel : ViewModel() {
     // Store user's selected options during the quiz
     var quizAnswers by mutableStateOf<List<Option?>>(emptyList())
     
+    fun resetQuizState() {
+        currentQuizIndex = 0
+        quizAnswers = emptyList()
+    }
+    
     init {
         loadUserState()
     }
     
-    private fun loadUserState() {
+    fun loadUserState() {
         val userId = authRepo.getUserId() ?: return
         userRepo.getUser(userId) { user ->
             audRisk = user.audScore
@@ -103,9 +108,6 @@ class OnboardingViewModel : ViewModel() {
             isLoading = false
             if (!success) {
                 errorMessage = error ?: "Unknown error"
-            } else {
-                // Successful completion not in progress anymore
-                setAudTestInProgress(false)
             }
         }
     }

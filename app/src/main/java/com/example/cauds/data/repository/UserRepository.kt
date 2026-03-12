@@ -49,7 +49,12 @@ class UserRepository {
     fun saveAudRiskLevel(userId: String, riskLevel: AudRisk, onResult: (Boolean, String?) -> Unit) {
         db.collection(USERS)
             .document(userId)
-            .update(AUDSCORE, riskLevel)
+            .update(
+                mapOf(
+                    AUDSCORE to riskLevel,
+                    AUD_TEST_IN_PROGRESS to false
+                )
+            )
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }
