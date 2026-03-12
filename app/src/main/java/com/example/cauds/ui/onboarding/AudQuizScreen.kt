@@ -97,9 +97,9 @@ fun QuizQuestion(
     ) { innerPadding ->
         Box(
             modifier = Modifier.fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
+            .padding(innerPadding)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp)
         ) {
 
             // Title pinned to top
@@ -168,64 +168,64 @@ fun QuizResultScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Results",
-                style = MaterialTheme.typography.headlineSmall
-            )
+        Text(
+            text = "Results",
+            style = MaterialTheme.typography.headlineSmall
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "DRINKING PATTERN",
-                style = MaterialTheme.typography.labelMedium
-            )
+        Text(
+            text = "DRINKING PATTERN",
+            style = MaterialTheme.typography.labelMedium
+        )
 
-            Text(
-                text = viewModel.audRisk.displayName,
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
+        Text(
+            text = viewModel.audRisk.displayName,
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold
+        )
 
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
-            // -- What It Means card --
-            OutlinedCard(
-                modifier = Modifier.fillMaxWidth()
+        // -- What It Means card --
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "WHAT IT MEANS",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                Text(
+                    text = "WHAT IT MEANS",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold
+                )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = viewModel.audRisk.description,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(
-                onClick = {
-                    viewModel.getCompletedOnboarding { completed ->
-                        if (completed) {
-                            navController.navigate(Screen.Account.route)
-                        } else {
-                            navController.navigate(Screen.NotificationPreferences.route)
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("CONTINUE")
+                Text(
+                    text = viewModel.audRisk.description,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = {
+                viewModel.getCompletedOnboarding { completed ->
+                    if (completed) {
+                        navController.navigate(Screen.Account.route)
+                    } else {
+                        navController.navigate(Screen.NotificationPreferences.route)
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("CONTINUE")
+        }
+    }
     }
 }

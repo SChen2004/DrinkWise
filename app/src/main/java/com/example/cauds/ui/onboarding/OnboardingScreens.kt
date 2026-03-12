@@ -1,9 +1,11 @@
 package com.example.cauds.ui.onboarding
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.cauds.ui.navigation.Screen
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.example.cauds.data.model.Sex
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingNameScreen(
     navController: NavController,
@@ -23,29 +26,36 @@ fun OnboardingNameScreen(
 
     val nameRegex = Regex("^[\\p{L} '-]*$")
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            TextButton(onClick = { navController.popBackStack() }) {
-                Text("CANCEL")
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    TextButton(onClick = { navController.popBackStack() }) {
+                        Text("CANCEL", color = Color.Gray)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
         Text(
             text = "What should we call you?",
-            style = MaterialTheme.typography.headlineSmall
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
         OutlinedTextField(
             value = name,
@@ -77,8 +87,10 @@ fun OnboardingNameScreen(
             Text("NEXT")
         }
     }
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingSexScreen(
     navController: NavController,
@@ -93,25 +105,33 @@ fun OnboardingSexScreen(
         else -> "This helps us personalize your recommended drink limits"
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp)  // was 48.dp
+                .padding(bottom = 24.dp) ,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "What is your biological sex?",
@@ -125,13 +145,14 @@ fun OnboardingSexScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { selectedOption = option }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = selectedOption == option,
-                    onClick = { selectedOption = option }
+                    onClick = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -163,8 +184,10 @@ fun OnboardingSexScreen(
             Text("NEXT")
         }
     }
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingPurposeScreen(
     navController: NavController,
@@ -181,25 +204,33 @@ fun OnboardingPurposeScreen(
 
     val buttonText = if (selectedOption == "Supporting someone else") "CONTINUE" else "START ASSESSMENT"
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp)  // was 48.dp
+                .padding(bottom = 24.dp) ,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "What brings you here today?",
@@ -221,13 +252,14 @@ fun OnboardingPurposeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { selectedOption = option }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 RadioButton(
                     selected = selectedOption == option,
-                    onClick = { selectedOption = option }
+                    onClick = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -257,5 +289,6 @@ fun OnboardingPurposeScreen(
         ) {
             Text(buttonText)
         }
+    }
     }
 }
