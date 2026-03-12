@@ -23,19 +23,34 @@ import kotlinx.coroutines.launch
 @Composable
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
 
+    LaunchedEffect(Unit) {
+        viewModel.setAudTestInProgress(true)
+    }
+
     // TODO: Drinking assessment intro page (see figma design file)
 
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var answers by remember { mutableStateOf(List<Option?>(questions.size) { null }) }
+    // Initialize answers list in ViewModel if it's empty
+    LaunchedEffect(Unit) {
+        if (viewModel.quizAnswers.isEmpty() || viewModel.quizAnswers.size != questions.size) {
+            viewModel.quizAnswers = List(questions.size) { null }
+        }
+    }
+
+    val currentIndex = viewModel.currentQuizIndex
+    val answers = viewModel.quizAnswers
+
+    // Safety check while loading
+    if (answers.size != questions.size) return
 
     val handleNext = {
         if (currentIndex < questions.size - 1) {
-            currentIndex++
+            viewModel.currentQuizIndex++
         } else {
             val totalScore = answers.filterNotNull().sumOf { it.score }
             val audRisk = viewModel.scoreToAudRisk(totalScore)
             viewModel.updateAudRisk(audRisk)
             viewModel.saveQuizResult(audRisk)
+            viewModel.resetQuizState()
             navController.navigate(Screen.QuizResult.route) { popUpTo("aud_quiz") { inclusive = true } }
         }
     }
@@ -54,14 +69,14 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
             question = question,
             selectedOption = selectedOption,
             onOptionSelected = { option ->
-                answers = answers.toMutableList().also { it[index] = option }
+                viewModel.quizAnswers = answers.toMutableList().also { it[index] = option }
                 kotlinx.coroutines.MainScope().launch {
                     kotlinx.coroutines.delay(350)
                     handleNext()
                 }
             },
             onBack = {
-                if (currentIndex > 0) currentIndex-- else navController.popBackStack()
+                if (viewModel.currentQuizIndex > 0) viewModel.currentQuizIndex-- else navController.popBackStack()
             }
         )
     }
@@ -97,9 +112,9 @@ fun QuizQuestion(
     ) { innerPadding ->
         Box(
             modifier = Modifier.fillMaxSize()
-            .padding(innerPadding)
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 24.dp)
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 24.dp)
         ) {
 
             // Title pinned to top
@@ -140,6 +155,11 @@ fun QuizResultScreen(
     navController: NavController,
     viewModel: OnboardingViewModel
 ) {
+    // Reload data if coming directly to this screen (eg from Account screen instead of Quiz completion)
+    LaunchedEffect(Unit) {
+        viewModel.loadUserState()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -168,64 +188,64 @@ fun QuizResultScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "Results",
-            style = MaterialTheme.typography.headlineSmall
-        )
+            Text(
+                text = "Results",
+                style = MaterialTheme.typography.headlineSmall
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "DRINKING PATTERN",
-            style = MaterialTheme.typography.labelMedium
-        )
+            Text(
+                text = "DRINKING PATTERN",
+                style = MaterialTheme.typography.labelMedium
+            )
 
-        Text(
-            text = viewModel.audRisk.displayName,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold
-        )
+            Text(
+                text = viewModel.audRisk.displayName,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        // -- What It Means card --
-        OutlinedCard(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
+            // -- What It Means card --
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "WHAT IT MEANS",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "WHAT IT MEANS",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = viewModel.audRisk.description,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                    Text(
+                        text = viewModel.audRisk.description,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = {
+                    viewModel.getCompletedOnboarding { completed ->
+                        if (completed) {
+                            navController.navigate(Screen.Account.route)
+                        } else {
+                            navController.navigate(Screen.NotificationPreferences.route)
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("CONTINUE")
             }
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = {
-                viewModel.getCompletedOnboarding { completed ->
-                    if (completed) {
-                        navController.navigate(Screen.Account.route)
-                    } else {
-                        navController.navigate(Screen.NotificationPreferences.route)
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("CONTINUE")
-        }
-    }
     }
 }

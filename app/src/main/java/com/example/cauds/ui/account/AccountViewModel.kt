@@ -2,62 +2,47 @@ package com.example.cauds.ui.account
 
 import androidx.lifecycle.ViewModel
 import com.example.cauds.data.model.AudRisk
+import com.example.cauds.data.model.User
 import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.UserRepository
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 
+enum class AudTestState {
+    UNTAKEN, IN_PROGRESS, COMPLETED
+}
 
 class AccountViewModel : ViewModel() {
     private val authRepo = AuthRepository()
     private val userRepo = UserRepository()
 
-    var errorMessage by mutableStateOf<String?>(null)
+    var user by mutableStateOf(User())
+        private set
+        
+    var userEmail by mutableStateOf("")
         private set
 
-    var audRisk by mutableStateOf(AudRisk.DEFAULT_RISK)
+    var audTestState by mutableStateOf(AudTestState.UNTAKEN)
         private set
 
-    fun performLogout() {
-        authRepo.logout()
-    }
-
-    fun getAudRiskLevel() {
-        val userId = authRepo.getUserId()!!
-
-        userRepo.getAudRiskLevel(userId) { success, result, error ->
-            if (success) {
-                audRisk = result
-            } else {
-                errorMessage = error ?: "Unknown error"
+    fun loadUserData() {
+        val userId = authRepo.getUserId()
+        if (userId != null) {
+            userEmail = authRepo.getUserEmail() ?: ""
+            userRepo.getUser(userId) { fetchedUser ->
+                user = fetchedUser
+                
+                audTestState = when {
+                    fetchedUser.audTestInProgress -> AudTestState.IN_PROGRESS
+                    fetchedUser.audScore != AudRisk.DEFAULT_RISK -> AudTestState.COMPLETED
+                    else -> AudTestState.UNTAKEN
+                }
             }
         }
     }
 
-    /// DEBUG
-
-    var userDebugInfo by mutableStateOf("")
-        private set
-
-    fun loadUserDebug() {
-        val userId = authRepo.getUserId()!!
-        userRepo.getUser(userId) { user ->
-            userDebugInfo = """
-            name: ${user.name}
-            sex: ${user.sex.name}
-            audScore: ${user.audScore.name}
-            favouriteDrinks: ${user.favouriteDrinks}
-            joinDate: ${user.joinDate.toDate()}
-            onboardingCompleted: ${user.onboardingCompleted}
-            supportingFriend: ${user.supportingFriend}
-            notificationPreferences:
-              dailyCheckin: ${user.notificationPreferences.dailyCheckin}
-              dailyEncouragement: ${user.notificationPreferences.dailyEncouragement}
-              weeklyReflection: ${user.notificationPreferences.weeklyReflection}
-              monthlyProgress: ${user.notificationPreferences.monthlyProgress}
-        """.trimIndent()
-        }
+    fun performLogout() {
+        authRepo.logout()
     }
-
 }

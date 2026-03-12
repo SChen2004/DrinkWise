@@ -67,6 +67,7 @@ class AuthViewModel : ViewModel() {
     fun checkOnboardingStatus(onResult: (Boolean) -> Unit) {
         val userId = repo.getUserId()
         if (userId != null) {
+            userRepo.setAudTestInProgress(userId, false) { _, _ -> }
             userRepo.getCompletedOnboarding(userId) { completed ->
                 onResult(completed)
             }
