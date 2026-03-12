@@ -10,6 +10,7 @@ import com.example.cauds.ui.auth.SignUpScreen
 import com.example.cauds.ui.dashboard.DashboardScreen
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
+import com.example.cauds.screens.CreateEntryScreen
 import com.example.cauds.screens.JournalScreen
 import com.example.cauds.ui.account.AccountScreen
 import com.example.cauds.ui.calendar.CalendarScreen
@@ -65,7 +66,10 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
             com.example.cauds.ui.drinklog.AddNewDrinkScreen(navController, viewModel = manageDrinksViewModel)
         }
 
+        // Journal
         composable(Screen.Journal.route) { JournalScreen(navController, journalViewModel) }
+        composable(Screen.CreateEntry.route) { CreateEntryScreen(navController, journalViewModel) }
+
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }
         ) }

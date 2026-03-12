@@ -1,61 +1,105 @@
 package com.example.cauds.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cauds.data.model.JournalData
+import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.JournalRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-sealed class JournalUiState {
-    object Loading : JournalUiState()
-    data class Success(val entries: List<Pair<String, JournalData>>) : JournalUiState()
-    data class Error(val message: String) : JournalUiState()
-}
-
 class JournalViewModel(
-    private val repository: JournalRepository = JournalRepository()
+    private val journalRepo: JournalRepository = JournalRepository(),
+    private val authRepo: AuthRepository = AuthRepository()
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<JournalUiState>(JournalUiState.Loading)
-    val uiState: StateFlow<JournalUiState> = _uiState
+    // --- Load state ---
+    var entries by mutableStateOf<List<Pair<String, JournalData>>>(emptyList())
+        private set
 
-    private val _deleteError = MutableStateFlow<String?>(null)
-    val deleteError: StateFlow<String?> = _deleteError
+    var isLoading by mutableStateOf(false)
+        private set
 
-    fun loadEntries(userId: String) {
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
+    // --- Delete state ---
+    var deleteError by mutableStateOf<String?>(null)
+        private set
+
+    // --- Save state ---
+    var isSaving by mutableStateOf(false)
+        private set
+
+    var saveError by mutableStateOf<String?>(null)
+        private set
+
+    // saveSuccess acts as a one-shot signal to the screen that the save worked.
+    // The screen watches this, navigates away when it flips to true, then calls
+    // onSaveHandled() to reset it back to false.
+    var saveSuccess by mutableStateOf(false)
+        private set
+
+    fun loadEntries() {
+        val userId = authRepo.getUserId() ?: return
+
         viewModelScope.launch {
-            _uiState.value = JournalUiState.Loading
+            isLoading = true
+            errorMessage = null
 
-            repository.getJournalEntries(userId) { success, entries, error ->
-                if (success && entries != null) {
-                    _uiState.value = JournalUiState.Success(entries)
+            journalRepo.getJournalEntries(userId) { success, result, error ->
+                isLoading = false
+                if (success && result != null) {
+                    entries = result
                 } else {
-                    _uiState.value = JournalUiState.Error(error ?: "Failed to load entries")
+                    errorMessage = error ?: "Failed to load entries"
                 }
             }
         }
     }
 
-    fun deleteEntry(userId: String, documentId: String) {
+    fun saveEntry(text: String) {
+        val userId = authRepo.getUserId() ?: return
+        if (text.isBlank()) return
+
         viewModelScope.launch {
-            repository.deleteJournalEntry(documentId) { success, error ->
+            isSaving = true
+            saveError = null
+
+            val journalData = JournalData(entry = text)
+
+            journalRepo.saveJournalEntry(userId, journalData) { success, error, _ ->
+                isSaving = false
                 if (success) {
-                    val current = _uiState.value
-                    if (current is JournalUiState.Success) {
-                        _uiState.value = JournalUiState.Success(
-                            current.entries.filter { it.first != documentId }
-                        )
-                    }
+                    saveSuccess = true
                 } else {
-                    _deleteError.value = error ?: "Failed to delete entry"
+                    saveError = error ?: "Failed to save entry"
+                }
+            }
+        }
+    }
+
+    // Called by the screen after it has reacted to saveSuccess, so the flag
+    // doesn't keep triggering on recomposition.
+    fun onSaveHandled() {
+        saveSuccess = false
+    }
+
+    fun deleteEntry(documentId: String) {
+        viewModelScope.launch {
+            journalRepo.deleteJournalEntry(documentId) { success, error ->
+                if (success) {
+                    entries = entries.filter { it.first != documentId }
+                } else {
+                    deleteError = error ?: "Failed to delete entry"
                 }
             }
         }
     }
 
     fun clearDeleteError() {
-        _deleteError.value = null
+        deleteError = null
     }
 }
