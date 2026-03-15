@@ -26,6 +26,20 @@ class AccountViewModel : ViewModel() {
     var audTestState by mutableStateOf(AudTestState.UNTAKEN)
         private set
 
+    val areNotificationsOff: Boolean
+        get() {
+            val prefs = user.notificationPreferences
+            return !prefs.dailyCheckin && !prefs.dailyEncouragement && !prefs.weeklyReflection && !prefs.monthlyProgress
+        }
+
+    fun updateUserSex(sex: com.example.cauds.data.model.Sex) {
+        user = user.copy(sex = sex)
+        val userId = authRepo.getUserId() ?: return
+        userRepo.saveUserSex(userId, sex) { success, _ -> 
+            // Handle error logic if needed, but UI is optimistically updated
+        }
+    }
+
     fun loadUserData() {
         val userId = authRepo.getUserId()
         if (userId != null) {
