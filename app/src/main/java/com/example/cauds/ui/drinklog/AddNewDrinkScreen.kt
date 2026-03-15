@@ -40,7 +40,7 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
     var drinkName by remember { mutableStateOf("") }
     
 
-    val categories = listOf("Select Category", "Beer", "Fermented Drinks", "Wine", "Hard Liquor", "Mixed Drinks")
+    val categories = listOf("Select Category", "Beer", "Fermented", "Wine", "Spirit", "Cocktail/Mixed")
     
     val categoryPagerState = rememberPagerState(pageCount = { categories.size })
 
@@ -78,9 +78,10 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         val selectedCategory = categories[categoryPagerState.currentPage]
                         val defaultSize = when (selectedCategory) {
                             "Beer" -> "PINT"
-                            "Wine" -> "STANDARD"
-                            "Fermented Drinks", "Hard Liquor" -> "AVERAGE"
-                            "Mixed Drinks" -> "REGULAR"
+                            "Wine" -> "GLASS"
+                            "Fermented" -> "REGULAR"
+                            "Spirit" -> "SINGLE SHOT"
+                            "Cocktail/Mixed" -> "SINGLE"
                             else -> "REGULAR"
                         }
                         
@@ -145,10 +146,10 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                 val currentCategory = categories[categoryPagerState.currentPage]
                 val iconRes = when (currentCategory) {
                     "Beer" -> R.drawable.ic_beer
-                    "Fermented Drinks" -> R.drawable.ic_fermented_drinks
+                    "Fermented" -> R.drawable.ic_fermented
                     "Wine" -> R.drawable.ic_wine
-                    "Hard Liquor" -> R.drawable.ic_hard_liquor
-                    "Mixed Drinks" -> R.drawable.ic_mixed_drinks
+                    "Spirit" -> R.drawable.ic_spirit
+                    "Cocktail/Mixed" -> R.drawable.ic_cocktail_mixed
                     else -> R.drawable.ic_beer 
                 }
 

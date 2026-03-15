@@ -254,18 +254,18 @@ fun DrinkLogScreen(
                         val category = currentDrink?.category ?: "Beer"
                         
                         val absoluteHeight = when (container.name) {
-                            "FLIGHT", "TASTING" -> 120.dp
-                            "PINT", "AVERAGE", "STANDARD", "REGULAR" -> 150.dp
-                            "PITCHER", "FROZEN", "LARGE" -> 180.dp
-                            else -> 160.dp 
+                            "FLIGHT"-> 100.dp
+                            "PINT", "SINGLE SHOT", "GLASS", "SINGLE", "REGULAR" -> 150.dp
+                            "PITCHER", "BOTTLE", "DOUBLE SHOT", "DOUBLE" -> 200.dp
+                            else -> 150.dp 
                         }
                         
                         val iconRes = when (category) {
                             "Beer" -> R.drawable.ic_beer
-                            "Fermented Drinks" -> R.drawable.ic_fermented_drinks
+                            "Fermented" -> R.drawable.ic_fermented
                             "Wine" -> R.drawable.ic_wine
-                            "Hard Liquor" -> R.drawable.ic_hard_liquor
-                            "Mixed Drinks" -> R.drawable.ic_mixed_drinks
+                            "Spirit" -> R.drawable.ic_spirit
+                            "Cocktail/Mixed" -> R.drawable.ic_cocktail_mixed
                             else -> R.drawable.ic_beer
                         }
                         

@@ -191,7 +191,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                         }
 
                         // Categories Breakdown
-                        val categories = listOf("Beer", "Fermented Drinks", "Wine", "Hard Liquor", "Mixed Drinks")
+                        val categories = listOf("Beer", "Fermented", "Wine", "Spirit", "Cocktail/Mixed")
 
                         categories.forEach { category ->
                             val categoryDrinks = filteredDrinks.filter { it.data.category == category }
@@ -312,9 +312,9 @@ fun DrinkRowItem(
                 val iconRes = when (drink.data.category) {
                     "Beer" -> R.drawable.ic_beer
                     "Wine" -> R.drawable.ic_wine
-                    "Mixed Drinks" -> R.drawable.ic_mixed_drinks
-                    "Hard Liquor" -> R.drawable.ic_hard_liquor
-                    "Fermented Drinks" -> R.drawable.ic_fermented_drinks
+                    "Cocktail/Mixed" -> R.drawable.ic_cocktail_mixed
+                    "Spirit" -> R.drawable.ic_spirit
+                    "Fermented" -> R.drawable.ic_fermented
                     else -> R.drawable.ic_beer
                 }
                 
