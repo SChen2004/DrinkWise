@@ -3,6 +3,7 @@ package com.example.cauds.data.repository
 import com.example.cauds.data.model.AudRisk
 import com.example.cauds.data.model.NotificationPreferences
 import com.example.cauds.data.model.User
+import com.example.cauds.data.model.Sex
 import com.google.firebase.firestore.FirebaseFirestore
 
 const val USERS = "users"
@@ -68,6 +69,13 @@ class UserRepository {
     fun saveFavouriteDrinks(userId: String, drinks: List<String>, onResult: (Boolean, String?) -> Unit) {
         db.collection(USERS).document(userId)
             .update(FAVOURITE_DRINKS, drinks)
+            .addOnSuccessListener { onResult(true, null) }
+            .addOnFailureListener { onResult(false, it.message) }
+    }
+
+    fun saveUserSex(userId: String, sex: Sex, onResult: (Boolean, String?) -> Unit) {
+        db.collection(USERS).document(userId)
+            .update("sex", sex)
             .addOnSuccessListener { onResult(true, null) }
             .addOnFailureListener { onResult(false, it.message) }
     }

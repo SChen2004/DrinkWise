@@ -26,37 +26,39 @@ data class DrinkType(val name: String, val category: String = "Beer")
 fun getSizesForDrink(drinkName: String, category: String): List<ContainerType> {
     return when (category) {
         "Beer" -> listOf(ContainerType("FLIGHT"), ContainerType("PINT"), ContainerType("PITCHER"))
-        "Wine" -> listOf(ContainerType("TASTING"), ContainerType("STANDARD"), ContainerType("LARGE"))
-        "Fermented Drinks", "Hard Liquor" -> listOf(ContainerType("AVERAGE"), ContainerType("LARGE"))
-        "Mixed Drinks" -> {
+        "Wine" -> listOf(ContainerType("GLASS"), ContainerType("BOTTLE"))
+        "Fermented" -> listOf(ContainerType("REGULAR"))
+        "Spirit" -> listOf(ContainerType("SINGLE SHOT"), ContainerType("DOUBLE SHOT"))
+        "Cocktail/Mixed" -> {
             if (drinkName.equals("Daiquiri", ignoreCase = true) || drinkName.equals("Margarita", ignoreCase = true)) {
-                listOf(ContainerType("REGULAR"), ContainerType("FROZEN"))
+                listOf(ContainerType("SINGLE"), ContainerType("DOUBLE"))
             } else {
-                listOf(ContainerType("REGULAR"))
+                listOf(ContainerType("SINGLE"))
             }
         }
-        else -> listOf(ContainerType("STANDARD"))
+        else -> listOf(ContainerType("REGULAR"))
     }
 }
 
 fun getDefaultSizeForDrink(drinkName: String, category: String): String {
     return when (category) {
         "Beer" -> "PINT"
-        "Wine" -> "STANDARD"
-        "Fermented Drinks", "Hard Liquor" -> "AVERAGE"
-        "Mixed Drinks" -> "REGULAR"
-        else -> "STANDARD"
+        "Wine" -> "GLASS"
+        "Fermented" -> "REGULAR"
+        "Spirit" -> "SINGLE SHOT"
+        "Cocktail/Mixed" -> "SINGLE"
+        else -> "REGULAR"
     }
 }
 
-// Hardcoded list of default drinks a user can select (TO DO: Show more drinks from database)
+// Hardcoded list of default drinks a user can select
 val availableDrinks = listOf(
     DrinkType("Ale", "Beer"),
-    DrinkType("Cider", "Fermented Drinks"), 
-    DrinkType("Rum", "Hard Liquor"),
+    DrinkType("Cider", "Fermented"), 
+    DrinkType("Rum", "Spirit"),
     DrinkType("Sauvignon", "Wine"),
-    DrinkType("Seltzer", "Fermented Drinks"),
-    DrinkType("Whiskey", "Hard Liquor")
+    DrinkType("Seltzer", "Fermented"),
+    DrinkType("Whiskey", "Spirit")
 )
 
 /**
