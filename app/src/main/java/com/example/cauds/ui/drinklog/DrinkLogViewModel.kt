@@ -200,16 +200,25 @@ class DrinkLogViewModel(
 
     // Called automatically when the VerticalPager (drink type wheel) snaps to a new item.
     fun selectDrink(type: String) {
+        if (_uiState.value.selectedDrinkType == type) return
+
         val drinkType = _uiState.value.availableDrinkTypes.find { it.name == type }
         val category = drinkType?.category ?: "Beer"
         val newContainers = getSizesForDrink(type, category)
-        val defSize = getDefaultSizeForDrink(type, category)
-        val selectedContainer = newContainers.find { it.name == defSize } ?: newContainers.first()
-        _uiState.value = _uiState.value.copy(
-            selectedDrinkType = type,
-            availableContainers = newContainers,
-            selectedContainer = selectedContainer
-        )
+        val currentState = _uiState.value
+        
+        // Only reset containers if they actually change (due to category switch)
+        if (currentState.availableContainers == newContainers) {
+            _uiState.value = currentState.copy(selectedDrinkType = type)
+        } else {
+            val defSize = getDefaultSizeForDrink(type, category)
+            val selectedContainer = newContainers.find { it.name == defSize } ?: newContainers.first()
+            _uiState.value = currentState.copy(
+                selectedDrinkType = type,
+                availableContainers = newContainers,
+                selectedContainer = selectedContainer
+            )
+        }
     }
 
     // Called automatically when the HorizontalPager (container carousel) snaps to a new item.
@@ -230,8 +239,15 @@ class DrinkLogViewModel(
 
     // Handles typing in the cost input field. Binds to `costInput` (String) to allow fluid deletion of '0.00'.
     fun updateCostInput(newInput: String) {
+        // Prevent negative numbers by checking for '-' or other invalid characters if necessary
+        if (newInput.startsWith("-")) return
+
         // Parse the input softly, falling back to 0.0 if empty or invalid.
         val parsedCost = newInput.toDoubleOrNull() ?: 0.0
+        
+        // Final safety check for numeric value, no negative price allow
+        if (parsedCost < 0) return
+
         _uiState.value = _uiState.value.copy(
             costInput = newInput,
             cost = parsedCost

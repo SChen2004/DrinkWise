@@ -18,12 +18,15 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,6 +68,8 @@ fun DrinkLogScreen(
     
     // Derived state to quickly check if any drinks have been logged today
     val hasLogs = uiState.addedDrinks.isNotEmpty()
+
+    val focusManager = LocalFocusManager.current
 
     // Ensure logs are fetched every time the screen is resumed (e.g. coming back from Manage Drinks)
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -151,6 +156,12 @@ fun DrinkLogScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    focusManager.clearFocus()
+                }
         ) {
             // Main vertically scrollable content column
             Column(
@@ -210,16 +221,18 @@ fun DrinkLogScreen(
             
             // Sync Pager visually when ViewModel state changes internally (e.g. changing drinks/categories)
             LaunchedEffect(uiState.selectedContainer, availableContainers) {
-                val targetIndex = availableContainers.indexOf(uiState.selectedContainer).coerceAtLeast(0)
-                if (pagerState.currentPage != targetIndex) {
-                    pagerState.scrollToPage(targetIndex)
+                if (!pagerState.isScrollInProgress) {
+                    val targetIndex = availableContainers.indexOf(uiState.selectedContainer).coerceAtLeast(0)
+                    if (pagerState.currentPage != targetIndex) {
+                        pagerState.scrollToPage(targetIndex)
+                    }
                 }
             }
 
             // Sync ViewModel when Pager settles on a new swipe
-            LaunchedEffect(pagerState.currentPage) {
-                if (pagerState.currentPage in availableContainers.indices) {
-                    viewModel.selectContainer(pagerState.currentPage)
+            LaunchedEffect(pagerState.settledPage) {
+                if (pagerState.settledPage in availableContainers.indices) {
+                    viewModel.selectContainer(pagerState.settledPage)
                 }
             }
 
@@ -324,35 +337,39 @@ fun DrinkLogScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // 4. Quantity Stepper & Cost Input Text Field Forms
+            var isPriceFocused by remember { mutableStateOf(false) }
+
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Quantity Stepper Component ([-] 1 [+])
-                Row(
-                    modifier = Modifier
-                        .height(48.dp)
-                        .weight(1f)
-                        .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(2.dp)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(-1) }, contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(18.dp))
+                // Quantity Stepper Component ([-] 1 [+]) - Only visible if price not focused
+                if (!isPriceFocused) {
+                    Row(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .weight(1f)
+                            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(2.dp)),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(-1) }, contentAlignment = Alignment.Center) {
+                            Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(18.dp))
+                        }
+                        Text(
+                            text = uiState.quantity.toString(),
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 16.sp
+                        )
+                        Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(1) }, contentAlignment = Alignment.Center) {
+                            Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(18.dp))
+                        }
                     }
-                    Text(
-                        text = uiState.quantity.toString(),
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 16.sp
-                    )
-                    Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(1) }, contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(18.dp))
-                    }
+                    
+                    Spacer(modifier = Modifier.width(24.dp))
                 }
-                
-                Spacer(modifier = Modifier.width(24.dp))
 
                 // Numerical Cost Text Field Input ($ 0.00)
                 Box(
@@ -382,7 +399,9 @@ fun DrinkLogScreen(
                                 fontFamily = FontFamily.Monospace,
                                 textAlign = TextAlign.End
                             ),
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged { isPriceFocused = it.isFocused },
                             decorationBox = { innerTextField ->
                                 Box(
                                     modifier = Modifier.fillMaxWidth(),
@@ -540,9 +559,19 @@ fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, o
     val coroutineScope = rememberCoroutineScope()
     
     // Automatically select the drink when scrolling dynamically changes the visible page
-    LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage in availableDrinkTypes.indices) {
-            onDrinkSelected(availableDrinkTypes[pagerState.currentPage].name)
+    LaunchedEffect(pagerState.settledPage) {
+        if (pagerState.settledPage in availableDrinkTypes.indices) {
+            onDrinkSelected(availableDrinkTypes[pagerState.settledPage].name)
+        }
+    }
+
+    // Sync pager when external selectedType changes (In Edit Mode)
+    LaunchedEffect(selectedType) {
+        if (!pagerState.isScrollInProgress) {
+            val index = availableDrinkTypes.indexOfFirst { it.name == selectedType }
+            if (index != -1 && pagerState.currentPage != index) {
+                pagerState.scrollToPage(index)
+            }
         }
     }
 
@@ -730,7 +759,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
                     .padding(vertical = 12.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.width(48.dp)) // Aligns under the text exactly: 32dp + 16dp
+                Spacer(modifier = Modifier.width(48.dp))
                 Text(
                     text = log.type, 
                     fontSize = 14.sp, 
