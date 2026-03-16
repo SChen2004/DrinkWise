@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -611,7 +612,9 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -620,14 +623,23 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                         .background(Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(text = type, fontSize = 16.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
+                Text(
+                    text = type, 
+                    fontSize = 16.sp, 
+                    color = Color.Black, 
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = drinkSize.uppercase(),
                     color = Color.LightGray,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1
                 )
             }
             
@@ -713,11 +725,21 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 12.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(48.dp)) // Aligns under the text exactly: 32dp + 16dp
-                Text(text = log.type, fontSize = 14.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
+                Text(
+                    text = log.type, 
+                    fontSize = 14.sp, 
+                    color = Color.Black, 
+                    fontFamily = FontFamily.Monospace,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
             }
             
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
