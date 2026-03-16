@@ -88,7 +88,7 @@ fun DrinkLogScreen(
     // Scaffold provides the standard Material structural layout (topBar, bottomBar, content)
     Scaffold(
         topBar = {
-            // The Top navigation bar containing the Back button and Red Dot Chips
+            // The Top navigation bar containing the Back button and Blue Dot Chips
             TopAppBar(
                 title = {
                     if (uiState.editModeId == null && hasLogs) {
@@ -98,9 +98,9 @@ fun DrinkLogScreen(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             val totalSpend = uiState.addedDrinks.sumOf { it.cost }
-                            CustomRedDotChip("${uiState.addedDrinks.size} Drinks")
+                            CustomBlueDotChip("${uiState.addedDrinks.size} Drinks")
                             Spacer(Modifier.width(12.dp))
-                            CustomRedDotChip(String.format("$%.2f Spent", totalSpend))
+                            CustomBlueDotChip(String.format("$%.2f Spent", totalSpend))
                         }
                     }
                 },
@@ -213,11 +213,16 @@ fun DrinkLogScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // 2. Container Pager Carousel
             val availableContainers = uiState.availableContainers
-            val pagerState = rememberPagerState(pageCount = { availableContainers.size })
+            
+            // Stable initial page index based on ViewModel state to prevent resets during category switches
+            val initialContainerPage = remember(availableContainers, uiState.selectedContainer) {
+                availableContainers.indexOf(uiState.selectedContainer).coerceAtLeast(0)
+            }
+            val pagerState = rememberPagerState(initialPage = initialContainerPage, pageCount = { availableContainers.size })
             
             // Sync Pager visually when ViewModel state changes internally (e.g. changing drinks/categories)
             LaunchedEffect(uiState.selectedContainer, availableContainers) {
@@ -240,7 +245,7 @@ fun DrinkLogScreen(
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(220.dp)
             ) {
                 val pageWidth = 120.dp 
                 val horizontalPadding = (maxWidth - pageWidth) / 2
@@ -249,7 +254,7 @@ fun DrinkLogScreen(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = horizontalPadding), // Centers the selected item
-                    pageSpacing = 36.dp // Space between adjacent items
+                    pageSpacing = 48.dp // Space between adjacent items
                 ) { page ->
                     val container = availableContainers[page]
                     val isSelected = pagerState.currentPage == page
@@ -264,10 +269,17 @@ fun DrinkLogScreen(
                         val category = currentDrink?.category ?: "Beer"
                         
                         val absoluteHeight = when (container.name) {
-                            "FLIGHT"-> 100.dp
-                            "PINT", "SINGLE SHOT", "GLASS", "SINGLE", "REGULAR" -> 150.dp
-                            "PITCHER", "BOTTLE", "DOUBLE SHOT", "DOUBLE" -> 200.dp
-                            else -> 150.dp 
+                            "FLIGHT"-> 90.dp
+                            "PINT", "SINGLE SHOT", "GLASS", "SINGLE", "REGULAR" -> 110.dp
+                            "PITCHER", "BOTTLE", "DOUBLE SHOT", "DOUBLE" -> 130.dp
+                            else -> 130.dp 
+                        }
+
+                        val absoluteWidth = when (container.name) {
+                            "FLIGHT"-> 86.dp
+                            "PINT", "SINGLE SHOT", "GLASS", "SINGLE", "REGULAR" -> 106.dp
+                            "PITCHER", "BOTTLE", "DOUBLE SHOT", "DOUBLE" -> 125.dp
+                            else -> 106.dp 
                         }
                         
                         val iconRes = when (category) {
@@ -290,9 +302,9 @@ fun DrinkLogScreen(
                                     id = iconRes
                                 ),
                                 contentDescription = container.name,
+                                alignment = Alignment.BottomCenter,
                                 modifier = Modifier
-                                    .height(absoluteHeight)
-                                    .fillMaxWidth()
+                                    .size(width = absoluteWidth, height = absoluteHeight)
                                     // Ghosting transparency effect for unselected side containers
                                     .alpha(if (isSelected) 1f else 0.15f), 
                                 contentScale = ContentScale.Fit
@@ -489,7 +501,12 @@ fun DrinkLogScreen(
         }
 
             // Toast overlay
-            val toastMessage = if (uiState.showLoggedToast) "Drinks logged." else if (uiState.showDeletedToast) "Drink deleted." else if (uiState.showSavedToast) "Drink saved." else null
+            val toastMessage = when {
+                uiState.showLoggedToast -> if (uiState.lastToastQuantity > 1) "Drinks logged." else "Drink logged."
+                uiState.showDeletedToast -> if (uiState.lastToastQuantity > 1) "Drinks deleted." else "Drink deleted."
+                uiState.showSavedToast -> if (uiState.lastToastQuantity > 1) "Drinks saved." else "Drink saved."
+                else -> null
+            }
             
             if (toastMessage != null) {
                 Row(
@@ -520,10 +537,10 @@ fun DrinkLogScreen(
 
 /**
  * Secondary custom composable for the small pill chips in the Top Bar.
- * Contains a tiny red dot `CircleShape` and trailing descriptive text based on Figma mockups.
+ * Contains a tiny blue dot `CircleShape` and trailing descriptive text based on Figma mockups.
  */
 @Composable
-fun CustomRedDotChip(text: String) {
+fun CustomBlueDotChip(text: String) {
     Surface(
         shape = RoundedCornerShape(50),
         border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
@@ -536,7 +553,7 @@ fun CustomRedDotChip(text: String) {
             Box(
                 modifier = Modifier
                     .size(6.dp)
-                    .background(Color(0xFFFF5252), CircleShape)
+                    .background(Color(0xFF5900FF), CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text, fontSize = 12.sp, color = Color.Black, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Medium)
