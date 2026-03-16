@@ -6,8 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -31,7 +29,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -41,7 +38,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import java.time.format.DateTimeFormatter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -426,7 +422,8 @@ fun DrinkLogScreen(
                             totalCost = groupTotal,
                             deletable = true,
                             onClick = { if (logs.size == 1) viewModel.enterEditMode(firstLog.id) },
-                            onRemove = { viewModel.removeBatch(firstLog.type, firstLog.drinkSize) }
+                            onRemove = { viewModel.removeBatch(firstLog.type, firstLog.drinkSize) },
+                            onDuplicate = { viewModel.duplicateDrink(firstLog.id) }
                         )
                         HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
                         
@@ -435,7 +432,8 @@ fun DrinkLogScreen(
                                 LogItemRow(
                                     log = log,
                                     onClick = { viewModel.enterEditMode(log.id) },
-                                    onRemove = { viewModel.removeDrink(log.id) }
+                                    onRemove = { viewModel.removeDrink(log.id) },
+                                    onDuplicate = { viewModel.duplicateDrink(log.id) }
                                 )
                                 HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
                             }
@@ -580,142 +578,198 @@ fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, o
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable: Boolean, onClick: () -> Unit = {}, onRemove: () -> Unit) {
+fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable: Boolean, onClick: () -> Unit = {}, onRemove: () -> Unit, onDuplicate: () -> Unit = {}) {
     var showDelete by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .background(Color.White)
-            .then(
-                if (deletable) {
-                    Modifier
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures { _, dragAmount ->
-                                // Swipe left to reveal, swipe right to hide
-                                if (dragAmount < -15) showDelete = true
-                                else if (dragAmount > 15) showDelete = false
-                            }
-                        }
-                        .clickable { 
-                            if (showDelete) showDelete = false 
-                            else onClick() 
-                        }
-                } else Modifier
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         Row(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .background(Color.White)
+                .then(
+                    if (deletable) {
+                        Modifier
+                            .pointerInput(Unit) {
+                                detectHorizontalDragGestures { _, dragAmount ->
+                                // Swipe left to reveal, swipe right to hide
+                                    if (dragAmount < -15) showDelete = true
+                                    else if (dragAmount > 15) showDelete = false
+                                }
+                            }
+                            .combinedClickable(
+                                onClick = { 
+                                    if (showDelete) showDelete = false 
+                                    else onClick() 
+                                },
+                                onLongClick = { showMenu = true }
+                            )
+                    } else Modifier
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(text = type, fontSize = 16.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = drinkSize.uppercase(),
-                color = Color.LightGray,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace
-            )
-        }
-        
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
-            Text(
-                text = String.format("$%.2f", totalCost),
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
-            )
-            
-            if (showDelete) {
-                Spacer(modifier = Modifier.width(16.dp))
+            Row(
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .width(48.dp)
-                        .background(Color(0xFFFF5252))
-                        .clickable {
-                            showDelete = false
-                            onRemove()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Close, "Remove", tint = Color.White, modifier = Modifier.size(20.dp))
+                        .size(32.dp)
+                        .background(Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = type, fontSize = 16.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = drinkSize.uppercase(),
+                    color = Color.LightGray,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+            }
+            
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
+                Text(
+                    text = String.format("$%.2f", totalCost),
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
+                )
+                
+                if (showDelete) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(48.dp)
+                            .background(Color(0xFFFF5252))
+                            .clickable {
+                                showDelete = false
+                                onRemove()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Close, "Remove", tint = Color.White, modifier = Modifier.size(20.dp))
+                    }
                 }
             }
+        }
+        
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            modifier = Modifier.background(Color.White)
+        ) {
+            DropdownMenuItem(
+                text = { Text("Delete", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                onClick = {
+                    showMenu = false
+                    onRemove()
+                }
+            )
+            HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+            DropdownMenuItem(
+                text = { Text("Duplicate", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                onClick = {
+                    showMenu = false
+                    onDuplicate()
+                }
+            )
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit) {
+fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, onDuplicate: () -> Unit = {}) {
     var showDelete by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .background(Color(0xFFFAFAFA))
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures { _, dragAmount ->
-                    if (dragAmount < -15) showDelete = true
-                    else if (dragAmount > 15) showDelete = false
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .background(Color(0xFFFAFAFA))
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        if (dragAmount < -15) showDelete = true
+                        else if (dragAmount > 15) showDelete = false
+                    }
+                }
+                .combinedClickable(
+                    onClick = { 
+                        if (showDelete) showDelete = false 
+                        else onClick() 
+                    },
+                    onLongClick = { showMenu = true }
+                ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.width(48.dp)) // Aligns under the text exactly: 32dp + 16dp
+                Text(text = log.type, fontSize = 14.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
+            }
+            
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
+                val costStr = if(log.cost > 0) String.format("$%.2f", log.cost) else "$0.00"
+                Text(
+                    text = costStr,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp,
+                    color = Color.Black,
+                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
+                )
+                
+                if (showDelete) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(48.dp)
+                            .background(Color(0xFFFF5252))
+                            .clickable {
+                                showDelete = false
+                                onRemove()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Close, "Remove", tint = Color.White, modifier = Modifier.size(20.dp))
+                    }
                 }
             }
-            .clickable { 
-                if (showDelete) showDelete = false 
-                else onClick() 
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(modifier = Modifier.width(48.dp)) // Aligns under the text exactly: 32dp + 16dp
-            Text(text = log.type, fontSize = 14.sp, color = Color.Black, fontFamily = FontFamily.Monospace)
         }
         
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
-            val costStr = if(log.cost > 0) String.format("$%.2f", log.cost) else "$0.00"
-            Text(
-                text = costStr,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
-            )
-            
-            if (showDelete) {
-                Spacer(modifier = Modifier.width(16.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(48.dp)
-                        .background(Color(0xFFFF5252))
-                        .clickable {
-                            showDelete = false
-                            onRemove()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Close, "Remove", tint = Color.White, modifier = Modifier.size(20.dp))
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            modifier = Modifier.background(Color.White)
+        ) {
+            DropdownMenuItem(
+                text = { Text("Delete", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                onClick = {
+                    showMenu = false
+                    onRemove()
                 }
-            }
+            )
+            HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+            DropdownMenuItem(
+                text = { Text("Duplicate", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                onClick = {
+                    showMenu = false
+                    onDuplicate()
+                }
+            )
         }
     }
 }

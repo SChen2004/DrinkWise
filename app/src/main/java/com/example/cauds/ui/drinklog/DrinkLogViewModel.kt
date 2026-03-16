@@ -394,6 +394,43 @@ class DrinkLogViewModel(
         )
     }
 
+    /**
+     * Finds the log by its ID and creates a new identical log pointing to this exact moment.
+     */
+    fun duplicateDrink(logId: String) {
+        val current = _uiState.value
+        val logToDuplicate = current.addedDrinks.find { it.id == logId } ?: return
+        
+        val userId = authRepository.getUserId() ?: return
+        
+        val newLogData = LogData(
+            date = current.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            drinkType = logToDuplicate.type,
+            drinkSize = logToDuplicate.drinkSize,
+            drinkCost = logToDuplicate.cost
+        )
+
+        logRepository.saveLog(userId, newLogData) { success, _, docId ->
+             if (success && docId != null) {
+                 val wrapper = LogDataWrapper(
+                     id = docId,
+                     type = newLogData.drinkType,
+                     drinkSize = newLogData.drinkSize,
+                     cost = newLogData.drinkCost
+                 )
+                 
+                 _uiState.value = current.copy(
+                     addedDrinks = listOf(wrapper) + current.addedDrinks,
+                     showLoggedToast = true
+                 )
+                 viewModelScope.launch {
+                     delay(3000)
+                     _uiState.value = _uiState.value.copy(showLoggedToast = false)
+                 }
+             }
+        }
+    }
+
     // Triggered by the trailing "X" icon on an individual drink row.
     fun removeDrink(logId: String) {
         val current = _uiState.value
