@@ -25,7 +25,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.example.cauds.R
 import com.example.cauds.ui.theme.BigShouldersDisplay
-import com.example.cauds.ui.theme.Roboto
+import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.BackgroundSand
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,7 +57,7 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
         }
     }
 
-    val backgroundColor = Color(0xFFFEF5DC)
+    val backgroundColor = BackgroundSand
 
     Scaffold(
         topBar = {
@@ -223,14 +224,14 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .background(Color(0xFFFEF5DC))
+                        .background(BackgroundSand)
                         .border(0.5.dp, Color(0xFF000000), RoundedCornerShape(2.dp))
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .align(Alignment.TopCenter),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(toastMessage!!, color = Color.Black, fontSize = 14.sp, fontFamily = Roboto)
+                    Text(toastMessage!!, color = Color.Black, fontSize = 14.sp, fontFamily = Poppins)
                     Icon(
                         Icons.Default.Close, 
                         contentDescription = "Close", 

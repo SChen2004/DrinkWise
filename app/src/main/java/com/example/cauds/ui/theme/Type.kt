@@ -16,6 +16,10 @@ val Roboto = FontFamily(
     Font(R.font.roboto_regular, FontWeight.Normal)
 )
 
+val Poppins = FontFamily(
+    Font(R.font.poppins_regular, FontWeight.Normal)
+)
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(

@@ -50,6 +50,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cauds.R
+import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
@@ -513,14 +515,14 @@ fun DrinkLogScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .background(Color(0xFFFEF5DC))
+                        .background(BackgroundSand)
                         .border(0.5.dp, Color(0xFF000000), RoundedCornerShape(2.dp))
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .align(Alignment.TopCenter),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(toastMessage, color = Color.Black, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+                    Text(toastMessage, color = Color.Black, fontFamily = Poppins, fontSize = 14.sp)
                     Icon(
                         Icons.Default.Close, 
                         contentDescription = "Close", 
@@ -556,7 +558,7 @@ fun CustomBlueDotChip(text: String) {
                     .background(Color(0xFF5900FF), CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text, fontSize = 12.sp, color = Color.Black, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Medium)
+            Text(text, fontSize = 12.sp, color = Color.Black, fontFamily = Poppins, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -609,7 +611,7 @@ fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, o
             fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal, // Bold if center focus
             color = if (isSelected) Color.Black else Color(0xFFD9D9D9),
             textAlign = TextAlign.Center,
-            fontFamily = FontFamily.Monospace,
+            fontFamily = Poppins,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { 
@@ -673,7 +675,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                     text = type, 
                     fontSize = 16.sp, 
                     color = Color.Black, 
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = Poppins,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
@@ -684,7 +686,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                     color = Color.LightGray,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = Poppins,
                     maxLines = 1
                 )
             }
@@ -695,7 +697,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     color = Color.Black,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = Poppins,
                     modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
                 )
                 
@@ -724,7 +726,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
             modifier = Modifier.background(Color.White)
         ) {
             DropdownMenuItem(
-                text = { Text("Delete", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                text = { Text("Delete", fontFamily = Poppins, fontSize = 14.sp) },
                 onClick = {
                     showMenu = false
                     onRemove()
@@ -732,7 +734,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
             )
             HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
             DropdownMenuItem(
-                text = { Text("Duplicate", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.sp) },
                 onClick = {
                     showMenu = false
                     onDuplicate()
@@ -781,7 +783,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
                     text = log.type, 
                     fontSize = 14.sp, 
                     color = Color.Black, 
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = Poppins,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
@@ -795,7 +797,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
                     color = Color.Black,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = Poppins,
                     modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
                 )
                 
