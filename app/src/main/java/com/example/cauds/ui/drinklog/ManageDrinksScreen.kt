@@ -35,14 +35,15 @@ import androidx.navigation.NavController
 import com.example.cauds.R
 import com.example.cauds.data.model.DrinkItem
 import com.example.cauds.ui.theme.BigShouldersDisplay
-import com.example.cauds.ui.theme.Roboto
+import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val backgroundColor = Color(0xFFFEF5DC)
+    val backgroundColor = BackgroundSand
 
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -107,8 +108,8 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                placeholder = { Text("Search", color = Color.Gray, fontFamily = Roboto) },
-                textStyle = LocalTextStyle.current.copy(fontFamily = Roboto),
+                placeholder = { Text("Search", color = Color.Gray, fontFamily = Poppins) },
+                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins),
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.Black) },
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
@@ -151,8 +152,14 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 ) {
                     // Search Results/Not Found Section
                     if (uiState.searchQuery.isNotBlank()) {
-                        item {
-                            if (filteredDrinks.isEmpty()) {
+                        val categoryOrder = listOf("Beer", "Wine", "Spirit", "Fermented", "Cocktail/Mixed")
+                        val filteredDrinks = uiState.allDrinks.filter { 
+                            it.data.name.contains(uiState.searchQuery, ignoreCase = true) ||
+                            it.data.category.contains(uiState.searchQuery, ignoreCase = true)
+                        }.sortedWith(compareBy({ categoryOrder.indexOf(it.data.category) }, { it.data.name }))
+
+                        if (filteredDrinks.isEmpty()) {
+                            item {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -170,11 +177,13 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                         "Try another search or add it as a new drink.",
                                         color = Color.Gray,
                                         fontSize = 14.sp,
-                                        fontFamily = Roboto,
+                                        fontFamily = Poppins,
                                         textAlign = TextAlign.Start
                                     )
                                 }
-                            } else {
+                            }
+                        } else {
+                            item {
                                 Column(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp, vertical = 16.dp)
@@ -223,6 +232,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
 
                     // Main List Section (Only visible when NOT searching)
                     if (uiState.searchQuery.isBlank()) {
+                        val categoryOrder = listOf("Beer", "Wine", "Spirit", "Fermented", "Cocktail/Mixed")
                         val isSelectedExpanded = uiState.expandedCategories.contains("Selected")
                         item {
                             SectionHeader(
@@ -233,7 +243,10 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                         }
 
                         if (isSelectedExpanded) {
-                            val selectedDrinks = uiState.allDrinks.filter { it.data.isSelected }
+                            val selectedDrinks = uiState.allDrinks
+                                .filter { it.data.isSelected }
+                                .sortedWith(compareBy({ categoryOrder.indexOf(it.data.category) }, { it.data.name }))
+                                
                             item {
                                 Column(
                                     modifier = Modifier
@@ -261,10 +274,10 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                         }
 
                         // Categories Breakdown
-                        val categories = listOf("Beer", "Cocktail/Mixed", "Fermented", "Spirit", "Wine")
-
-                        categories.forEachIndexed { catIndex, category ->
-                            val categoryDrinks = uiState.allDrinks.filter { it.data.category == category }
+                        categoryOrder.forEachIndexed { catIndex, category ->
+                            val categoryDrinks = uiState.allDrinks
+                                .filter { it.data.category == category }
+                                .sortedBy { it.data.name }
                             
                             if (categoryDrinks.isNotEmpty()) {
                                 item(key = category) {
@@ -341,7 +354,7 @@ fun SectionHeader(
 
 @Composable
 fun CategoryHeader(title: String, isExpanded: Boolean, onClick: () -> Unit) {
-    val backgroundColor = Color(0xFFFEF5DC)
+    val backgroundColor = BackgroundSand
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -356,7 +369,7 @@ fun CategoryHeader(title: String, isExpanded: Boolean, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Normal, fontFamily = Roboto)
+            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Normal, fontFamily = Poppins)
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = null,
@@ -374,7 +387,7 @@ fun DrinkRowItem(
     onDelete: () -> Unit
 ) {
     var showDelete by remember { mutableStateOf(false) }
-    val backgroundColor = Color(0xFFFEF5DC)
+    val backgroundColor = BackgroundSand
 
     Box(modifier = Modifier.fillMaxWidth().height(50.dp).background(backgroundColor)) {
         Row(
@@ -417,7 +430,7 @@ fun DrinkRowItem(
                     text = drink.data.name,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
-                    fontFamily = Roboto
+                    fontFamily = Poppins
                 )
             }
 
