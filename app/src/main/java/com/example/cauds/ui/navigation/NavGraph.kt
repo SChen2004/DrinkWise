@@ -21,6 +21,7 @@ import com.example.cauds.ui.account.AccountScreen
 import com.example.cauds.ui.calendar.CalendarScreen
 import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
+import com.example.cauds.ui.dashboard.DashboardViewModel
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
 import com.example.cauds.ui.learning.ArticleScreen
@@ -37,7 +38,9 @@ import com.example.cauds.viewmodel.JournalViewModel
 
 @Composable
 fun NavGraph(navController: NavHostController, startDestination: String) {
-    // Share the onboarding view model
+
+    // viewmodel init
+    val dashboardViewModel: DashboardViewModel = viewModel()
     val onboardingViewModel: OnboardingViewModel = viewModel()
     val journalViewModel: JournalViewModel = viewModel()
     val context = LocalContext.current.applicationContext
@@ -65,7 +68,8 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home
-        composable(Screen.Dashboard.route) { DashboardScreen(navController) }
+
+        composable(Screen.Dashboard.route) { DashboardScreen(navController, dashboardViewModel) }
 
         // Main Sections (Accessible from Dashboard or Bottom Nav)
         composable(Screen.Tracking.route) { DrinkLogScreen(navController) }
@@ -99,19 +103,16 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
         // Secondary Features
         composable(Screen.DaySummary.route) { backStackEntry ->
-
             val dateStr = backStackEntry.arguments?.getString("date") ?: return@composable
 
-
-            val parentEntry = remember(backStackEntry) {
-                navController.getBackStackEntry(Screen.Calendar.route)
-            }
-
-            val sharedCalendarViewModel: CalendarViewModel = viewModel(parentEntry)
+            // Own ViewModel instance — works whether we came from CalendarScreen or Dashboard.
+            // If we came from CalendarScreen, the data might already be cached by Firestore
+            // so the fetch is fast. If from Dashboard, it loads fresh.
+            val calendarViewModel: CalendarViewModel = viewModel()
 
             DaySummaryScreen(
                 date = dateStr,
-                calendarViewModel = sharedCalendarViewModel,
+                calendarViewModel = calendarViewModel,
                 onBack = { navController.popBackStack() }
             )
         }
