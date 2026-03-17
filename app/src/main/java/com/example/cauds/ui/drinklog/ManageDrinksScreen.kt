@@ -44,6 +44,20 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
     val uiState by viewModel.uiState.collectAsState()
     val backgroundColor = Color(0xFFFEF5DC)
 
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            // Refresh page when user ar eback from add new drink
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                viewModel.loadDrinks()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -63,17 +77,18 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(backgroundColor)
-                    .padding(16.dp)
+                    .padding(horizontal = 24.dp)
+                    .padding(vertical = 16.dp)
             ) {
                 Button(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(2.dp),
+                        .height(44.dp),
+                    shape = RoundedCornerShape(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30))
                 ) {
-                    Text("SAVE", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = BigShouldersDisplay, letterSpacing = 2.sp)
+                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.sp)
                 }
             }
         },
@@ -112,23 +127,9 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { navController.navigate(Screen.AddNewDrink.route) }
-                    .padding(vertical = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add New Drink", tint = Color.Black, modifier = Modifier.size(32.dp))
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Add New Drink", fontSize = 24.sp, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay)
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Scrollable List Section
+            Spacer(modifier = Modifier.height(8.dp))
+ 
+            // Scrollable Section
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color.Black)
@@ -138,86 +139,134 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                     uiState.allDrinks
                 } else {
                     uiState.allDrinks.filter {
-                        it.data.name.contains(uiState.searchQuery, ignoreCase = true)
+                        it.data.name.contains(uiState.searchQuery, ignoreCase = true) ||
+                        it.data.category.contains(uiState.searchQuery, ignoreCase = true)
                     }
                 }
-
-                if (filteredDrinks.isEmpty() && uiState.searchQuery.isNotBlank()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            "Drink not found.",
-                            fontSize = 24.sp,
-                            fontFamily = BigShouldersDisplay,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Try another search or add it as a new drink.",
-                            color = Color.Gray,
-                            fontSize = 14.sp,
-                            fontFamily = Roboto,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        // Section: Selected
-                        if (uiState.searchQuery.isBlank()) {
-                            val isSelectedExpanded = uiState.expandedCategories.contains("Selected")
-                            item {
-                                SectionHeader(
-                                    title = "Selected",
-                                    isExpanded = isSelectedExpanded,
-                                    onClick = { viewModel.toggleCategoryExpansion("Selected") }
-                                )
-                            }
-
-                            if (isSelectedExpanded) {
-                                val selectedDrinks = uiState.allDrinks.filter { it.data.isSelected }
-                                item {
-                                    Column(
-                                        modifier = Modifier
-                                            .padding(horizontal = 16.dp)
-                                            .border(1.dp, Color.Black)
-                                    ) {
-                                        selectedDrinks.forEachIndexed { index, drink ->
-                                            DrinkRowItem(
-                                                drink = drink,
-                                                onToggleSelection = { viewModel.toggleDrinkSelection(drink) },
-                                                onDelete = { viewModel.deleteDrink(drink) }
-                                            )
-                                            if (index < selectedDrinks.size - 1) {
-                                                HorizontalDivider(color = Color.Black, thickness = 1.dp)
-                                            }
+ 
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    // Search Results/Not Found Section
+                    if (uiState.searchQuery.isNotBlank()) {
+                        item {
+                            if (filteredDrinks.isEmpty()) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    Text(
+                                        "Drink not found.",
+                                        fontSize = 24.sp,
+                                        fontFamily = BigShouldersDisplay,
+                                        textAlign = TextAlign.Start
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        "Try another search or add it as a new drink.",
+                                        color = Color.Gray,
+                                        fontSize = 14.sp,
+                                        fontFamily = Roboto,
+                                        textAlign = TextAlign.Start
+                                    )
+                                }
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                                        .border(1.dp, Color.Black)
+                                ) {
+                                    filteredDrinks.forEachIndexed { index, drink ->
+                                        DrinkRowItem(
+                                            drink = drink,
+                                            onToggleSelection = { viewModel.toggleDrinkSelection(drink) },
+                                            onDelete = { viewModel.deleteDrink(drink) }
+                                        )
+                                        if (index < filteredDrinks.size - 1) {
+                                            HorizontalDivider(color = Color.Black, thickness = 1.dp)
                                         }
                                     }
                                 }
                             }
+                        }
+                    }
 
+                    // Add New Drink Button (Always below search results or at top if not searching)
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { navController.navigate(Screen.AddNewDrink.route) }
+                                .padding(vertical = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Add New Drink",
+                                tint = Color.Black,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "Add New Drink",
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = BigShouldersDisplay
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    // Main List Section (Only visible when NOT searching)
+                    if (uiState.searchQuery.isBlank()) {
+                        val isSelectedExpanded = uiState.expandedCategories.contains("Selected")
+                        item {
+                            SectionHeader(
+                                title = "Selected",
+                                isExpanded = isSelectedExpanded,
+                                onClick = { viewModel.toggleCategoryExpansion("Selected") }
+                            )
+                        }
+
+                        if (isSelectedExpanded) {
+                            val selectedDrinks = uiState.allDrinks.filter { it.data.isSelected }
                             item {
-                                Spacer(modifier = Modifier.height(48.dp))
-                                SectionHeader("All", showDropdownIcon = false)
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Column(
+                                    modifier = Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .border(1.dp, Color.Black)
+                                ) {
+                                    selectedDrinks.forEachIndexed { index, drink ->
+                                        DrinkRowItem(
+                                            drink = drink,
+                                            onToggleSelection = { viewModel.toggleDrinkSelection(drink) },
+                                            onDelete = { viewModel.deleteDrink(drink) }
+                                        )
+                                        if (index < selectedDrinks.size - 1) {
+                                            HorizontalDivider(color = Color.Black, thickness = 1.dp)
+                                        }
+                                    }
+                                }
                             }
                         }
 
+                        item {
+                            Spacer(modifier = Modifier.height(48.dp))
+                            SectionHeader("All", showDropdownIcon = false)
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+
                         // Categories Breakdown
-                        val categories = listOf("Beer", "Fermented", "Wine", "Spirit", "Cocktail/Mixed")
+                        val categories = listOf("Beer", "Cocktail/Mixed", "Fermented", "Spirit", "Wine")
 
                         categories.forEachIndexed { catIndex, category ->
-                            val categoryDrinks = filteredDrinks.filter { it.data.category == category }
+                            val categoryDrinks = uiState.allDrinks.filter { it.data.category == category }
                             
-                            // Only show category if it has matching drinks (relevant for search)
-                            if (categoryDrinks.isNotEmpty() || uiState.searchQuery.isBlank()) {
+                            if (categoryDrinks.isNotEmpty()) {
                                 item(key = category) {
                                     val isExpanded = uiState.expandedCategories.contains(category)
                                     Column(
@@ -231,7 +280,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                             onClick = { viewModel.toggleCategoryExpansion(category) }
                                         )
                                         
-                                        if (uiState.searchQuery.isNotBlank() || isExpanded) {
+                                        if (isExpanded) {
                                             HorizontalDivider(color = Color.Black, thickness = 1.dp)
                                             categoryDrinks.forEachIndexed { index, drink ->
                                                 DrinkRowItem(
@@ -251,10 +300,6 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                     Spacer(modifier = Modifier.height(24.dp))
                                 }
                             }
-                        }
-                        
-                        item {
-                            Spacer(modifier = Modifier.height(40.dp))
                         }
                     }
                 }

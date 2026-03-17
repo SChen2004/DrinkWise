@@ -513,8 +513,8 @@ fun DrinkLogScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 24.dp)
-                        .background(Color.White)
-                        .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
+                        .background(Color(0xFFFEF5DC))
+                        .border(0.5.dp, Color(0xFF000000), RoundedCornerShape(2.dp))
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .align(Alignment.TopCenter),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -527,7 +527,7 @@ fun DrinkLogScreen(
                         modifier = Modifier
                             .size(16.dp)
                             .clickable { viewModel.hideToast() }, 
-                        tint = Color.LightGray
+                        tint = Color.Black
                     )
                 }
             }
