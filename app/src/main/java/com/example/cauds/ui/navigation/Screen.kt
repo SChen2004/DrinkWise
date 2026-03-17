@@ -30,7 +30,9 @@ sealed class Screen(val route: String) {
 
     // -----    Calendar    -----
     object Calendar : Screen("calendar")
-    object DaySummary : Screen("day_summary/{date}")
+    object DaySummary : Screen("day_summary/{date}") {
+        fun createRoute(date: String) = "day_summary/$date"
+    }
 
     // -----    Learning    -----
     object LearningPage : Screen("learning_page")
