@@ -20,22 +20,22 @@ class OnboardingViewModel : ViewModel() {
 
     var biologicalSex by mutableStateOf(Sex.PREFER_NOT_TO_SAY)
         private set
-        
+
     // Tracks current quiz question
     var currentQuizIndex by mutableStateOf(0)
-    
+
     // Store user's selected options during the quiz
     var quizAnswers by mutableStateOf<List<Option?>>(emptyList())
-    
+
     fun resetQuizState() {
         currentQuizIndex = 0
         quizAnswers = emptyList()
     }
-    
+
     init {
         loadUserState()
     }
-    
+
     fun loadUserState() {
         val userId = authRepo.getUserId() ?: return
         userRepo.getUser(userId) { user ->
@@ -43,7 +43,7 @@ class OnboardingViewModel : ViewModel() {
             notificationPreferences = user.notificationPreferences
             if (user.audTestInProgress) {
                 // If it was in progress, we don't have stored answers yet without another DB field,
-                // but we at least don't reset the risk. 
+                // but we at least don't reset the risk.
             }
         }
     }
