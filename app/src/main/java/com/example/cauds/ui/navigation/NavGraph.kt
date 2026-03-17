@@ -10,6 +10,10 @@ import com.example.cauds.ui.auth.SignUpScreen
 import com.example.cauds.ui.dashboard.DashboardScreen
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.cauds.data.repository.ArticleRepository
 import com.example.cauds.screens.CreateEntryScreen
 import com.example.cauds.screens.JournalScreen
 import com.example.cauds.ui.account.AccountTestScreen
@@ -19,6 +23,8 @@ import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
+import com.example.cauds.ui.learning.LearningPageScreen
+import com.example.cauds.ui.learning.LearningViewModel
 import com.example.cauds.ui.onboarding.AudQuizScreen
 import com.example.cauds.ui.onboarding.FavouriteDrinksScreen
 import com.example.cauds.ui.onboarding.NotificationPreferencesScreen
@@ -33,6 +39,13 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
     // Share the onboarding view model
     val onboardingViewModel: OnboardingViewModel = viewModel()
     val journalViewModel: JournalViewModel = viewModel()
+    val context = LocalContext.current.applicationContext
+    val articleRepo = ArticleRepository(context)
+    val learningViewModel: LearningViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer { LearningViewModel(articleRepo) }
+        }
+    )
 
     NavHost(navController = navController, startDestination = startDestination) {
 
@@ -71,6 +84,8 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.Journal.route) { JournalScreen(navController, journalViewModel) }
         composable(Screen.CreateEntry.route) { CreateEntryScreen(navController, journalViewModel) }
 
+        // Learning
+        composable(Screen.LearningPage.route) { LearningPageScreen(navController, learningViewModel) }
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }
         ) }

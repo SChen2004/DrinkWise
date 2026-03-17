@@ -89,6 +89,9 @@ dependencies {
     // Facebook SDK
     implementation(libs.facebook.login)
 
+    // Google JSON (for articles)
+    implementation("com.google.code.gson:gson:2.10.1")
+
     // Unit-test dependencies
     testImplementation("junit:junit:4.13.2")
     testImplementation("io.mockk:mockk:1.13.10")

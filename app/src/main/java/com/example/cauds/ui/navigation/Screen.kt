@@ -32,6 +32,10 @@ sealed class Screen(val route: String) {
     object Calendar : Screen("calendar")
     object DaySummary : Screen("day_summary/{date}")
 
+    // -----    Learning    -----
+    object LearningPage : Screen("learning_page")
+
+
     // -----    Support    -----
     object Support : Screen("support")
 
