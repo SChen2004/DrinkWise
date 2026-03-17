@@ -29,13 +29,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cauds.data.model.Article
+import com.example.cauds.ui.navigation.Screen
 
 @Composable
 fun ArticleTileCard(
     article: Article,
     onClick: () -> Unit
 ) {
-    val context = LocalContext.current
     val imageRes = remember(article.imageRes) {
         article.imageRes
     }
@@ -106,7 +106,8 @@ fun LearningPageScreen(
             ArticleTileCard(
                 article = article,
                 onClick = {
-                    // navigation to article detail goes here later
+                    viewModel.selectArticle(article)
+                    navController.navigate(Screen.ArticlePage.route)
                 }
             )
         }

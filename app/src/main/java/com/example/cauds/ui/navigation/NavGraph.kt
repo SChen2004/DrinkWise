@@ -23,6 +23,7 @@ import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
+import com.example.cauds.ui.learning.ArticleScreen
 import com.example.cauds.ui.learning.LearningPageScreen
 import com.example.cauds.ui.learning.LearningViewModel
 import com.example.cauds.ui.onboarding.AudQuizScreen
@@ -86,6 +87,9 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
         // Learning
         composable(Screen.LearningPage.route) { LearningPageScreen(navController, learningViewModel) }
+        composable(Screen.ArticlePage.route) { ArticleScreen(navController, learningViewModel) }
+
+
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }
         ) }

@@ -34,7 +34,7 @@ sealed class Screen(val route: String) {
 
     // -----    Learning    -----
     object LearningPage : Screen("learning_page")
-
+    object ArticlePage : Screen("article_page")
 
     // -----    Support    -----
     object Support : Screen("support")
