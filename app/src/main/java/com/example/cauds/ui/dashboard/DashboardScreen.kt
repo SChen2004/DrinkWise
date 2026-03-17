@@ -31,8 +31,8 @@ fun DashboardScreen(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = { navController.navigate(Screen.Support.route) }, modifier = Modifier.fillMaxWidth()) {
-            Text("Support")
+        Button(onClick = { navController.navigate(Screen.LearningPage.route) }, modifier = Modifier.fillMaxWidth()) {
+            Text("Learning")
         }
     }
 }
