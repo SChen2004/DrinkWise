@@ -86,6 +86,7 @@ data class DrinkLogUiState(
     val showLoggedToast: Boolean = false, // Controls the visibility of the "Drink logged." top overlay
     val showDeletedToast: Boolean = false, // Controls the visibility of the "Drink deleted." top overlay
     val showSavedToast: Boolean = false, // Controls the visibility of the "Drink saved." top overlay
+    val lastToastQuantity: Int = 1, // The quantity associated with the last toast (for pluralization)
     val addedDrinks: List<LogDataWrapper> = emptyList() // The list of successfully logged drinks appearing above the inputs
 )
 
@@ -200,16 +201,25 @@ class DrinkLogViewModel(
 
     // Called automatically when the VerticalPager (drink type wheel) snaps to a new item.
     fun selectDrink(type: String) {
+        if (_uiState.value.selectedDrinkType == type) return
+
         val drinkType = _uiState.value.availableDrinkTypes.find { it.name == type }
         val category = drinkType?.category ?: "Beer"
         val newContainers = getSizesForDrink(type, category)
-        val defSize = getDefaultSizeForDrink(type, category)
-        val selectedContainer = newContainers.find { it.name == defSize } ?: newContainers.first()
-        _uiState.value = _uiState.value.copy(
-            selectedDrinkType = type,
-            availableContainers = newContainers,
-            selectedContainer = selectedContainer
-        )
+        val currentState = _uiState.value
+        
+        // Only reset containers if they actually change (due to category switch)
+        if (currentState.availableContainers == newContainers) {
+            _uiState.value = currentState.copy(selectedDrinkType = type)
+        } else {
+            val defSize = getDefaultSizeForDrink(type, category)
+            val selectedContainer = newContainers.find { it.name == defSize } ?: newContainers.first()
+            _uiState.value = currentState.copy(
+                selectedDrinkType = type,
+                availableContainers = newContainers,
+                selectedContainer = selectedContainer
+            )
+        }
     }
 
     // Called automatically when the HorizontalPager (container carousel) snaps to a new item.
@@ -230,8 +240,15 @@ class DrinkLogViewModel(
 
     // Handles typing in the cost input field. Binds to `costInput` (String) to allow fluid deletion of '0.00'.
     fun updateCostInput(newInput: String) {
+        // Prevent negative numbers by checking for '-' or other invalid characters if necessary
+        if (newInput.startsWith("-")) return
+
         // Parse the input softly, falling back to 0.0 if empty or invalid.
         val parsedCost = newInput.toDoubleOrNull() ?: 0.0
+        
+        // Final safety check for numeric value, no negative price allow
+        if (parsedCost < 0) return
+
         _uiState.value = _uiState.value.copy(
             costInput = newInput,
             cost = parsedCost
@@ -259,9 +276,15 @@ class DrinkLogViewModel(
             quantity = 1, // Reset stepper
             costInput = "", // Reset input field text
             cost = 0.0, // Reset internal cost metric
-            showLoggedToast = true
+            showLoggedToast = true,
+            lastToastQuantity = current.quantity
         )
-        
+
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.update { it.copy(showLoggedToast = false) }
+        }
+
         // Save to Firebase
         newLogs.forEach { wrapper ->
             val logData = LogData(
@@ -349,8 +372,14 @@ class DrinkLogViewModel(
             quantity = 1,
             costInput = "",
             cost = 0.0,
-            showSavedToast = true
+            showSavedToast = true,
+            lastToastQuantity = current.quantity
         )
+        
+        viewModelScope.launch {
+            delay(3000)
+            _uiState.update { it.copy(showSavedToast = false) }
+        }
         
         // Delete old from Firebase
         logRepository.deleteLog(editId) { _, _ -> }
@@ -376,10 +405,8 @@ class DrinkLogViewModel(
             }
         }
         
-        viewModelScope.launch {
-            delay(3000)
-            _uiState.value = _uiState.value.copy(showSavedToast = false)
-        }
+        // Result of saving: toast logic handled above
+
     }
 
     /**
@@ -394,6 +421,44 @@ class DrinkLogViewModel(
         )
     }
 
+    /**
+     * Finds the log by its ID and creates a new identical log pointing to this exact moment.
+     */
+    fun duplicateDrink(logId: String) {
+        val current = _uiState.value
+        val logToDuplicate = current.addedDrinks.find { it.id == logId } ?: return
+        
+        val userId = authRepository.getUserId() ?: return
+        
+        val newLogData = LogData(
+            date = current.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            drinkType = logToDuplicate.type,
+            drinkSize = logToDuplicate.drinkSize,
+            drinkCost = logToDuplicate.cost
+        )
+
+        logRepository.saveLog(userId, newLogData) { success, _, docId ->
+             if (success && docId != null) {
+                 val wrapper = LogDataWrapper(
+                     id = docId,
+                     type = newLogData.drinkType,
+                     drinkSize = newLogData.drinkSize,
+                     cost = newLogData.drinkCost
+                 )
+                 
+                 _uiState.value = current.copy(
+                     addedDrinks = listOf(wrapper) + current.addedDrinks,
+                     showLoggedToast = true,
+                     lastToastQuantity = 1
+                 )
+                 viewModelScope.launch {
+                     delay(3000)
+                     _uiState.update { it.copy(showLoggedToast = false) }
+                 }
+             }
+        }
+    }
+
     // Triggered by the trailing "X" icon on an individual drink row.
     fun removeDrink(logId: String) {
         val current = _uiState.value
@@ -403,7 +468,7 @@ class DrinkLogViewModel(
         _uiState.value = current.copy(
             addedDrinks = newLogs
         )
-        triggerToast()
+        triggerToast(1)
         
         logRepository.deleteLog(logId) { _, _ -> }
     }
@@ -418,7 +483,7 @@ class DrinkLogViewModel(
         _uiState.value = current.copy(
             addedDrinks = newLogs
         )
-        triggerToast()
+        triggerToast(batchIds.size)
         
         batchIds.forEach { logId ->
             logRepository.deleteLog(logId) { _, _ -> }
@@ -429,11 +494,11 @@ class DrinkLogViewModel(
      * Activates the top overlay toast "Drink deleted."
      * Uses a coroutine to automatically hide the toast after exactly 3000ms (3 seconds).
      */
-    private fun triggerToast() {
-        _uiState.value = _uiState.value.copy(showDeletedToast = true)
+    private fun triggerToast(quantity: Int) {
+        _uiState.value = _uiState.value.copy(showDeletedToast = true, lastToastQuantity = quantity)
         viewModelScope.launch {
             delay(3000)
-            _uiState.value = _uiState.value.copy(showDeletedToast = false)
+            _uiState.update { it.copy(showDeletedToast = false) }
         }
     }
 

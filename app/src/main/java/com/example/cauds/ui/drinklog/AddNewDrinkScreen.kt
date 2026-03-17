@@ -3,6 +3,7 @@ package com.example.cauds.ui.drinklog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -23,7 +24,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.example.cauds.R
-import androidx.compose.ui.text.font.FontFamily
+import com.example.cauds.ui.theme.BigShouldersDisplay
+import com.example.cauds.ui.theme.Roboto
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,58 +56,66 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
         }
     }
 
+    val backgroundColor = Color(0xFFFEF5DC)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundColor)
             )
         },
         bottomBar = {
+            val selectedCategory = categories[categoryPagerState.currentPage]
+            val canSave = drinkName.isNotBlank() && selectedCategory != "Select Category"
+            val saveButtonColor = if (canSave) Color(0xFF121E30) else Color(0xFF121E30).copy(alpha = 0.5f)
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(16.dp)
+                    .background(backgroundColor)
+                    .padding(horizontal = 24.dp)
+                    .padding(vertical = 16.dp)
             ) {
                 Button(
                     onClick = {
-                        val selectedCategory = categories[categoryPagerState.currentPage]
-                        val defaultSize = when (selectedCategory) {
-                            "Beer" -> "PINT"
-                            "Wine" -> "GLASS"
-                            "Fermented" -> "REGULAR"
-                            "Spirit" -> "SINGLE SHOT"
-                            "Cocktail/Mixed" -> "SINGLE"
-                            else -> "REGULAR"
-                        }
-                        
-                        if (drinkName.isBlank()) {
-                            showToast("Please input name.")
-                        } else if (selectedCategory == "Select Category") {
-                            showToast("Please select category.")
-                        } else {
+                        if (canSave) {
+                            val defaultSize = when (selectedCategory) {
+                                "Beer" -> "PINT"
+                                "Wine" -> "GLASS"
+                                "Fermented" -> "REGULAR"
+                                "Spirit" -> "SINGLE SHOT"
+                                "Cocktail/Mixed" -> "SINGLE"
+                                else -> "REGULAR"
+                            }
                             viewModel.addCustomDrink(drinkName, selectedCategory, defaultSize) {
-                                navController.popBackStack()
+                                // Completion callback
+                            }
+                            navController.popBackStack()
+                        } else {
+                            if (drinkName.isBlank()) {
+                                showToast("Please input name.")
+                            } else {
+                                showToast("Please select category.")
                             }
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(2.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                        .height(44.dp),
+                    shape = RoundedCornerShape(0.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = saveButtonColor)
                 ) {
-                    Text("SAVE", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, letterSpacing = 2.sp)
+                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.sp)
                 }
             }
         },
-        containerColor = Color.White
+        containerColor = backgroundColor
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column(
@@ -121,15 +131,15 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                     value = drinkName,
                     onValueChange = { drinkName = it },
                     placeholder = { 
-                        Text("Add drink name", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, color = Color.LightGray, fontFamily = FontFamily.Monospace) 
+                        Text("Add drink name", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, color = Color.Gray.copy(alpha = 0.5f), fontFamily = BigShouldersDisplay, fontSize = 32.sp) 
                     },
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, fontSize = 32.sp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Black,
-                        unfocusedIndicatorColor = Color.LightGray,
+                        focusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
+                        unfocusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
                     ),
                     trailingIcon = {
                         if (drinkName.isNotEmpty()) {
@@ -163,8 +173,8 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         painter = painterResource(id = iconRes),
                         contentDescription = currentCategory,
                         modifier = Modifier
-                            .size(160.dp)
-                            .alpha(if (currentCategory == "Select Category") 0.2f else 1f), 
+                            .size(160.dp),
+                        colorFilter = if (currentCategory == "Select Category") ColorFilter.tint(Color(0xFFE8E1CE)) else null,
                         contentScale = ContentScale.Fit
                     )
                 }
@@ -173,9 +183,17 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
 
                 // Drink Category Roller
                 Box(
-                    modifier = Modifier.height(100.dp),
+                    modifier = Modifier.height(100.dp).fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
+                    // Highlight Box for selected item
+                    Box(
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(36.dp)
+                            .background(Color(0x1A3583A4))
+                    )
+
                     VerticalPager(
                         state = categoryPagerState,
                         modifier = Modifier.fillMaxSize(),
@@ -183,13 +201,15 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         contentPadding = PaddingValues(vertical = 32.dp)
                     ) { page ->
                         val isCenter = categoryPagerState.currentPage == page
-                        // The UI should display "Select Category", "Beer", etc inline and let them scroll together.
+                        val categoryName = categories[page]
+                        val displayText = if (isCenter && categoryName == "Select Category") "—  $categoryName  —" else categoryName
+                        
                         Text(
-                            text = categories[page],
+                            text = displayText,
                             fontSize = if (isCenter) 20.sp else 16.sp,
-                            fontWeight = if (isCenter) FontWeight.Medium else FontWeight.Normal,
-                            fontFamily = FontFamily.Monospace,
-                            color = if (isCenter) Color.Black else Color(0xFFD9D9D9),
+                            fontWeight = if (isCenter) FontWeight.Normal else FontWeight.Normal,
+                            fontFamily = BigShouldersDisplay,
+                            color = if (isCenter) Color.Black else Color.Black.copy(alpha = 0.1f),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
@@ -199,29 +219,26 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
 
             // Toast Overlay
             if (toastMessage != null) {
-                Box(
+                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 100.dp) // above save button
-                        .padding(horizontal = 16.dp)
-                        .background(Color.White, shape = RoundedCornerShape(4.dp))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.CenterStart
+                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                        .background(Color(0xFFFEF5DC))
+                        .border(0.5.dp, Color(0xFF000000), RoundedCornerShape(2.dp))
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .align(Alignment.TopCenter),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(toastMessage!!, color = Color.Black, fontSize = 14.sp, fontFamily = FontFamily.Monospace)
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Dismiss",
-                            tint = Color.Gray,
-                            modifier = Modifier.clickable { toastMessage = null }
-                        )
-                    }
+                    Text(toastMessage!!, color = Color.Black, fontSize = 14.sp, fontFamily = Roboto)
+                    Icon(
+                        Icons.Default.Close, 
+                        contentDescription = "Close", 
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clickable { toastMessage = null},
+                        tint = Color.Black
+                    )
                 }
             }
         }
