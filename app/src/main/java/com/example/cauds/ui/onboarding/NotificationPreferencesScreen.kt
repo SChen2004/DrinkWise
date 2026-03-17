@@ -29,12 +29,17 @@ fun NotificationPreferencesScreen(
         }
     }
 
-    // State for each preference, matching your NotificationPreferences fields
-    var dailyCheckin by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.dailyCheckin) }
-    var dailyEncouragement by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.dailyEncouragement) }
-    var weeklyReflection by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.weeklyReflection) }
-    var monthlyProgress by remember(viewModel.notificationPreferences) { mutableStateOf(viewModel.notificationPreferences.monthlyProgress) }
+    var dailyCheckin by remember { mutableStateOf(viewModel.notificationPreferences.dailyCheckin) }
+    var dailyEncouragement by remember { mutableStateOf(viewModel.notificationPreferences.dailyEncouragement) }
+    var weeklyReflection by remember { mutableStateOf(viewModel.notificationPreferences.weeklyReflection) }
+    var monthlyProgress by remember { mutableStateOf(viewModel.notificationPreferences.monthlyProgress) }
 
+    LaunchedEffect(viewModel.notificationPreferences) {
+        dailyCheckin = viewModel.notificationPreferences.dailyCheckin
+        dailyEncouragement = viewModel.notificationPreferences.dailyEncouragement
+        weeklyReflection = viewModel.notificationPreferences.weeklyReflection
+        monthlyProgress = viewModel.notificationPreferences.monthlyProgress
+    }
     // Pair each state with its label and description
     val options = listOf(
         Triple("Daily check-ins", "A gentle nudge to log or reflect on your day.", dailyCheckin) to { v: Boolean -> dailyCheckin = v },
