@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.focus.onFocusChanged
@@ -51,7 +52,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cauds.R
 import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.Roboto
+import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.BackgroundSand
+import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
@@ -59,6 +63,7 @@ import kotlinx.coroutines.launch
  * Main Composable for the Drink Log UI.
  * Connects the UI to the `DrinkLogViewModel` which holds the state data and logic.
  */
+val LightSectionBlue = Color(0xFFAFC9DC)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrinkLogScreen(
@@ -89,6 +94,7 @@ fun DrinkLogScreen(
     
     // Scaffold provides the standard Material structural layout (topBar, bottomBar, content)
     Scaffold(
+        containerColor = BackgroundSand, // Main sand background for the entire screen
         topBar = {
             // The Top navigation bar containing the Back button and Blue Dot Chips
             TopAppBar(
@@ -118,7 +124,7 @@ fun DrinkLogScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             modifier = Modifier.size(24.dp),
-                            tint = Color.Gray
+                            tint = Color.Black
                         )
                     }
                 },
@@ -130,7 +136,7 @@ fun DrinkLogScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(BackgroundSand)
                     .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -145,9 +151,16 @@ fun DrinkLogScreen(
                         .padding(horizontal = 16.dp)
                         .height(52.dp),
                     shape = RoundedCornerShape(0.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30))
                 ) {
-                    Text(if (uiState.editModeId != null) "SAVE" else "ADD", color = Color.White, fontSize = 16.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+                    Text(
+                        if (uiState.editModeId != null) "Save" else "Add", 
+                        color = Color.White, 
+                        fontSize = 24.sp, 
+                        fontFamily = BigShouldersDisplay, 
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 0.sp
+                    )
                 }
             }
         }
@@ -182,10 +195,10 @@ fun DrinkLogScreen(
                 ) {
                     Text(
                         text = "Edit", 
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily.Monospace,
-                        color = Color.Black
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 32.sp,
+                        fontFamily = BigShouldersDisplay,
+                        color = Color(0xFF1A3720)
                     )
                 }
             } else {
@@ -197,20 +210,23 @@ fun DrinkLogScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_left), 
                         contentDescription = "Prev", 
-                        modifier = Modifier.size(16.dp).clickable { viewModel.previousDay() }
+                        modifier = Modifier.size(32.dp).clickable { viewModel.previousDay() },
+                        tint = Color(0xFF1A3720)
                     )
                     Spacer(modifier = Modifier.width(32.dp))
                     Text(
                         text = uiState.selectedDate,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily.Monospace
+                        fontSize = 32.sp,
+                        fontFamily = BigShouldersDisplay,
+                        color = Color(0xFF1A3720)
                     )
                     Spacer(modifier = Modifier.width(32.dp))
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_right), 
                         contentDescription = "Next", 
-                        modifier = Modifier.size(16.dp).clickable { viewModel.nextDay() }
+                        modifier = Modifier.size(32.dp).clickable { viewModel.nextDay() },
+                        tint = Color(0xFF1A3720)
                     )
                 }
             }
@@ -251,7 +267,15 @@ fun DrinkLogScreen(
             ) {
                 val pageWidth = 120.dp 
                 val horizontalPadding = (maxWidth - pageWidth) / 2
-                
+
+                Box(
+                    modifier = Modifier
+                        .width(pageWidth)
+                        .height(53.dp)
+                        .padding(bottom = 19.dp)
+                        .background(Color(0xFF3583A4).copy(alpha = 0.3f))
+                        .align(Alignment.BottomCenter)
+                )
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize(),
@@ -272,14 +296,14 @@ fun DrinkLogScreen(
                         
                         val absoluteHeight = when (container.name) {
                             "FLIGHT"-> 90.dp
-                            "PINT", "SINGLE SHOT", "GLASS", "SINGLE", "REGULAR" -> 110.dp
+                            "PINT", "REGULAR SHOT", "GLASS", "SINGLE", "REGULAR" -> 110.dp
                             "PITCHER", "BOTTLE", "DOUBLE SHOT", "DOUBLE" -> 130.dp
                             else -> 130.dp 
                         }
 
                         val absoluteWidth = when (container.name) {
                             "FLIGHT"-> 86.dp
-                            "PINT", "SINGLE SHOT", "GLASS", "SINGLE", "REGULAR" -> 106.dp
+                            "PINT", "REGULAR SHOT", "GLASS", "SINGLE", "REGULAR" -> 106.dp
                             "PITCHER", "BOTTLE", "DOUBLE SHOT", "DOUBLE" -> 125.dp
                             else -> 106.dp 
                         }
@@ -315,21 +339,16 @@ fun DrinkLogScreen(
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        // Small blue indicator block + Text Name label below the bottle
+                        // ext Name label below the bottle
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.height(24.dp)
                         ) {
-                            if (isSelected) {
-                                Box(modifier = Modifier.size(8.dp).background(Color(0xFF5A90DE)))
-                                Spacer(Modifier.width(8.dp))
-                            }
                             Text(
                                 text = container.name,
-                                style = MaterialTheme.typography.labelMedium,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) Color.Black else Color(0xFFD9D9D9),
-                                fontFamily = FontFamily.Monospace,
+                                color = if (isSelected) Color(0xFF264168) else Color(0xFF264168).copy(alpha = 0.2f),
+                                fontFamily = BowlbyOne,
                                 modifier = Modifier.alpha(if (isSelected) 1f else 0.5f)
                             )
                         }
@@ -341,94 +360,105 @@ fun DrinkLogScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 3. Drink Type Wheel Picker (Scrollable text: Ale, Cider, etc.)
-            DrinkTypeWheel(
-                selectedType = uiState.selectedDrinkType,
-                availableDrinkTypes = uiState.availableDrinkTypes,
-                onDrinkSelected = { viewModel.selectDrink(it) }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 4. Quantity Stepper & Cost Input Text Field Forms
-            var isPriceFocused by remember { mutableStateOf(false) }
-
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Group 3 & 4 (Wheel + Inputs) into a blue-backgrounded drawer section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(LightSectionBlue)
+                    .padding(vertical = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Quantity Stepper Component ([-] 1 [+]) - Only visible if price not focused
-                if (!isPriceFocused) {
-                    Row(
-                        modifier = Modifier
+                // 3. Drink Type Wheel Picker (Scrollable text: Ale, Cider, etc.)
+                DrinkTypeWheel(
+                    selectedType = uiState.selectedDrinkType,
+                    availableDrinkTypes = uiState.availableDrinkTypes,
+                    onDrinkSelected = { viewModel.selectDrink(it) }
+                )
+
+                Spacer(modifier = Modifier.height(48.dp))
+
+                // 4. Quantity Stepper & Cost Input Text Field Forms
+                var isPriceFocused by remember { mutableStateOf(false) }
+
+                Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Quantity Stepper Component ([-] 1 [+]) - Only visible if price not focused
+                    if (!isPriceFocused) {
+                        Row(
+                            modifier = Modifier
                             .height(48.dp)
                             .weight(1f)
-                            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(2.dp)),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(-1) }, contentAlignment = Alignment.Center) {
+                            .border(0.5.dp, Color(0xFF1A3720).copy(alpha = 0.5f), RoundedCornerShape(0.dp)),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(-1) }, contentAlignment = Alignment.Center) {
                             Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(18.dp))
-                        }
-                        Text(
-                            text = uiState.quantity.toString(),
-                            fontWeight = FontWeight.Medium,
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 16.sp
-                        )
-                        Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(1) }, contentAlignment = Alignment.Center) {
+                            }
+                            Text(
+                                text = uiState.quantity.toString(),
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = Roboto,
+                                fontSize = 18.sp,
+                                color = Color.Black
+                            )
+                            Box(modifier = Modifier.fillMaxHeight().weight(1f).clickable { viewModel.updateQuantity(1) }, contentAlignment = Alignment.Center) {
                             Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(18.dp))
+                            }
                         }
+                        
+                        Spacer(modifier = Modifier.width(24.dp))
                     }
-                    
-                    Spacer(modifier = Modifier.width(24.dp))
-                }
 
-                // Numerical Cost Text Field Input ($ 0.00)
-                Box(
-                    modifier = Modifier
+                    // Numerical Cost Text Field Input ($ 0.00)
+                    Box(
+                        modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
-                        .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
+                        .border(0.5.dp, Color(0xFF1A3720).copy(alpha = 0.5f), RoundedCornerShape(0.dp))
                         .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "$", color = Color.LightGray, fontSize = 16.sp, fontFamily = FontFamily.Monospace)
-                        BasicTextField(
-                            value = uiState.costInput, // Raw string backing
-                            onValueChange = { newText ->
-                                viewModel.updateCostInput(newText)
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            textStyle = TextStyle(
-                                // Pure black text vs LightGray hint text
-                                color = if(uiState.costInput.isNotEmpty()) Color.Black else Color.LightGray,
-                                fontSize = 16.sp,
-                                fontFamily = FontFamily.Monospace,
-                                textAlign = TextAlign.End
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { isPriceFocused = it.isFocused },
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    // Simulated placeholder Hint text when completely empty
-                                    if (uiState.costInput.isEmpty()) {
-                                        Text(text = "0.00", color = Color.LightGray, fontSize = 16.sp, fontFamily = FontFamily.Monospace, textAlign = TextAlign.End)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = "$",  color = if(uiState.costInput.isNotEmpty()) Color.Black else Color.Black.copy(alpha = 0.3f), fontSize = 20.sp, fontFamily = Roboto, fontWeight = FontWeight.Normal)
+                            BasicTextField(
+                                value = uiState.costInput,
+                                onValueChange = { newText ->
+                                    viewModel.updateCostInput(newText)
+                                },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                textStyle = TextStyle(
+                                    // Pure black text vs LightGray hint text
+                                    color = if(uiState.costInput.isNotEmpty()) Color.Black else Color.Black.copy(alpha = 0.3f),
+                                    fontSize = 20.sp,
+                                    fontFamily = Roboto,
+                                    fontWeight = FontWeight.Normal,
+                                    textAlign = TextAlign.End
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .onFocusChanged { isPriceFocused = it.isFocused },
+                                decorationBox = { innerTextField ->
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        // Simulated placeholder Hint text when completely empty
+                                        if (uiState.costInput.isEmpty()) {
+                                            Text(text = "0.00", color = Color.Black.copy(alpha = 0.3f), fontSize = 20.sp, fontFamily = Roboto, textAlign = TextAlign.End)
+                                        }
+                                        innerTextField()
                                     }
-                                    innerTextField()
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }
@@ -443,23 +473,23 @@ fun DrinkLogScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .border(1.dp, Color(0xFFE0E0E0)) // Bounding box stroke around the list
+                        .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f)) // Bounding box stroke around the list
                 ) {
                     groupedLogs.values.forEach { logs ->
                         val firstLog = logs.first()
                         val groupTotal = logs.sumOf { it.cost }
                         
-                        // Render Top Header for grouping (showing combined metrics)
                         BatchHeaderRow(
                             type = firstLog.type,
                             drinkSize = firstLog.drinkSize,
                             totalCost = groupTotal,
                             deletable = true,
+                            viewModel = viewModel,
                             onClick = { if (logs.size == 1) viewModel.enterEditMode(firstLog.id) },
                             onRemove = { viewModel.removeBatch(firstLog.type, firstLog.drinkSize) },
                             onDuplicate = { viewModel.duplicateDrink(firstLog.id) }
                         )
-                        HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+                        HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
                         
                         if (logs.size > 1) {
                             logs.forEach { log ->
@@ -469,7 +499,7 @@ fun DrinkLogScreen(
                                     onRemove = { viewModel.removeDrink(log.id) },
                                     onDuplicate = { viewModel.duplicateDrink(log.id) }
                                 )
-                                HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+                                HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
                             }
                         }
                     }
@@ -482,8 +512,8 @@ fun DrinkLogScreen(
             Text(
                 text = "Drink not here? Add your own.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.LightGray,
-                fontFamily = FontFamily.Monospace,
+                color = Color(0xFF1A3720).copy(alpha = 0.5f),
+                fontFamily = Poppins,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 textAlign = TextAlign.Center
             )
@@ -492,11 +522,12 @@ fun DrinkLogScreen(
             
             OutlinedButton(
                 onClick = { navController.navigate(Screen.ManageDrinks.route) },
-                shape = RoundedCornerShape(50),
+                modifier = Modifier.height(36.dp),
+                shape = RoundedCornerShape(0.dp),
                 border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF121E30), containerColor = Color(0xFFAFC9DC))
             ) {
-                 Text("Manage Drinks >", color = Color.Black, fontSize = 14.sp, fontFamily = FontFamily.Monospace)
+                 Text("Manage Drinks >", color = Color(0xFF121E30), fontSize = 14.sp, fontFamily = Poppins, fontWeight = FontWeight.Normal)
             }
             
             Spacer(modifier = Modifier.height(32.dp))
@@ -545,11 +576,11 @@ fun DrinkLogScreen(
 fun CustomBlueDotChip(text: String) {
     Surface(
         shape = RoundedCornerShape(50),
-        border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-        color = Color.White
+        border = BorderStroke(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f)),
+        color = Color(0xFFEDF5EF).copy(alpha = 0.5f)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -558,7 +589,7 @@ fun CustomBlueDotChip(text: String) {
                     .background(Color(0xFF5900FF), CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text, fontSize = 12.sp, color = Color.Black, fontFamily = Poppins, fontWeight = FontWeight.Medium)
+            Text(text, fontSize = 14.sp, color = Color.Black, fontFamily = Poppins, fontWeight = FontWeight.Normal)
         }
     }
 }
@@ -594,40 +625,77 @@ fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, o
         }
     }
 
-    VerticalPager(
-        state = pagerState,
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp), 
-        horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(vertical = 32.dp)
-    ) { page ->
-        val drink = availableDrinkTypes[page]
-        val isSelected = pagerState.currentPage == page
-        
-        Text(
-            text = drink.name,
-            fontSize = if (isSelected) 20.sp else 16.sp,
-            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal, // Bold if center focus
-            color = if (isSelected) Color.Black else Color(0xFFD9D9D9),
-            textAlign = TextAlign.Center,
-            fontFamily = Poppins,
+            .height(110.dp), // Fixed height to allow overlay centering
+        contentAlignment = Alignment.Center
+    ) {
+        // Overlay rectangle behind the selected item
+        Box(
+            modifier = Modifier
+                .width(250.dp)
+                .height(44.dp)
+                .background(Color(0xFF3583A4).copy(alpha = 0.3f), RoundedCornerShape(0.dp))
+        )
+
+        VerticalPager(
+            state = pagerState,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { 
-                    coroutineScope.launch {
+            .height(100.dp), 
+            horizontalAlignment = Alignment.CenterHorizontally,
+            contentPadding = PaddingValues(vertical = 32.dp)
+        ) { page ->
+            val drink = availableDrinkTypes[page]
+            val isSelected = pagerState.currentPage == page
+            
+            Text(
+                text = drink.name,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Normal, 
+                color = if (isSelected) Color.Black else Color.Black.copy(alpha = 0.2f),
+                textAlign = TextAlign.Center,
+                fontFamily = BigShouldersDisplay,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { 
+                        coroutineScope.launch {
                         // Smoothly animates center-selection if user clicks an off-center item
-                        pagerState.animateScrollToPage(page)
+                            pagerState.animateScrollToPage(page)
+                        }
                     }
-                }
-                .padding(vertical = 4.dp)
-        )
+                    .padding(vertical = 4.dp)
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable: Boolean, onClick: () -> Unit = {}, onRemove: () -> Unit, onDuplicate: () -> Unit = {}) {
+fun BatchHeaderRow(
+    type: String, 
+    drinkSize: String, 
+    totalCost: Double, 
+    deletable: Boolean, 
+    viewModel: DrinkLogViewModel,
+    onClick: () -> Unit = {}, 
+    onRemove: () -> Unit, 
+    onDuplicate: () -> Unit = {}
+) {
+    // 1. Dynamic category lookup based on drink name
+    val uiState by viewModel.uiState.collectAsState()
+    val category = uiState.availableDrinkTypes.find { it.name == type }?.category ?: "Beer"
+
+    // 2. Select corresponding icon (ic_{category}_o)
+    val iconRes = when (category) {
+        "Beer" -> R.drawable.ic_beer_o
+        "Wine" -> R.drawable.ic_wine_o
+        "Spirit" -> R.drawable.ic_spirit_o
+        "Fermented" -> R.drawable.ic_fermented_o
+        "Cocktail/Mixed" -> R.drawable.ic_cocktail_mixed_o
+        else -> R.drawable.ic_beer_o
+    }
     var showDelete by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
 
@@ -635,8 +703,8 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .background(Color.White)
+                .height(50.dp)
+                .background(BackgroundSand)
                 .then(
                     if (deletable) {
                         Modifier
@@ -662,19 +730,24 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
+                Image(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = null,
                     modifier = Modifier
                         .size(32.dp)
-                        .background(Color(0xFFE0E0E0), RoundedCornerShape(2.dp))
-                )
+                        .background(BackgroundSand, CircleShape)
+                        .padding(4.dp)
+                        //.clip(CircleShape)
+)
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = type, 
-                    fontSize = 16.sp, 
-                    color = Color.Black, 
+                    fontSize = 14.sp, 
+                    fontWeight = FontWeight.Normal,
+                    color = Color(0xFF1A3720), 
                     fontFamily = Poppins,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -683,9 +756,9 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = drinkSize.uppercase(),
-                    color = Color.LightGray,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
+                    color = Color.Black.copy(alpha = 0.3f),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal,
                     fontFamily = Poppins,
                     maxLines = 1
                 )
@@ -695,7 +768,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                 Text(
                     text = String.format("$%.2f", totalCost),
                     fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     color = Color.Black,
                     fontFamily = Poppins,
                     modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
@@ -706,7 +779,7 @@ fun BatchHeaderRow(type: String, drinkSize: String, totalCost: Double, deletable
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(48.dp)
+                            .width(50.dp)
                             .background(Color(0xFFFF5252))
                             .clickable {
                                 showDelete = false
@@ -754,8 +827,8 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .background(Color(0xFFFAFAFA))
+                .height(34.dp)
+                .background(Color(0xFFFFEFC6).copy(alpha = 0.5f))
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { _, dragAmount ->
                         if (dragAmount < -15) showDelete = true
@@ -775,13 +848,13 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(modifier = Modifier.width(48.dp))
                 Text(
                     text = log.type, 
-                    fontSize = 14.sp, 
+                    fontSize = 12.sp,
                     color = Color.Black, 
                     fontFamily = Poppins,
                     maxLines = 1,
@@ -795,7 +868,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
                 Text(
                     text = costStr,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     color = Color.Black,
                     fontFamily = Poppins,
                     modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.dp)
@@ -806,7 +879,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(48.dp)
+                            .width(34.dp)
                             .background(Color(0xFFFF5252))
                             .clickable {
                                 showDelete = false
@@ -826,7 +899,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
             modifier = Modifier.background(Color.White)
         ) {
             DropdownMenuItem(
-                text = { Text("Delete", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                text = { Text("Delete", fontFamily = Poppins, fontSize = 14.sp) },
                 onClick = {
                     showMenu = false
                     onRemove()
@@ -834,7 +907,7 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
             )
             HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
             DropdownMenuItem(
-                text = { Text("Duplicate", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+                text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.sp) },
                 onClick = {
                     showMenu = false
                     onDuplicate()

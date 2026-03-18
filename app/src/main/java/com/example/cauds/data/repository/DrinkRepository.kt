@@ -24,8 +24,8 @@ class DrinkRepository(
         DrinkData(name = "Rose", category = "Wine", defaultSize = "GLASS", isSelected = true),
         DrinkData(name = "Sauvignon", category = "Wine", defaultSize = "GLASS", isSelected = true),
         DrinkData(name = "Seltzer", category = "Fermented", defaultSize = "REGULAR", isSelected = true),
-        DrinkData(name = "Rum", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = true),
-        DrinkData(name = "Whiskey", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = true),
+        DrinkData(name = "Rum", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = true),
+        DrinkData(name = "Whiskey", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = true),
 
         
         // Other defaults (not selected by default)
@@ -58,11 +58,11 @@ class DrinkRepository(
         DrinkData(name = "Sake", category = "Fermented", defaultSize = "REGULAR", isSelected = false),
         DrinkData(name = "Malt Liquor", category = "Fermented", defaultSize = "REGULAR", isSelected = false),
         
-        DrinkData(name = "Gin", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = false),
-        DrinkData(name = "Vodka", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = false),
-        DrinkData(name = "Brandy", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = false),
-        DrinkData(name = "Tequila", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = false),
-        DrinkData(name = "Flavoured Liqueur", category = "Spirit", defaultSize = "SINGLE SHOT", isSelected = false),
+        DrinkData(name = "Gin", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
+        DrinkData(name = "Vodka", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
+        DrinkData(name = "Brandy", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
+        DrinkData(name = "Tequila", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
+        DrinkData(name = "Flavoured Liqueur", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
         
         DrinkData(name = "Old Fashioned", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
         DrinkData(name = "Margarita", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
