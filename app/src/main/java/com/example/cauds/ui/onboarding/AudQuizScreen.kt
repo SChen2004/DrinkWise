@@ -29,16 +29,190 @@ import androidx.compose.ui.unit.sp
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import androidx.compose.foundation.Image
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import com.example.cauds.R
+import com.example.cauds.ui.theme.BowlbyOne
+import com.example.cauds.ui.theme.Poppins
+
+
+@Composable
+fun QuizIntroScreen(navController: NavController) {
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF4A9D5B))
+    ) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .statusBarsPadding()
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.White
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+
+                Image(
+                    painter = painterResource(id = R.drawable.drink_cluster),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(240.dp)
+                )
+
+                Spacer(modifier = Modifier.height(56.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 128.dp),
+                        shape = RectangleShape,
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFEDF5EF))
+                    ) {
+                        Text(
+                            text = "We'll ask a few quick questions about your drinking to help personalize your experience.",
+                            fontSize = 16.sp,
+                            fontFamily = Poppins,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(24.dp)
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Understanding",
+                            fontFamily = BowlbyOne,
+                            fontSize = 36.sp,
+                            color = Color(0xFF1A3720),
+                            modifier = Modifier
+                                .background(Color(0xFFAFC9DC))
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Your",
+                                fontFamily = BigShouldersDisplay,
+                                fontWeight = FontWeight.Light,
+                                fontSize = 32.sp,
+                                color = Color(0xFF1A3720),
+                                modifier = Modifier
+                                    .graphicsLayer { rotationZ = -6f }
+                                    .background(Color(0xFFAFC9DC))
+                                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            Text(
+                                text = "Habits",
+                                fontFamily = BowlbyOne,
+                                fontSize = 36.sp,
+                                color = Color(0xFF1A3720),
+                                modifier = Modifier
+                                    .background(Color(0xFFAFC9DC))
+                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = Color.Black.copy(alpha = 0.5f)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = { navController.navigate(Screen.AudQuiz.route) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .height(44.dp),
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF121E30),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Begin",
+                    fontFamily = BigShouldersDisplay,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 24.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(
+                onClick = {
+                    navController.navigate(Screen.NotificationPreferences.route) {
+                        popUpTo(Screen.QuizIntro.route) { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .height(44.dp),
+                shape = RectangleShape
+            ) {
+                Text(
+                    text = "Skip",
+                    fontFamily = BigShouldersDisplay,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color.Black
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
     val darkBlue = Color(0xFF264168)
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    val imageHeight = if (screenHeight < 700) 140.dp else 200.dp
+    val imageHeight = if (screenHeight < 700) 150.dp else 200.dp
 
     LaunchedEffect(Unit) {
         viewModel.setAudTestInProgress(true)
@@ -169,7 +343,7 @@ fun QuizContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = 6.dp)
                     .border(
                         width = 0.5.dp,
                         color = if (isSelected) Color.White else Color.White.copy(alpha = 0.3f),
@@ -181,18 +355,20 @@ fun QuizContent(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(12.dp)
+                        .size(6.dp)
                         .border(
                             0.5.dp,
                             if (isSelected) Color.White else Color.White.copy(alpha = 0.3f),
                             CircleShape
                         )
                         .background(
-                            color = if (isSelected) Color.White.copy(alpha = 0.4f) else Color.Transparent,
+                            color = if (isSelected) Color.White else Color.Transparent,
                             shape = CircleShape
                         )
                 )
+
                 Spacer(modifier = Modifier.width(12.dp))
+
                 Text(
                     text = option.text,
                     fontFamily = BigShouldersDisplay,

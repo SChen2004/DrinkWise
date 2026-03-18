@@ -157,7 +157,7 @@ fun OnboardingNameScreen(
                 enabled = name.isNotBlank() && !hasError,
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
+                    containerColor = Color(0xFF121E30),
                     disabledContainerColor = Color(0x80121E30),
                     contentColor = Color.White,
                     disabledContentColor = Color.White
@@ -258,7 +258,7 @@ fun OnboardingSexScreen(
                 enabled = selectedOption != null,
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
+                    containerColor = Color(0xFF121E30),
                     disabledContainerColor = Color(0x80121E30),
                     contentColor = Color.White,
                     disabledContentColor = Color.White
@@ -300,8 +300,8 @@ fun OnboardingPurposeScreen(
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val topSpacing = if (screenHeight < 700) 16.dp else 60.dp
     val optionFontSize = if (screenHeight < 700) 18.sp else 24.sp
-    val optionVerticalPadding = if (screenHeight < 700) 8.dp else 14.dp
-    val optionVerticalSpacing = if (screenHeight < 700) 2.dp else 4.dp
+    val optionVerticalPadding = if (screenHeight < 700) 10.dp else 14.dp
+    val optionVerticalSpacing = if (screenHeight < 700) 6.dp else 8.dp
     val labelFontSize = if (screenHeight < 700) 16.sp else 20.sp
     val bottomSpacing = if (screenHeight < 700) 24.dp else 48.dp
 
@@ -411,13 +411,13 @@ fun OnboardingPurposeScreen(
                     } else {
                         viewModel.updateSupportingFriend(false)
                         viewModel.saveOnboardingData()
-                        navController.navigate(Screen.AudQuiz.route)
+                        navController.navigate(Screen.QuizIntro.route)
                     }
                 },
                 enabled = selectedOption != null,
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black,
+                    containerColor = Color(0xFF121E30),
                     disabledContainerColor = Color(0x80121E30),
                     contentColor = Color.White,
                     disabledContentColor = Color.White
