@@ -28,7 +28,7 @@ fun getSizesForDrink(drinkName: String, category: String): List<ContainerType> {
         "Beer" -> listOf(ContainerType("FLIGHT"), ContainerType("PINT"), ContainerType("PITCHER"))
         "Wine" -> listOf(ContainerType("GLASS"), ContainerType("BOTTLE"))
         "Fermented" -> listOf(ContainerType("REGULAR"))
-        "Spirit" -> listOf(ContainerType("SINGLE SHOT"), ContainerType("DOUBLE SHOT"))
+        "Spirit" -> listOf(ContainerType("REGULAR SHOT"), ContainerType("DOUBLE SHOT"))
         "Cocktail/Mixed" -> {
             if (drinkName.equals("Daiquiri", ignoreCase = true) || drinkName.equals("Margarita", ignoreCase = true)) {
                 listOf(ContainerType("SINGLE"), ContainerType("DOUBLE"))
@@ -45,7 +45,7 @@ fun getDefaultSizeForDrink(drinkName: String, category: String): String {
         "Beer" -> "PINT"
         "Wine" -> "GLASS"
         "Fermented" -> "REGULAR"
-        "Spirit" -> "SINGLE SHOT"
+        "Spirit" -> "REGULAR SHOT"
         "Cocktail/Mixed" -> "SINGLE"
         else -> "REGULAR"
     }

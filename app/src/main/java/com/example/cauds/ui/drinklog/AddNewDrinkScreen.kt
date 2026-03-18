@@ -90,7 +90,7 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                                 "Beer" -> "PINT"
                                 "Wine" -> "GLASS"
                                 "Fermented" -> "REGULAR"
-                                "Spirit" -> "SINGLE SHOT"
+                                "Spirit" -> "REGULAR SHOT"
                                 "Cocktail/Mixed" -> "SINGLE"
                                 else -> "REGULAR"
                             }
