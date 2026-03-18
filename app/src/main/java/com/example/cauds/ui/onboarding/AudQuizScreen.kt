@@ -35,10 +35,24 @@ import androidx.compose.ui.platform.LocalConfiguration
 import com.example.cauds.R
 import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.Poppins
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun QuizIntroScreen(navController: NavController) {
+
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val isSmall = screenHeight < 700
+
+    val imageHeight = if (isSmall) 200.dp else 240.dp
+    val imageTitleSpacing = if (isSmall) 32.dp else 50.dp
+    val cardTopPadding = if (isSmall) 90.dp else 128.dp
+    val titleFontSize = if (isSmall) 26.sp else 36.sp
+    val yourFontSize = if (isSmall) 22.sp else 32.sp
+    val cardTextFontSize = if (isSmall) 14.sp else 16.sp
+    val buttonHeight = if (isSmall) 40.dp else 44.dp
+    val buttonFontSize = if (isSmall) 20.sp else 24.sp
+    val bottomSpacing = if (isSmall) 12.dp else 24.dp
 
     Box(
         modifier = Modifier
@@ -79,10 +93,10 @@ fun QuizIntroScreen(navController: NavController) {
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .height(imageHeight)
                 )
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(imageTitleSpacing))
 
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -90,13 +104,13 @@ fun QuizIntroScreen(navController: NavController) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 128.dp),
+                            .padding(top = cardTopPadding),
                         shape = RectangleShape,
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFEDF5EF))
                     ) {
                         Text(
                             text = "We'll ask a few quick questions about your drinking to help personalize your experience.",
-                            fontSize = 16.sp,
+                            fontSize = cardTextFontSize,
                             fontFamily = Poppins,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp)
@@ -110,7 +124,7 @@ fun QuizIntroScreen(navController: NavController) {
                         Text(
                             text = "Understanding",
                             fontFamily = BowlbyOne,
-                            fontSize = 36.sp,
+                            fontSize = titleFontSize,
                             color = Color(0xFF1A3720),
                             modifier = Modifier
                                 .background(Color(0xFFAFC9DC))
@@ -126,7 +140,7 @@ fun QuizIntroScreen(navController: NavController) {
                                 text = "Your",
                                 fontFamily = BigShouldersDisplay,
                                 fontWeight = FontWeight.Light,
-                                fontSize = 32.sp,
+                                fontSize = yourFontSize,
                                 color = Color(0xFF1A3720),
                                 modifier = Modifier
                                     .graphicsLayer {
@@ -144,7 +158,7 @@ fun QuizIntroScreen(navController: NavController) {
                             Text(
                                 text = "Habits",
                                 fontFamily = BowlbyOne,
-                                fontSize = 36.sp,
+                                fontSize = titleFontSize,
                                 color = Color(0xFF1A3720),
                                 modifier = Modifier
                                     .background(Color(0xFFAFC9DC))
@@ -169,7 +183,7 @@ fun QuizIntroScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(44.dp),
+                    .height(buttonHeight),
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF121E30),
@@ -180,7 +194,7 @@ fun QuizIntroScreen(navController: NavController) {
                     text = "Begin",
                     fontFamily = BigShouldersDisplay,
                     fontWeight = FontWeight.Light,
-                    fontSize = 24.sp
+                    fontSize = buttonFontSize
                 )
             }
 
@@ -195,19 +209,19 @@ fun QuizIntroScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(44.dp),
+                    .height(buttonHeight),
                 shape = RectangleShape
             ) {
                 Text(
                     text = "Skip",
                     fontFamily = BigShouldersDisplay,
-                    fontSize = 24.sp,
+                    fontSize = buttonFontSize,
                     fontWeight = FontWeight.Light,
                     color = Color.Black
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(bottomSpacing))
         }
     }
 }
@@ -240,7 +254,9 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
             viewModel.updateAudRisk(audRisk)
             viewModel.saveQuizResult(audRisk)
             viewModel.resetQuizState()
-            navController.navigate(Screen.QuizResult.route) { popUpTo("aud_quiz") { inclusive = true } }
+            navController.navigate(Screen.QuizLoading.route) {
+                popUpTo("aud_quiz") { inclusive = true }
+            }
         }
     }
 
@@ -381,6 +397,44 @@ fun QuizContent(
                     color = Color.White
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun QuizLoadingScreen(navController: NavController) {
+    LaunchedEffect(Unit) {
+        delay(4000)
+        navController.navigate(Screen.QuizResult.route) {
+            popUpTo(Screen.QuizLoading.route) { inclusive = true }
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF33578A)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.drink_cluster_loading),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .height(300.dp)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Preparing your results...",
+                fontFamily = BigShouldersDisplay,
+                fontSize = 36.sp,
+                color = Color.White
+            )
         }
     }
 }

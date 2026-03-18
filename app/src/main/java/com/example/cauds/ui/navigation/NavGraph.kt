@@ -34,6 +34,7 @@ import com.example.cauds.ui.onboarding.OnboardingNameScreen
 import com.example.cauds.ui.onboarding.OnboardingPurposeScreen
 import com.example.cauds.ui.onboarding.OnboardingSexScreen
 import com.example.cauds.ui.onboarding.QuizIntroScreen
+import com.example.cauds.ui.onboarding.QuizLoadingScreen
 import com.example.cauds.ui.onboarding.QuizResultScreen
 import com.example.cauds.viewmodel.JournalViewModel
 
@@ -62,6 +63,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         // Onboarding
         composable(Screen.QuizIntro.route) { QuizIntroScreen(navController) }
         composable(Screen.AudQuiz.route) { AudQuizScreen(navController, onboardingViewModel) }
+        composable(Screen.QuizLoading.route) { QuizLoadingScreen(navController) }
         composable(Screen.QuizResult.route) { QuizResultScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingName.route) { OnboardingNameScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingSex.route) { OnboardingSexScreen(navController, onboardingViewModel) }
