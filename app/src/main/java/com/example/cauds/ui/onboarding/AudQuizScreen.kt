@@ -50,12 +50,12 @@ fun QuizIntroScreen(navController: NavController) {
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .statusBarsPadding()
-                .padding(8.dp)
+                .padding(top = 32.dp, start = 8.dp)
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = Color.White
+                tint = Color.Black
             )
         }
 
@@ -82,7 +82,7 @@ fun QuizIntroScreen(navController: NavController) {
                         .height(240.dp)
                 )
 
-                Spacer(modifier = Modifier.height(56.dp))
+                Spacer(modifier = Modifier.height(50.dp))
 
                 Box(
                     modifier = Modifier.fillMaxWidth()
@@ -99,7 +99,7 @@ fun QuizIntroScreen(navController: NavController) {
                             fontSize = 16.sp,
                             fontFamily = Poppins,
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(24.dp)
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp)
                         )
                     }
 
@@ -129,7 +129,12 @@ fun QuizIntroScreen(navController: NavController) {
                                 fontSize = 32.sp,
                                 color = Color(0xFF1A3720),
                                 modifier = Modifier
-                                    .graphicsLayer { rotationZ = -6f }
+                                    .graphicsLayer {
+                                        rotationZ = -6f
+                                        shadowElevation = 10f
+                                        shape = RectangleShape
+                                        clip = false
+                                    }
                                     .background(Color(0xFFAFC9DC))
                                     .padding(horizontal = 16.dp, vertical = 10.dp)
                             )
