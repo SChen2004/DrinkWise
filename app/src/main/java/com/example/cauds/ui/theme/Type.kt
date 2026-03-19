@@ -17,7 +17,12 @@ val Roboto = FontFamily(
 )
 
 val Poppins = FontFamily(
-    Font(R.font.poppins_regular, FontWeight.Normal)
+    Font(R.font.poppins_regular, FontWeight.Normal),
+    Font(R.font.poppins_black, FontWeight.Black)
+)
+
+val BowlbyOne = FontFamily(
+    Font(R.font.bowlby_one_regular, FontWeight.Normal)
 )
 
 val BowlbyOne = FontFamily(
