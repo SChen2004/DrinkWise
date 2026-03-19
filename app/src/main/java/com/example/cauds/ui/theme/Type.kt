@@ -25,10 +25,6 @@ val BowlbyOne = FontFamily(
     Font(R.font.bowlby_one_regular, FontWeight.Normal)
 )
 
-val BowlbyOne = FontFamily(
-    Font(R.font.bowlbyone_regular, FontWeight.Normal)
-)   
-
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
