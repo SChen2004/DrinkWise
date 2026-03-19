@@ -29,12 +29,16 @@ import androidx.compose.ui.unit.sp
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import androidx.compose.foundation.Image
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import com.example.cauds.R
+import com.example.cauds.data.model.AudRisk
 import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.util.buildStyledDescription
 import kotlinx.coroutines.delay
 
 
@@ -302,7 +306,7 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
                     onOptionSelected = { option ->
                         viewModel.quizAnswers = answers.toMutableList().also { it[index] = option }
                         kotlinx.coroutines.MainScope().launch {
-                            kotlinx.coroutines.delay(350)
+                            delay(350)
                             handleNext()
                         }
                     }
@@ -439,7 +443,6 @@ fun QuizLoadingScreen(navController: NavController) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizResultScreen(
     navController: NavController,
@@ -449,76 +452,145 @@ fun QuizResultScreen(
         viewModel.loadUserState()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.Gray
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        }
-    ) { innerPadding ->
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val riskFontSize = if (screenHeight < 700) 36.sp else 52.sp
+    val beerOffsetY = if (screenHeight < 700) 155.dp else 255.dp
+
+    val backgroundColor = when (viewModel.audRisk) {
+        AudRisk.DEFAULT_RISK -> Color(0xFFFFFFFF)
+        AudRisk.NO_RISK -> Color(0xFF4A9D5B)
+        AudRisk.LOW_RISK -> Color(0xFFFEF5DC)
+        AudRisk.MODERATE_RISK -> Color(0xFFFFCB46)
+        AudRisk.HIGH_RISK -> Color(0xFFFAAAA5)
+    }
+
+    val cocktailColor = when (viewModel.audRisk) {
+        AudRisk.LOW_RISK -> Color(0x662E4E7C)
+        else -> Color(0xFF33578A)
+    }
+
+    val beerColor = when (viewModel.audRisk) {
+        AudRisk.MODERATE_RISK -> Color(0xFFFAAAA5)
+        else -> Color(0xFFFFCB46)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Results",
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "DRINKING PATTERN",
-                style = MaterialTheme.typography.labelMedium
-            )
-
-            Text(
-                text = viewModel.audRisk.displayName,
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            OutlinedCard(
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .clipToBounds()
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_beer),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(beerColor),
+                    modifier = Modifier
+                        .size(250.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = 115.dp, y = beerOffsetY)
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_cocktail_mixed),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(cocktailColor),
+                    modifier = Modifier
+                        .size(265.dp)
+                        .align(Alignment.BottomStart)
+                        .offset(x = (-63).dp, y = 12.dp)
+                )
+
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "WHAT IT MEANS",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.weight(2f))
 
                     Text(
-                        text = viewModel.audRisk.description,
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "Results",
+                        fontFamily = BigShouldersDisplay,
+                        fontSize = 32.sp,
+                        color = Color(0xFF1A3720)
                     )
+
+                    Spacer(modifier = Modifier.weight(1.5f))
+
+                    Text(
+                        text = "DRINKING PATTERN",
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        color = Color(0xFF1A3720)
+                    )
+
+                    Spacer(modifier = Modifier.weight(0.35f))
+
+                    Text(
+                        text = viewModel.audRisk.displayName,
+                        fontFamily = BowlbyOne,
+                        fontSize = riskFontSize,
+                        color = Color(0xFF1A3720),
+                        modifier = Modifier
+                            .background(Color(0xFFAFC9DC))
+                            .padding(horizontal = 12.dp, vertical = 1.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(2f))
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 28.dp),
+                            shape = RectangleShape,
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFEDF5EF))
+                        ) {
+                            Text(
+                                text = buildStyledDescription(viewModel.audRisk.description),
+                                fontFamily = Poppins,
+                                fontSize = 15.sp,
+                                color = Color(0xFF1A3720),
+                                modifier = Modifier.padding(horizontal = 36.dp, vertical = 36.dp)
+                            )
+                        }
+
+                        Text(
+                            text = "What it means",
+                            fontFamily = BowlbyOne,
+                            fontSize = 17.sp,
+                            color = Color(0xFF1A3720),
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .offset(x = 20.dp, y = 12.dp)
+                                .background(Color(0xFFAFC9DC))
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1.25f))
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = Color.Black.copy(alpha = 0.5f)
+            )
+
+            Spacer(modifier = Modifier.weight(0.0225f))
 
             Button(
                 onClick = {
@@ -530,10 +602,24 @@ fun QuizResultScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .height(44.dp),
+                shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF121E30),
+                    contentColor = Color(0xFFEDF5EF)
+                )
             ) {
-                Text("CONTINUE")
+                Text(
+                    text = "Continue",
+                    fontFamily = BigShouldersDisplay,
+                    fontSize = 24.sp
+                )
             }
+
+            Spacer(modifier = Modifier.weight(0.05f))
         }
     }
 }
