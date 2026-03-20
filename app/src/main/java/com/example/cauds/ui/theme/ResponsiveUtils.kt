@@ -9,13 +9,13 @@ import androidx.compose.ui.unit.sp
 
 /**
  * Base on 412dp figma design
- * Scale from 0.85 to 1.15
+ * Scale from 0.75 to 1.25
  */
 @Composable
 fun getScaleRatio(): Float {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
-    return (screenWidth / 412f).coerceIn(0.85f, 1.15f)
+    return (screenWidth / 412f).coerceIn(0.75f, 1.25f)
 }
 
 @Composable

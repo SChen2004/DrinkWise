@@ -25,6 +25,7 @@ import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.ui.platform.LocalConfiguration
 
 /**
  * DrinkLogSection — the "Log your intake" card shown on the dashboard.
@@ -51,6 +52,8 @@ fun DrinkLogSection(
     onLogClick: () -> Unit,
     onDidntDrinkToggle: () -> Unit
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,7 +78,13 @@ fun DrinkLogSection(
 
             Text(
                 text = "Log your intake",
-                fontSize = 32.rsp(),
+                fontSize = if (screenHeight < 700.dp) {
+                    24.rsp()
+                } else if (screenHeight < 850.dp) {
+                    28.rsp()
+                } else {
+                    32.rsp()
+                },
                 fontFamily = BigShouldersDisplay,
                 color = Color(0xFF1A3720),
                 textAlign = TextAlign.Center
@@ -146,6 +155,8 @@ fun DashboardChip(
     dotColor: Color = Color(0xFF4A9D5B),
     onClick: (() -> Unit)? = null
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
     Surface(
         shape = RoundedCornerShape(50),
         border = BorderStroke(0.5.rdp(), Color.Black.copy(alpha = 0.5f)),
@@ -170,7 +181,13 @@ fun DashboardChip(
             }
             Text(
                 text = text,
-                fontSize = 14.rsp(),
+                fontSize = if (screenHeight < 700.dp) {
+                    9.rsp()
+                } else if (screenHeight < 850.dp) {
+                    11.rsp()
+                } else {
+                    12.rsp()
+                },
                 fontFamily = Poppins,
                 color = Color(0xFF1A3720),
                 fontWeight = FontWeight.Normal

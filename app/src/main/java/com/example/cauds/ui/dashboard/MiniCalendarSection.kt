@@ -102,14 +102,14 @@ fun MiniCalendarSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.rdp()))
+        Spacer(modifier = Modifier.height(6.rdp()))
 
         // Build the grid cells for this month.
         // "cells" is a list of nullable LocalDates — null means a blank filler cell.
         val cells = remember(currentMonth) { buildMiniCalendarCells(currentMonth) }
         Column(
             modifier = Modifier.weight(1f), // let the date grid fill the space
-            verticalArrangement = Arrangement.spacedBy(6.rdp()) // space between each row of week
+            verticalArrangement = Arrangement.spacedBy(4.rdp()) // space between each row of week
         ) {
             // Chunk into rows of 7 (one per week) and render each row
             cells.chunked(7).forEach { week ->

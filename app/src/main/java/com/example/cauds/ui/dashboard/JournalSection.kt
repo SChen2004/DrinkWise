@@ -11,7 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
@@ -43,6 +45,8 @@ fun JournalSection(
     onNewEntryClick: () -> Unit,
     onViewJournalClick: () -> Unit
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
     val todayDate = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date())
     val todayDayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
     Box(
@@ -59,7 +63,13 @@ fun JournalSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 140.rdp())
+                .heightIn(min = if (screenHeight < 700.dp) {
+                    80.rdp()
+                } else if (screenHeight < 850.dp) {
+                    110.rdp()
+                } else {
+                    140.rdp()
+                })
                 .background(Color(0xFFEDF5EF).copy(alpha = 0.5f))
                 .border(0.5.rdp(), Color.Black.copy(alpha = 0.5f))
                 .padding(16.rdp())
@@ -72,13 +82,25 @@ fun JournalSection(
             ) {
                 Text(
                     text = todayDate,
-                    fontSize = 28.rsp(),
+                    fontSize = if (screenHeight < 700.dp) {
+                        20.rsp()
+                    } else if (screenHeight < 850.dp) {
+                        24.rsp()
+                    } else {
+                        28.rsp()
+                    },
                     fontFamily = BigShouldersDisplay,
                     color = Color(0xFF1A3720)
                 )
                 Text(
                     text = todayDayOfWeek,
-                    fontSize = 20.rsp(),
+                    fontSize = if (screenHeight < 700.dp) {
+                        12.rsp()
+                    } else if (screenHeight < 850.dp) {
+                        16.rsp()
+                    } else {
+                        20.rsp()
+                    },
                     fontFamily = BigShouldersDisplay,
                     color = Color(0xFF1A3720)
                 )
@@ -92,7 +114,15 @@ fun JournalSection(
                 fontSize = 14.rsp(),
                 fontFamily = Poppins,
                 lineHeight = 22.rsp(),
-                color = if (todayEntryPreview != null) Color(0xFF1A3720) else Color(0xFFA0A5A0)
+                color = if (todayEntryPreview != null) Color(0xFF1A3720) else Color(0xFFA0A5A0),
+                maxLines = if (screenHeight < 700.dp) {
+                    1
+                } else if (screenHeight < 850.dp) {
+                    2
+                } else {
+                    3
+                },
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

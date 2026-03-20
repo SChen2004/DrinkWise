@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.Poppins
@@ -37,6 +39,15 @@ fun WeekSummarySection(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val drinkCountFontSize = if (screenHeight < 700.dp) {
+        64.rsp()
+    } else if (screenHeight < 800.dp) {
+        72.rsp()
+    } else {
+        96.rsp()
+    }
     Column(
         modifier = modifier
             .background(Color(0xFF4A9D5B))
@@ -48,7 +59,7 @@ fun WeekSummarySection(
         // "This week" header
         Text(
             text = "This week",
-            fontSize = 14.rsp(),
+            fontSize = 12.rsp(),
             fontFamily = BowlbyOne,
             fontWeight = FontWeight.Normal,
             color = Color(0xFF121E30),
@@ -70,7 +81,7 @@ fun WeekSummarySection(
                 // Using a large font size so it dominates the card, matching the mockup.
                 Text(
                     text = weekDrinkCount.toString(),
-                    fontSize = 96.rsp(),
+                    fontSize = drinkCountFontSize,
                     fontWeight = FontWeight.Medium,
                     fontFamily = Poppins,
                     color = Color(0xFF121E30),
@@ -86,8 +97,17 @@ fun WeekSummarySection(
                     fontFamily = Poppins,
                     color = Color(0xFF121E30),
                     letterSpacing = 0.rsp(),
-                    modifier = Modifier.offset(y = (-28).rdp())
+                    modifier = Modifier.offset(y =
+                        if (screenHeight < 700.dp) {
+                            -8.rdp()
+                        } else if (screenHeight < 800.dp) {
+                            (-16).rdp()
+                        } else {
+                            (-28).rdp()
+                        }
+                    )
                 )
+                
             }
         }
         Spacer(modifier = Modifier.height(0.rdp()))
