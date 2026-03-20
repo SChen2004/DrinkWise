@@ -1,13 +1,19 @@
 package com.example.cauds.ui.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import com.example.cauds.ui.theme.BackgroundSand
+import com.example.cauds.ui.theme.rdp
+import com.example.cauds.ui.theme.rsp
 import com.example.cauds.ui.navigation.Screen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -25,6 +31,7 @@ fun DashboardScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 dashboardViewModel.loadTodaySummary()
                 dashboardViewModel.loadTodayJournal()
+                dashboardViewModel.loadMonthCalendar()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -36,20 +43,36 @@ fun DashboardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
+            .background(Color(0xFFFFCB46))
     ) {
-        DrinkLogSection(
-            todayDrinkCount = dashboardViewModel.todayDrinkCount,
-            todayTotalSpent = dashboardViewModel.todayTotalSpent,
-            didntDrinkToggled = dashboardViewModel.didntDrinkToggled,
-            onLogClick = {
-                navController.navigate(Screen.Tracking.route)
-            },
-            onDidntDrinkToggle = {
-                dashboardViewModel.toggleDidntDrink()
-            }
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(BackgroundSand)
+                .padding(horizontal = 16.rdp())
+                .padding(top = 56.rdp())
+        ) {
+            DrinkLogSection(
+                todayDrinkCount = dashboardViewModel.todayDrinkCount,
+                todayTotalSpent = dashboardViewModel.todayTotalSpent,
+                didntDrinkToggled = dashboardViewModel.didntDrinkToggled,
+                onLogClick = {
+                    navController.navigate(Screen.Tracking.route)
+                },
+                onDidntDrinkToggle = {
+                    dashboardViewModel.toggleDidntDrink()
+                }
+            )
+            Spacer(modifier = Modifier.height(16.rdp()))
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(horizontal = 16.rdp())
+                .padding(top = 24.rdp(), bottom = 32.rdp())
+        ) {
 
         JournalSection(
             todayEntryPreview = dashboardViewModel.todayEntryPreview,
@@ -61,14 +84,21 @@ fun DashboardScreen(
             }
         )
 
-        DailyMessageSection()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            DailyMessageSection()
+        }
 
         // ── Bottom row: Mini Calendar + Week Summary side by side ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min),  // Forces both children to match the taller one's height
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.rdp())
         ) {
             MiniCalendarSection(
                 drinkCountByDay = dashboardViewModel.drinkCountByDay,
@@ -86,6 +116,7 @@ fun DashboardScreen(
                 },
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
+        }
         }
     }
 }

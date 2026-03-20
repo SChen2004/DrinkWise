@@ -181,9 +181,15 @@ class DashboardViewModel(
             if (success && logs != null) {
 
                 drinkCountByDay = logs.mapNotNull { item ->
-                    item.data.timestamp?.toDate()?.toInstant()
-                        ?.atZone(ZoneId.systemDefault())
-                        ?.toLocalDate()
+                    try {
+                        // Use the actually date
+                        LocalDate.parse(item.data.date, DateTimeFormatter.ISO_LOCAL_DATE)
+                    } catch (e: Exception) {
+                        // only use log time stamp if the date does not work
+                        item.data.timestamp?.toDate()?.toInstant()
+                            ?.atZone(ZoneId.systemDefault())
+                            ?.toLocalDate()
+                    }
                 }.groupingBy { it }.eachCount()
             }
         }

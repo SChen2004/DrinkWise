@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cauds.ui.theme.BigShouldersDisplay
+import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.rdp
+import com.example.cauds.ui.theme.rsp
+import androidx.compose.material.icons.filled.TrendingUp
 
 /**
  * DrinkLogSection — the "Log your intake" card shown on the dashboard.
@@ -46,7 +54,7 @@ fun DrinkLogSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp),
+            .padding(top = 48.rdp(), bottom = 16.rdp()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // "+" icon and "Log your intake" — these navigate to the drink log screen.
@@ -56,27 +64,25 @@ fun DrinkLogSection(
             modifier = Modifier.clickable { onLogClick() },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "+",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Light,
-                color = Color.Black,
-                textAlign = TextAlign.Center
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Log Intake",
+                tint = Color(0xFF1A3720),
+                modifier = Modifier.size(28.rdp())
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.rdp()))
 
             Text(
                 text = "Log your intake",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Serif,
-                color = Color.Black,
+                fontSize = 32.rsp(),
+                fontFamily = BigShouldersDisplay,
+                color = Color(0xFF1A3720),
                 textAlign = TextAlign.Center
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.rdp()))
 
         if (todayDrinkCount > 0) {
             // Drinks logged → show count + spend chips (always have green dots)
@@ -85,9 +91,30 @@ fun DrinkLogSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val drinkLabel = if (todayDrinkCount == 1) "1 Drink" else "$todayDrinkCount Drinks"
-                DashboardChip(text = drinkLabel, showDot = true)
-                Spacer(modifier = Modifier.width(8.dp))
-                DashboardChip(text = String.format("$%.0f Spent", todayTotalSpent), showDot = true)
+                DashboardChip(text = drinkLabel, showDot = true, dotColor = Color(0xFF859BAF))
+                Spacer(modifier = Modifier.width(8.rdp()))
+                DashboardChip(text = String.format("$%.0f Spent", todayTotalSpent), showDot = true, dotColor = Color(0xFF859BAF))
+            }
+
+            Spacer(modifier = Modifier.height(24.rdp()))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "4 days streak",
+                    fontSize = 12.rsp(),
+                    color = Color(0xFF1A3720),
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.width(6.rdp()))
+                Icon(
+                    imageVector = Icons.Default.TrendingUp,
+                    contentDescription = "Streak",
+                    tint = Color(0xFF1A3720),
+                    modifier = Modifier.size(16.rdp())
+                )
             }
         } else {
             // No drinks logged — show "I didn't drink" chip.
@@ -95,6 +122,7 @@ fun DrinkLogSection(
             DashboardChip(
                 text = "I didn't drink",
                 showDot = didntDrinkToggled,
+                dotColor = Color(0xFF519D5C),
                 onClick = onDidntDrinkToggle
             )
         }
@@ -112,34 +140,40 @@ fun DrinkLogSection(
  *                 before the user has logged it, and inert afterward.
  */
 @Composable
-fun DashboardChip(text: String, showDot: Boolean = true, onClick: (() -> Unit)? = null) {
+fun DashboardChip(
+    text: String, 
+    showDot: Boolean = true, 
+    dotColor: Color = Color(0xFF4A9D5B),
+    onClick: (() -> Unit)? = null
+) {
     Surface(
         shape = RoundedCornerShape(50),
-        border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-        color = Color.White,
+        border = BorderStroke(0.5.rdp(), Color.Black.copy(alpha = 0.5f)),
+        color = Color(0xFFEDF5EF).copy(alpha = 0.5f),
         // Only attach a click modifier if onClick is provided.
         // Modifier.then() lets us conditionally chain modifiers —
         // if onClick is null, we add nothing extra.
         modifier = if (onClick != null) Modifier.clickable { onClick() } else Modifier
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 12.rdp(), vertical = 4.rdp()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (showDot) {
                 // Green dot — only visible when this chip represents a "confirmed" state
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
-                        .background(Color(0xFF2E7D32), CircleShape)
+                        .size(6.rdp())
+                        .background(dotColor, CircleShape)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.rdp()))
             }
             Text(
                 text = text,
-                fontSize = 14.sp,
-                fontFamily = FontFamily.Serif,
-                color = Color.Black
+                fontSize = 14.rsp(),
+                fontFamily = Poppins,
+                color = Color(0xFF1A3720),
+                fontWeight = FontWeight.Normal
             )
         }
     }

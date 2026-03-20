@@ -11,6 +11,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cauds.ui.theme.rdp
+import com.example.cauds.ui.theme.rsp
+import com.example.cauds.ui.theme.BigShouldersDisplay
 
 /**
  * DailyMessageSection — placeholder for a daily motivational quote.
@@ -18,19 +21,11 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 fun DailyMessageSection() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "\u201CToday is a good day for a good day.\u201D",
-            fontSize = 18.sp,
-            fontStyle = FontStyle.Italic,
-            fontFamily = FontFamily.Serif,
-            color = Color.Black,
-            textAlign = TextAlign.Center
-        )
-    }
+    Text(
+        text = "\u201CToday is a good day for a good day.\u201D",
+        fontSize = 24.rsp(),
+        fontFamily = BigShouldersDisplay,
+        color = Color(0xFF1A3720),
+        textAlign = TextAlign.Center
+    )
 }

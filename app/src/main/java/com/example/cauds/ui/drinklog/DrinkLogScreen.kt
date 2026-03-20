@@ -56,6 +56,7 @@ import com.example.cauds.ui.theme.Roboto
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.theme.BowlbyOne
+import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
