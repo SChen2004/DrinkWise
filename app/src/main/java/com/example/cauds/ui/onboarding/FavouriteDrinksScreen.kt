@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +57,20 @@ fun FavouriteDrinksScreen(
 ) {
     var selectedOptions by remember { mutableStateOf(setOf<String>()) }
 
+    // ── Responsive sizing ─────────────────────────────────────
+    // LocalConfiguration gives us the screen height in dp.
+    // 1080x2400 at typical density ≈ 800+ dp tall, so that's
+    // the "normal" baseline. Below 700 dp we shrink things down
+    // so nothing gets clipped or crushed on shorter screens.
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val isSmall = screenHeight < 700
+
+    val iconSize       = if (isSmall) 70.dp else 80.dp
+    val rowGap         = if (isSmall) 10.dp  else 16.dp
+    val cellWidth      = if (isSmall) 120.dp else 120.dp
+    val bottomPadding  = if (isSmall) 16.dp else 24.dp
+    val skipFontSize   = if (isSmall) 24.sp else 24.sp
+
     Scaffold(
         containerColor = CreamBackground,
         topBar = {
@@ -83,7 +98,7 @@ fun FavouriteDrinksScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(bottom = 24.dp),
+                .padding(bottom = bottomPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -93,7 +108,7 @@ fun FavouriteDrinksScreen(
                     .padding(horizontal = 48.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = "Almost done.",
@@ -113,6 +128,7 @@ fun FavouriteDrinksScreen(
                     color = DarkGreen
                 )
 
+                Spacer(modifier = Modifier.height(16.dp))
                 Spacer(modifier = Modifier.weight(1f))
 
                 drinkOptions.take(4).chunked(2).forEach { rowPair ->
@@ -125,6 +141,8 @@ fun FavouriteDrinksScreen(
                                 drink = drink,
                                 isSelected = selectedOptions.contains(drink.label),
                                 maxReached = selectedOptions.size >= 3,
+                                iconSize = iconSize,
+                                cellWidth = cellWidth,
                                 onClick = {
                                     val alreadySelected = selectedOptions.contains(drink.label)
                                     if (alreadySelected) {
@@ -137,7 +155,7 @@ fun FavouriteDrinksScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(rowGap))
                 }
 
                 val lastDrink = drinkOptions.last()
@@ -145,6 +163,8 @@ fun FavouriteDrinksScreen(
                     drink = lastDrink,
                     isSelected = selectedOptions.contains(lastDrink.label),
                     maxReached = selectedOptions.size >= 3,
+                    iconSize = iconSize,
+                    cellWidth = cellWidth,
                     onClick = {
                         val alreadySelected = selectedOptions.contains(lastDrink.label)
                         if (alreadySelected) {
@@ -180,7 +200,7 @@ fun FavouriteDrinksScreen(
                 enabled = selectedOptions.isNotEmpty(),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 48.dp)
+                    .padding(horizontal = 24.dp)
                     .padding(top = 16.dp)
                     .height(44.dp),
                 shape = RectangleShape,
@@ -218,7 +238,7 @@ fun FavouriteDrinksScreen(
                 Text(
                     text = "Skip",
                     fontFamily = BigShouldersDisplay,
-                    fontSize = 24.sp,
+                    fontSize = skipFontSize,
                     fontWeight = FontWeight.Normal,
                     color = DarkGreen
                 )
@@ -233,18 +253,20 @@ private fun DrinkCell(
     drink: DrinkOption,
     isSelected: Boolean,
     maxReached: Boolean,
+    iconSize: androidx.compose.ui.unit.Dp,
+    cellWidth: androidx.compose.ui.unit.Dp,
     onClick: () -> Unit
 ) {
     val tint = if (isSelected) drink.selectedTint else DeselectedTint
     val labelColor = when {
         isSelected -> DarkGreen
-        maxReached -> Color(0x66000000)
+        maxReached -> Color(0x44000000)
         else       -> DarkGreen
     }
 
     Column(
         modifier = Modifier
-            .width(120.dp)
+            .width(cellWidth)
             .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -253,7 +275,7 @@ private fun DrinkCell(
             painter = painterResource(id = drink.iconRes),
             contentDescription = drink.label,
             modifier = Modifier
-                .size(80.dp)
+                .size(iconSize)
                 .rotate(drink.rotation),
             colorFilter = ColorFilter.tint(tint)
         )
@@ -266,7 +288,8 @@ private fun DrinkCell(
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             color = labelColor,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            maxLines = 1
         )
     }
 }
