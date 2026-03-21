@@ -10,6 +10,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
@@ -29,6 +30,8 @@ import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.BackgroundSand
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import com.example.cauds.ui.theme.rdp
+import com.example.cauds.ui.theme.rsp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -80,8 +83,8 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(backgroundColor)
-                    .padding(horizontal = 24.dp)
-                    .padding(vertical = 16.dp)
+                    .padding(horizontal = 24.rdp())
+                    .padding(vertical = 16.rdp())
             ) {
                 Button(
                     onClick = {
@@ -108,11 +111,11 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(44.dp),
+                        .height(44.rdp()),
                     shape = RoundedCornerShape(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = saveButtonColor)
                 ) {
-                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.sp)
+                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.rsp())
                 }
             }
         },
@@ -122,37 +125,72 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 32.dp),
+                    .padding(horizontal = 32.rdp()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.rdp()))
                 
                 // Drink Name Input (Underlined, centered)
-                TextField(
+                BasicTextField(
                     value = drinkName,
                     onValueChange = { drinkName = it },
-                    placeholder = { 
-                        Text("Add drink name", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, color = Color.Gray.copy(alpha = 0.5f), fontFamily = BigShouldersDisplay, fontSize = 32.sp) 
-                    },
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, fontSize = 32.sp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
-                        unfocusedIndicatorColor = Color.Black.copy(alpha = 0.3f),
+                    textStyle = LocalTextStyle.current.copy(
+                        textAlign = TextAlign.Center, 
+                        fontWeight = FontWeight.Normal, 
+                        fontFamily = BigShouldersDisplay, 
+                        fontSize = 32.rsp(),
+                        color = Color.Black
                     ),
-                    trailingIcon = {
-                        if (drinkName.isNotEmpty()) {
-                            IconButton(onClick = { drinkName = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray)
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.rdp()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                // Proper text field & placeholder (Centered)
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (drinkName.isEmpty()) {
+                                        Text(
+                                            text = "Add drink name",
+                                            color = Color.Black.copy(alpha = 0.3f),
+                                            fontFamily = BigShouldersDisplay,
+                                            fontSize = 32.rsp(),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                                
+                                // Clear Icon (Right-aligned, overlays without pushing)
+                                if (drinkName.isNotEmpty()) {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        IconButton(onClick = { drinkName = "" }) {
+                                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray)
+                                        }
+                                    }
+                                }
                             }
+                            // Bottom Indicator (Underline)
+                            HorizontalDivider(
+                                color = Color.Black.copy(alpha = 0.3f),
+                                thickness = 1.rdp(),
+                                modifier = Modifier.padding(top = 8.rdp())
+                            )
                         }
-                    },
-                    singleLine = true
+                    }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.rdp()))
 
                 val currentCategory = categories[categoryPagerState.currentPage]
                 val iconRes = when (currentCategory) {
@@ -167,31 +205,31 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
+                        .height(200.rdp()),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = iconRes),
                         contentDescription = currentCategory,
                         modifier = Modifier
-                            .size(160.dp),
+                            .size(160.rdp()),
                         colorFilter = if (currentCategory == "Select Category") ColorFilter.tint(Color(0xFFE8E1CE)) else null,
                         contentScale = ContentScale.Fit
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(32.rdp()))
 
                 // Drink Category Roller
                 Box(
-                    modifier = Modifier.height(100.dp).fillMaxWidth(),
+                    modifier = Modifier.height(130.rdp()).fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     // Highlight Box for selected item
                     Box(
                         modifier = Modifier
-                            .width(200.dp)
-                            .height(36.dp)
+                            .width(200.rdp())
+                            .height(40.rdp())
                             .background(Color(0x1A3583A4))
                     )
 
@@ -199,7 +237,8 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         state = categoryPagerState,
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        contentPadding = PaddingValues(vertical = 32.dp)
+                        contentPadding = PaddingValues(vertical = 50.rdp()),
+                        pageSpacing = 12.rdp()
                     ) { page ->
                         val isCenter = categoryPagerState.currentPage == page
                         val categoryName = categories[page]
@@ -207,11 +246,14 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         
                         Text(
                             text = displayText,
-                            fontSize = if (isCenter) 20.sp else 16.sp,
+                            fontSize = if (isCenter) 20.rsp() else 16.rsp(),
                             fontWeight = if (isCenter) FontWeight.Normal else FontWeight.Normal,
                             fontFamily = BigShouldersDisplay,
                             color = if (isCenter) Color.Black else Color.Black.copy(alpha = 0.1f),
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(30.rdp())
+                                .wrapContentHeight(Alignment.CenterVertically),
                             textAlign = TextAlign.Center
                         )
                     }
@@ -223,20 +265,20 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                  Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 24.dp)
+                        .padding(horizontal = 16.rdp(), vertical = 24.rdp())
                         .background(BackgroundSand)
                         .border(0.5.dp, Color(0xFF000000), RoundedCornerShape(2.dp))
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.rdp(), vertical = 12.rdp())
                         .align(Alignment.TopCenter),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(toastMessage!!, color = Color.Black, fontSize = 14.sp, fontFamily = Poppins)
+                    Text(toastMessage!!, color = Color.Black, fontSize = 14.rsp(), fontFamily = Poppins)
                     Icon(
                         Icons.Default.Close, 
                         contentDescription = "Close", 
                         modifier = Modifier
-                            .size(16.dp)
+                            .size(16.rdp())
                             .clickable { toastMessage = null},
                         tint = Color.Black
                     )

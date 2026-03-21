@@ -28,6 +28,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import com.example.cauds.ui.theme.rdp
+import com.example.cauds.ui.theme.rsp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
@@ -79,18 +81,18 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(backgroundColor)
-                    .padding(horizontal = 24.dp)
-                    .padding(vertical = 16.dp)
+                    .padding(horizontal = 24.rdp())
+                    .padding(vertical = 16.rdp())
             ) {
                 Button(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(44.dp),
+                        .height(44.rdp()),
                     shape = RoundedCornerShape(0.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30))
                 ) {
-                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.sp)
+                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.rsp())
                 }
             }
         },
@@ -108,9 +110,9 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 onValueChange = { viewModel.updateSearchQuery(it) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                placeholder = { Text("Search", color = Color.Gray, fontFamily = Poppins) },
-                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins),
+                    .padding(horizontal = 16.rdp()),
+                placeholder = { Text("Search", color = Color.Gray, fontFamily = Poppins, fontSize = 14.rsp()) },
+                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins, fontSize = 14.rsp()),
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.Black) },
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
@@ -164,20 +166,20 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 24.dp),
+                                        .padding(horizontal = 16.rdp(), vertical = 24.rdp()),
                                     horizontalAlignment = Alignment.Start
                                 ) {
                                     Text(
                                         "Drink not found.",
-                                        fontSize = 24.sp,
+                                        fontSize = 24.rsp(),
                                         fontFamily = BigShouldersDisplay,
                                         textAlign = TextAlign.Start
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(8.rdp()))
                                     Text(
                                         "Try another search or add it as a new drink.",
                                         color = Color.Gray,
-                                        fontSize = 14.sp,
+                                        fontSize = 14.rsp(),
                                         fontFamily = Poppins,
                                         textAlign = TextAlign.Start
                                     )
@@ -187,7 +189,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                             item {
                                 Column(
                                     modifier = Modifier
-                                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                                        .padding(horizontal = 16.rdp(), vertical = 16.rdp())
                                         .border(1.dp, Color.Black)
                                 ) {
                                     filteredDrinks.forEachIndexed { index, drink ->
@@ -211,19 +213,19 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { navController.navigate(Screen.AddNewDrink.route) }
-                                .padding(vertical = 16.dp),
+                                .padding(vertical = 16.rdp()),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = "Add New Drink",
                                 tint = Color.Black,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(32.rdp())
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(8.rdp()))
                             Text(
                                 "Add New Drink",
-                                fontSize = 24.sp,
+                                fontSize = 24.rsp(),
                                 fontWeight = FontWeight.Normal,
                                 fontFamily = BigShouldersDisplay
                             )
@@ -251,7 +253,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                             item {
                                 Column(
                                     modifier = Modifier
-                                        .padding(horizontal = 16.dp)
+                                        .padding(horizontal = 16.rdp())
                                         .border(1.dp, Color.Black)
                                 ) {
                                     selectedDrinks.forEachIndexed { index, drink ->
@@ -285,7 +287,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                     val isExpanded = uiState.expandedCategories.contains(category)
                                     Column(
                                         modifier = Modifier
-                                            .padding(horizontal = 16.dp)
+                                            .padding(horizontal = 16.rdp())
                                             .border(1.dp, Color.Black)
                                     ) {
                                         CategoryHeader(
@@ -311,7 +313,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 }
                                 
                                 item {
-                                    Spacer(modifier = Modifier.height(24.dp))
+                                    Spacer(modifier = Modifier.height(24.rdp()))
                                 }
                             }
                         }
@@ -333,13 +335,13 @@ fun SectionHeader(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(enabled = showDropdownIcon) { onClick() }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.rdp(), vertical = 8.rdp()),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = title,
-            fontSize = 24.sp,
+            fontSize = 24.rsp(),
             fontWeight = FontWeight.Normal,
             fontFamily = BigShouldersDisplay
         )
@@ -359,18 +361,18 @@ fun CategoryHeader(title: String, isExpanded: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(32.dp)
+            .height(32.rdp())
             .clickable { onClick() }
             .background(backgroundColor)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.rdp()),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Normal, fontFamily = Poppins)
+            Text(title, fontSize = 14.rsp(), fontWeight = FontWeight.Normal, fontFamily = Poppins)
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = null,
@@ -423,15 +425,18 @@ fun DrinkRowItem(
                 Image(
                     painter = painterResource(id = iconRes),
                     contentDescription = drink.data.category,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.rdp())
                 )
                 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.rdp()))
                 Text(
                     text = drink.data.name,
-                    fontSize = 14.sp,
+                    fontSize = 14.rsp(),
                     fontWeight = FontWeight.Normal,
-                    fontFamily = Poppins
+                    fontFamily = Poppins,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
             }
 
@@ -455,11 +460,11 @@ fun DrinkRowItem(
                 }
 
                 if (showDelete) {
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.rdp()))
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(50.dp)
+                            .width(50.rdp())
                             .background(Color(0xFFFF6A6A))
                             .clickable {
                                 showDelete = false
