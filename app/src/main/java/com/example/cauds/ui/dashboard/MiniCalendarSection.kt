@@ -1,6 +1,7 @@
 package com.example.cauds.ui.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -16,11 +17,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cauds.ui.theme.Poppins
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+import com.example.cauds.ui.theme.rdp
+import com.example.cauds.ui.theme.rsp
+import com.example.cauds.ui.theme.BigShouldersDisplay
+import com.example.cauds.ui.theme.BowlbyOne
 
 /**
  * MiniCalendarSection — a compact month view for the dashboard's bottom-left slot.
@@ -58,18 +64,19 @@ fun MiniCalendarSection(
 
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color(0xFFE8E0F0))
+            .background(Color(0xFFAFC9DC))
+            .border(0.5.rdp(), Color.Black.copy(alpha = 0.5f))
             .clickable { onClick() }
-            .padding(8.dp)
+            .padding(12.rdp())
     ) {
         // Month + year header (e.g., "March 2026")
         Text(
             text = monthTitle,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 4.dp)
+            fontSize = 12.rsp(),
+            fontFamily = BowlbyOne,
+            fontWeight = FontWeight.Normal,
+            color = Color(0xFF1A3720),
+            modifier = Modifier.padding(bottom = 8.rdp())
         )
 
         // Weekday header row: S M T W T F S
@@ -81,70 +88,97 @@ fun MiniCalendarSection(
 
         Row(modifier = Modifier.fillMaxWidth()) {
             weekdays.forEach { dow ->
+                val isWeekend = dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY
                 Text(
                     // .NARROW gives single letter: "S", "M", "T", etc.
                     text = dow.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Gray
+                    fontFamily = Poppins,
+                    fontSize = 10.rsp(),
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isWeekend) Color(0xFF000000).copy(alpha = 0.4f) else Color(0xFF1A3720)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(6.rdp()))
 
         // Build the grid cells for this month.
         // "cells" is a list of nullable LocalDates — null means a blank filler cell.
         val cells = remember(currentMonth) { buildMiniCalendarCells(currentMonth) }
+        Column(
+            modifier = Modifier.weight(1f), // let the date grid fill the space
+            verticalArrangement = Arrangement.spacedBy(4.rdp()) // space between each row of week
+        ) {
+            // Chunk into rows of 7 (one per week) and render each row
+            cells.chunked(7).forEach { week ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    week.forEach { date ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)        // Equal width for all 7 columns
+                                .aspectRatio(1f),  // Square cells
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (date != null) {
+                                val drinkCount = drinkCountByDay[date] ?: 0
+                                val isToday = date == today
+                                val isFuture = date.isAfter(today)
+                                val isWeekendDay =
+                                    date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY
+                                // Background highlight — color intensity scales with drink count
+                                val bgColor = when {
+                                    drinkCount >= 5 -> Color(0xFF5900FF).copy(alpha = 0.32f)
+                                    drinkCount >= 3 -> Color(0xFF6074FF).copy(alpha = 0.7f)
+                                    drinkCount >= 2 -> Color(0xFF6EA8FE).copy(alpha = 0.4f)
+                                    drinkCount >= 1 -> Color(0xFFFFFFFF).copy(alpha = 0.2f)
+                                    else -> Color.Transparent
+                                }
 
-        // Chunk into rows of 7 (one per week) and render each row
-        cells.chunked(7).forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth()) {
-                week.forEach { date ->
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)        // Equal width for all 7 columns
-                            .aspectRatio(1f),  // Square cells
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (date != null) {
-                            val drinkCount = drinkCountByDay[date] ?: 0
-                            val isToday = date == today
+                                // Text color — white on dark backgrounds, black otherwise
+                                val textColor = when {
+                                    isToday -> Color.White
+                                    isFuture -> Color(0xFF000000).copy(alpha = 0.2f)
+                                    isWeekendDay -> Color(0xFF000000).copy(alpha = 0.4f)
+                                    else -> Color(0xFF000000)
+                                }
 
-                            // Background highlight — color intensity scales with drink count
-                            val bgColor = when {
-                                isToday -> Color.Black  // Today gets a solid dark circle
-                                drinkCount >= 3 -> Color(0xFF7E57C2).copy(alpha = 0.8f)   // Heavy
-                                drinkCount == 2 -> Color(0xFF7E57C2).copy(alpha = 0.5f)   // Medium
-                                drinkCount == 1 -> Color(0xFF7E57C2).copy(alpha = 0.3f)   // Light
-                                else -> Color.Transparent                                  // No drinks
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(if (!isToday && drinkCount > 0) bgColor else Color.Transparent),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (isToday) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(24.rdp())
+                                                .clip(CircleShape)
+                                                .background(Color(0xFF000000)),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = date.dayOfMonth.toString(),
+                                                fontSize = 11.rsp(),
+                                                fontFamily = Poppins,
+                                                fontWeight = FontWeight.Bold,
+                                                color = textColor
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            text = date.dayOfMonth.toString(),
+                                            fontSize = 11.rsp(),
+                                            fontFamily = Poppins,
+                                            fontWeight = FontWeight.Bold,
+                                            color = textColor
+                                        )
+                                    }
+                                }
                             }
-
-                            // Text color — white on dark backgrounds, black otherwise
-                            val textColor = when {
-                                isToday -> Color.White
-                                drinkCount >= 2 -> Color.White
-                                else -> Color.Black
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clip(CircleShape)
-                                    .background(bgColor),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = date.dayOfMonth.toString(),
-                                    fontSize = 9.sp,
-                                    fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                                    color = textColor
-                                )
-                            }
+                            // If date is null → blank cell, Box stays empty
                         }
-                        // If date is null → blank cell, Box stays empty
                     }
                 }
             }
