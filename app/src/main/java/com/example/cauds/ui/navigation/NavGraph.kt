@@ -33,6 +33,8 @@ import com.example.cauds.ui.onboarding.NotificationPreferencesScreen
 import com.example.cauds.ui.onboarding.OnboardingNameScreen
 import com.example.cauds.ui.onboarding.OnboardingPurposeScreen
 import com.example.cauds.ui.onboarding.OnboardingSexScreen
+import com.example.cauds.ui.onboarding.QuizIntroScreen
+import com.example.cauds.ui.onboarding.QuizLoadingScreen
 import com.example.cauds.ui.onboarding.QuizResultScreen
 import com.example.cauds.viewmodel.JournalViewModel
 
@@ -59,7 +61,9 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.ForgotPassword.route) { com.example.cauds.ui.auth.ForgotPasswordScreen(navController) }
 
         // Onboarding
+        composable(Screen.QuizIntro.route) { QuizIntroScreen(navController) }
         composable(Screen.AudQuiz.route) { AudQuizScreen(navController, onboardingViewModel) }
+        composable(Screen.QuizLoading.route) { QuizLoadingScreen(navController) }
         composable(Screen.QuizResult.route) { QuizResultScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingName.route) { OnboardingNameScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingSex.route) { OnboardingSexScreen(navController, onboardingViewModel) }
@@ -68,7 +72,6 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home
-
         composable(Screen.Dashboard.route) { DashboardScreen(navController, dashboardViewModel) }
 
         // Main Sections (Accessible from Dashboard or Bottom Nav)
