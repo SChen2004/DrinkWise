@@ -40,9 +40,6 @@ sealed class Screen(val route: String) {
     object LearningPage : Screen("learning_page")
     object ArticlePage : Screen("article_page")
 
-    // -----    Support    -----
-    object Support : Screen("support")
-
 
     // -----    Account/Setting    -----
     object AccountTest : Screen("account_test")
