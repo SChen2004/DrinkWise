@@ -97,7 +97,6 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }
         ) }
-        composable(Screen.Support.route) { Text("Support Screen") }
         composable(Screen.AccountTest.route) { AccountTestScreen(navController) }
         composable(Screen.Account.route) { AccountScreen(navController) }
 
