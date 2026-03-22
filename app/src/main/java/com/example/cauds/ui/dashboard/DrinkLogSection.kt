@@ -38,14 +38,15 @@ import androidx.compose.ui.platform.LocalConfiguration
  *       • "I didn't drink" chip WITH green dot (user tapped it, sober day logged)
  *       • Two chips: "X Drink(s)" and "$Y Spent" (actual drinks logged)
  *
- * @param todayDrinkCount   Number of actual drinks logged today (excludes SOBER markers)
+ * @param todayDrinkCount   Number of actual drinks logged today (excludes ACTION_LOG markers)
  * @param todayTotalSpent   Total dollar amount spent today
  * @param didntDrinkLogged  Whether the user has tapped "I didn't drink" today
  * @param onLogClick        Lambda to navigate to DrinkLogScreen ("+"/title tap)
- * @param onDidntDrinkClick Lambda to save the SOBER marker ("I didn't drink" tap)
+ * @param onDidntDrinkClick Lambda to save the ACTION_LOG marker ("I didn't drink" tap)
  */
 @Composable
 fun DrinkLogSection(
+    streakCount: Int,
     todayDrinkCount: Int,
     todayTotalSpent: Double,
     didntDrinkToggled: Boolean,
@@ -104,14 +105,25 @@ fun DrinkLogSection(
                 Spacer(modifier = Modifier.width(8.rdp()))
                 DashboardChip(text = String.format("$%.0f Spent", todayTotalSpent), showDot = true, dotColor = Color(0xFF859BAF))
             }
-
+        } else {
+            // No drinks logged — show "I didn't drink" chip.
+            // Always clickable: tapping toggles the green dot on/off.
+            DashboardChip(
+                text = "I didn't drink",
+                showDot = didntDrinkToggled,
+                dotColor = Color(0xFF519D5C),
+                onClick = onDidntDrinkToggle
+            )
+        }
+        
+        if (streakCount > 1) {
             Spacer(modifier = Modifier.height(24.rdp()))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "4 days streak",
+                    text = "$streakCount days streak",
                     fontSize = 12.rsp(),
                     color = Color(0xFF1A3720),
                     fontFamily = Poppins,
@@ -125,15 +137,6 @@ fun DrinkLogSection(
                     modifier = Modifier.size(16.rdp())
                 )
             }
-        } else {
-            // No drinks logged — show "I didn't drink" chip.
-            // Always clickable: tapping toggles the green dot on/off.
-            DashboardChip(
-                text = "I didn't drink",
-                showDot = didntDrinkToggled,
-                dotColor = Color(0xFF519D5C),
-                onClick = onDidntDrinkToggle
-            )
         }
     }
 }

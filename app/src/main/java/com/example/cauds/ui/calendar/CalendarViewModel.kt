@@ -77,7 +77,8 @@ class CalendarViewModel : ViewModel() {
             isLoading = false
 
             if (success) {
-                val list = logs ?: emptyList()
+                // Exclude ACTION_LOG logs from calendar summaries so they don't count as actual drinks
+                val list = logs?.filter { it.data.drinkType != "ACTION_LOG" } ?: emptyList()
                 monthLogs = list
 
                 // Convert logs -> Set<LocalDate> to highlight days

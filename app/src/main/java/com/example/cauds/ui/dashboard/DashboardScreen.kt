@@ -51,6 +51,7 @@ fun DashboardScreen(
                 .padding(horizontal = 16.rdp())
         ) {
             DrinkLogSection(
+                streakCount = dashboardViewModel.streakCount,
                 todayDrinkCount = dashboardViewModel.todayDrinkCount,
                 todayTotalSpent = dashboardViewModel.todayTotalSpent,
                 didntDrinkToggled = dashboardViewModel.didntDrinkToggled,
