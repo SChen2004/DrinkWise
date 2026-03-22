@@ -8,7 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.cauds.data.model.JournalData
 import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.JournalRepository
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 
 class JournalViewModel(
     private val journalRepo: JournalRepository = JournalRepository(),
@@ -35,6 +39,13 @@ class JournalViewModel(
 
     var saveError by mutableStateOf<String?>(null)
         private set
+
+    var selectedDate by mutableStateOf<LocalDate?>(null)
+        private set
+
+    fun setEntryDate(date: LocalDate) {
+        selectedDate = date
+    }
 
     // saveSuccess acts as a one-shot signal to the screen that the save worked.
     // The screen watches this, navigates away when it flips to true, then calls
@@ -68,7 +79,13 @@ class JournalViewModel(
             isSaving = true
             saveError = null
 
-            val journalData = JournalData(entry = text)
+            // Use the selected date if set, otherwise default to now
+            val timestamp = selectedDate?.let {
+                val instant = it.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                Timestamp(Date.from(instant))
+            } ?: Timestamp.now()
+
+            val journalData = JournalData(entry = text, createdAt = timestamp)
 
             journalRepo.saveJournalEntry(userId, journalData) { success, error, _ ->
                 isSaving = false
@@ -85,6 +102,7 @@ class JournalViewModel(
     // doesn't keep triggering on recomposition.
     fun onSaveHandled() {
         saveSuccess = false
+        selectedDate = null
     }
 
     fun deleteEntry(documentId: String) {

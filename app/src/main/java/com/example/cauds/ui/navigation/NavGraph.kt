@@ -96,7 +96,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.LearningPage.route) { LearningPageScreen(navController, learningViewModel) }
         composable(Screen.ArticlePage.route) { ArticleScreen(navController, learningViewModel) }
 
-
+        // Calendar
         composable(Screen.Calendar.route) { CalendarScreen(
             onDayClick = { date -> navController.navigate("day_summary/${date}") }
         ) }
@@ -115,6 +115,8 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
             DaySummaryScreen(
                 date = dateStr,
+                navController= navController,
+                journalViewModel = journalViewModel,
                 calendarViewModel = calendarViewModel,
                 onBack = { navController.popBackStack() }
             )

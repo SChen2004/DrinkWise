@@ -17,7 +17,7 @@ class JournalRepository (
         onResult: (Boolean, String?, String?) -> Unit) {
         val journalWithMetadata = journalData.copy(
             userId = userId,
-            createdAt = Timestamp.now(),
+            createdAt = journalData.createdAt ?: Timestamp.now(),
         )
 
         db.collection(JOURNAL)

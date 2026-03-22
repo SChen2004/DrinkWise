@@ -1,173 +1,567 @@
 package com.example.cauds.ui.calendar
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.cauds.components.JournalEntry
+import com.example.cauds.components.JournalEntryCard
+import com.example.cauds.data.model.LogItem
+import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.BigShouldersDisplay
+import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.viewmodel.JournalViewModel
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.TextStyle
+import java.util.Locale
+import com.example.cauds.R
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Brush
+import com.example.cauds.components.EmptyTodayCard
+import com.example.cauds.components.JournalEntryPager
+
+
+private val CreamBackground = Color(0xFFFEF5DC)
+private val CalendarBlue     = Color(0xFFAFC9DC)
+private val DarkNavy         = Color(0xFF121E30)
+private val WeekendColor     = Color(0x9933578A)
+
 
 @Composable
 fun DaySummaryScreen(
     date: String,
     calendarViewModel: CalendarViewModel,
+    journalViewModel: JournalViewModel,
+    navController: NavController,
     onBack: () -> Unit
 ) {
-    val localDate = remember(date) { LocalDate.parse(date) }
 
-    val logsForDay = remember(calendarViewModel.monthLogs, date) {
-        calendarViewModel.monthLogs
-            .filter { it.data.date == date }
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val calendarTopPadding = if (screenHeight > 700) 64.dp else 48.dp
+
+    var currentDate by remember { mutableStateOf(LocalDate.parse(date)) }
+    val dateString = currentDate.toString()
+
+    LaunchedEffect(dateString) {
+        journalViewModel.loadEntries()
+    }
+
+
+    val logsForDay = remember(calendarViewModel.monthLogs, dateString) {
+        calendarViewModel.monthLogs.filter { it.data.date == dateString }
     }
 
     val totalDrinks = remember(logsForDay) {
-        logsForDay.sumOf { it.data.drinkCount.toInt() }
+        logsForDay.size
     }
 
-    val totalSpent = remember(logsForDay) {
-        logsForDay.sumOf { it.data.drinkCost.toDouble() }
+    val journalEntries = remember(journalViewModel.entries, dateString) {
+        journalViewModel.entries.filter { (_, data) ->
+            val entryDate = data.createdAt?.toDate()?.toInstant()
+                ?.atZone(ZoneId.systemDefault())
+                ?.toLocalDate()
+            entryDate?.toString() == dateString
+        }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(CreamBackground)
     ) {
+        // ── Calendar header (blue background) ─────────────────
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(CalendarBlue)
+                .statusBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = calendarTopPadding, bottom = 36.dp)
+        ) {
+            WeekHeader(
+                selectedDate = currentDate,
+                onBack = onBack,
+                onDayClick = { newDate -> currentDate = newDate }
+            )
+        }
 
-        // Header
-        WeekHeader(
-            selectedDate = localDate,
-            onBack = onBack
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Total section
-        Text(
-            text = "Drinks: $totalDrinks",
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Text(
-            text = "Total spent: $${"%.2f".format(totalSpent)}",
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Divider()
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Drink list
-        logsForDay.forEach { logItem ->
-
-            val drink = logItem.data
-
-            Row(
+        // ── Content (cream background, scrollable) ────────────
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 24.dp)
             ) {
-
-                Column(modifier = Modifier.weight(1f)) {
+                // ── Drinks header ─────────────────────────────────
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = drink.drinkType,
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "Drinks",
+                        fontFamily = BigShouldersDisplay,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = DarkNavy
                     )
 
-                    if (drink.drinkCount > 1) {
-                        Text(
-                            text = "${drink.drinkCount} drinks",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = "$totalDrinks",
+                        fontFamily = BigShouldersDisplay,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = DarkNavy.copy(alpha = 0.4f)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.plus_button),
+                        contentDescription = "Add drink",
+                        tint = DarkNavy,
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clickable { navController.navigate(Screen.Tracking.route) }
+                    )
                 }
 
-                Text(
-                    text = "$${"%.2f".format(drink.drinkCost.toDouble())}",
-                    style = MaterialTheme.typography.bodyLarge
+                Spacer(modifier = Modifier.height(8.dp))
+
+                DaySummaryDrinkList(
+                    logs = logsForDay,
+                    onRemoveItem = { logId -> calendarViewModel.deleteLog(logId) },
+                    onRemoveBatch = { logIds -> logIds.forEach { calendarViewModel.deleteLog(it) } }
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // ── Journal header ────────────────────────────────
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Journal",
+                        fontFamily = BigShouldersDisplay,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = DarkNavy
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Text(
+                        text = "${journalEntries.size}",
+                        fontFamily = BigShouldersDisplay,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = DarkNavy.copy(alpha = 0.4f)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.plus_button),
+                        contentDescription = "Add journal entry",
+                        tint = DarkNavy,
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clickable {
+                                journalViewModel.setEntryDate(currentDate)
+                                navController.navigate(Screen.CreateEntry.route)
+                            }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (journalEntries.isEmpty()) {
+                    EmptyTodayCard(
+                        date = currentDate.format(java.time.format.DateTimeFormatter.ofPattern("MMM d")),
+                        dayOfWeek = currentDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+                        onClick = {
+                            journalViewModel.setEntryDate(currentDate)
+                            navController.navigate(Screen.CreateEntry.route)
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                } else {
+                    JournalEntryPager(
+                        entries = journalEntries.map { (docId, data) ->
+                            JournalEntry(
+                                documentId = docId,
+                                timestampMillis = data.createdAt?.toDate()?.time ?: 0L,
+                                body = data.entry
+                            )
+                        },
+                        onDelete = { docId -> journalViewModel.deleteEntry(docId) },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             }
 
-            Divider()
+            // Top fade
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(36.dp)
+                    .align(Alignment.TopCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(CreamBackground, Color.Transparent)
+                        )
+                    )
+            )
+
+            // Bottom fade
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, CreamBackground)
+                        )
+                    )
+            )
         }
     }
 }
+
+
+// ── Week header (lives inside the blue section) ───────────────
 
 @Composable
 private fun WeekHeader(
     selectedDate: LocalDate,
     onBack: () -> Unit,
+    onDayClick: (LocalDate) -> Unit
 ) {
     val startOfWeek = selectedDate.minusDays(
         (selectedDate.dayOfWeek.value % 7).toLong()
-    ) // Sunday start
-
+    )
     val weekDates = (0..6).map { startOfWeek.plusDays(it.toLong()) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
-        // Back + Month
+        // ── Back + month name ─────────────────────────────────
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) {
-                Text("< Back")
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = DarkNavy,
+                    modifier = Modifier.size(22.dp)
+                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = selectedDate.month.name,
-                style = MaterialTheme.typography.titleMedium
+                text = selectedDate.month.getDisplayName(
+                    TextStyle.FULL, Locale.getDefault()
+                ),
+                fontFamily = BigShouldersDisplay,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Normal,
+                color = DarkNavy
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Weekday letters
+        // ── Weekday letters ───────────────────────────────────
         Row(modifier = Modifier.fillMaxWidth()) {
-            weekDates.forEach { date ->
+            weekDates.forEach { d ->
+                val isWeekend = d.dayOfWeek.value == 6 || d.dayOfWeek.value == 7
                 Text(
-                    text = date.dayOfWeek.name.first().toString(),
+                    text = d.dayOfWeek.getDisplayName(
+                        TextStyle.SHORT, Locale.getDefault()
+                    ).first().uppercase(),
                     modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = Poppins,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = if (isWeekend) WeekendColor else DarkNavy
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        // Dates
+        // ── Date numbers ──────────────────────────────────────
         Row(modifier = Modifier.fillMaxWidth()) {
             weekDates.forEach { d ->
                 val isSelected = d == selectedDate
 
                 Box(
                     modifier = Modifier
-                        .weight(1f),
+                        .weight(1f)
+                        .clickable { onDayClick(d) },
                     contentAlignment = Alignment.Center
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = if (isSelected) MaterialTheme.colorScheme.secondaryContainer
-                        else MaterialTheme.colorScheme.surface,
-                        tonalElevation = if (isSelected) 6.dp else 0.dp
-                    ) {
+                    if (isSelected) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(DarkNavy, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = d.dayOfMonth.toString(),
+                                fontFamily = Poppins,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        val isWeekend = d.dayOfWeek.value == 6 || d.dayOfWeek.value == 7
                         Text(
                             text = d.dayOfMonth.toString(),
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            fontFamily = Poppins,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = if (isWeekend) WeekendColor else DarkNavy,
                             textAlign = TextAlign.Center,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer
-                            else MaterialTheme.colorScheme.onSurface
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
                 }
             }
         }
+    }
+}
+
+
+// ── Grouped drink list ────────────────────────────────────────
+
+@Composable
+fun DaySummaryDrinkList(
+    logs: List<LogItem>,
+    onRemoveItem: (String) -> Unit,
+    onRemoveBatch: (List<String>) -> Unit
+) {
+    if (logs.isEmpty()) return
+
+    val groupedLogs = logs.groupBy { "${it.data.drinkType}_${it.data.drinkSize}" }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .background(Color(0x80EDF5EF))
+            .border(0.35.dp, Color(0x80000000))
+    ) {
+        groupedLogs.values.forEachIndexed { groupIndex, group ->
+            val first = group.first().data
+            val groupTotal = group.sumOf { it.data.drinkCost }
+            val groupIds = group.map { it.id }
+
+            SwipeToDeleteRow(
+                height = 44.dp,
+                onDelete = { onRemoveBatch(groupIds) }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = drinkIconRes(first.drinkType)),
+                        contentDescription = first.drinkType,
+                        modifier = Modifier.size(28.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = first.drinkType,
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        color = Color.Black
+                    )
+
+                    if (first.drinkSize.isNotBlank()) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = first.drinkSize.uppercase(),
+                            fontFamily = Poppins,
+                            fontSize = 10.sp,
+                            color = Color.Black.copy(alpha = 0.4f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "$${String.format("%.2f", groupTotal)}",
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        color = Color.Black
+                    )
+                }
+            }
+
+            HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
+
+            if (group.size > 1) {
+                group.forEach { logItem ->
+                    SwipeToDeleteRow(
+                        height = 34.dp,
+                        onDelete = { onRemoveItem(logItem.id) }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Spacer(modifier = Modifier.width(40.dp))
+
+                            Text(
+                                text = logItem.data.drinkType,
+                                fontFamily = Poppins,
+                                fontSize = 12.sp,
+                                color = Color.Black
+                            )
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            Text(
+                                text = "$${String.format("%.2f", logItem.data.drinkCost)}",
+                                fontFamily = Poppins,
+                                fontSize = 12.sp,
+                                color = Color.Black
+                            )
+                        }
+                    }
+
+                    HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
+                }
+            }
+
+            if (groupIndex < groupedLogs.size - 1) {
+                HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
+            }
+        }
+    }
+}
+
+
+// ── Swipe-to-delete wrapper ───────────────────────────────────
+
+@Composable
+private fun SwipeToDeleteRow(
+    height: Dp,
+    onDelete: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    var showDelete by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxWidth().height(height)) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        if (dragAmount < -15) showDelete = true
+                        else if (dragAmount > 15) showDelete = false
+                    }
+                }
+                .clickable { if (showDelete) showDelete = false },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(modifier = Modifier.weight(1f)) {
+                content()
+            }
+
+            if (showDelete) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(44.dp)
+                        .background(Color(0xFFFF5252))
+                        .clickable {
+                            showDelete = false
+                            onDelete()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Delete",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+// ── Drink dot color mapper ────────────────────────────────────
+
+private fun drinkIconRes(drinkType: String): Int {
+    val lower = drinkType.lowercase()
+    return when {
+        lower.contains("ale") || lower.contains("beer")
+                || lower.contains("lager") || lower.contains("stout")
+                || lower.contains("ipa")                                -> R.drawable.ic_beer_o
+        lower.contains("cider") || lower.contains("seltzer")           -> R.drawable.ic_fermented_o
+        lower.contains("wine") || lower.contains("sauvignon")
+                || lower.contains("merlot") || lower.contains("pinot")
+                || lower.contains("cabernet") || lower.contains("rosé")
+                || lower.contains("rose") || lower.contains("champagne")
+                || lower.contains("prosecco") || lower.contains("riesling")
+                || lower.contains("chardonnay") || lower.contains("shiraz")
+                || lower.contains("malbec")                             -> R.drawable.ic_wine_o
+        lower.contains("cocktail") || lower.contains("margarita")
+                || lower.contains("mojito") || lower.contains("martini")
+                || lower.contains("bloody mary") || lower.contains("daiquiri")
+                || lower.contains("cosmopolitan") || lower.contains("negroni")
+                || lower.contains("old fashioned") || lower.contains("spritz") -> R.drawable.ic_cocktail_mixed_o
+        lower.contains("vodka") || lower.contains("whiskey")
+                || lower.contains("rum") || lower.contains("gin")
+                || lower.contains("tequila") || lower.contains("brandy")
+                || lower.contains("bourbon") || lower.contains("scotch") -> R.drawable.ic_spirit_o
+        else                                                             -> R.drawable.ic_beer_o
     }
 }

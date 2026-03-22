@@ -40,6 +40,8 @@ class CalendarViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
         private set
 
+    var viewedDate by mutableStateOf<LocalDate?>(null)
+
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
@@ -109,5 +111,19 @@ class CalendarViewModel : ViewModel() {
             totalMoneySpent = totalMoney,
             avgDrinksPerDay = avgPerDay
         )
+    }
+
+    fun deleteLog(logId: String) {
+        logRepo.deleteLog(logId) { success, error ->
+            if (success) {
+                monthLogs = monthLogs.filter { it.id != logId }
+                loggedDays = monthLogs.mapNotNull { item ->
+                    item.data.timestamp?.toDate()?.toInstant()
+                        ?.atZone(ZoneId.systemDefault())
+                        ?.toLocalDate()
+                }.toSet()
+                monthSummary = computeMonthSummary(currentMonth, monthLogs)
+            }
+        }
     }
 }

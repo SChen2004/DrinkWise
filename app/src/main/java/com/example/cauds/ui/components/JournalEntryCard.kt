@@ -14,6 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.BigShouldersDisplay
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+
 
 // Updated to use a String documentId (Firestore's ID) instead of an Int,
 // and a Long timestamp (milliseconds) instead of pre-formatted date strings.
@@ -40,31 +49,43 @@ fun JournalEntryCard(
     onDelete: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .background(Color(0x80EDF5EF))
+            .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f))
+            .clickable { onClick() }
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = entry.date, fontWeight = FontWeight.Medium, fontSize = 14.sp)
-                Text(text = entry.dayOfWeek, fontSize = 14.sp, color = Color.Gray)
+                Text(
+                    text = entry.date,
+                    fontFamily = BigShouldersDisplay,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 24.sp,
+                    color = Color(0xFF121E30)
+                )
+                Text(
+                    text = entry.dayOfWeek,
+                    fontFamily = BigShouldersDisplay,
+                    fontSize = 20.sp,
+                    color = Color(0xFF121E30)
+                )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = entry.body,
+                fontFamily = Poppins,
                 fontSize = 14.sp,
-                maxLines = if (isExpanded) Int.MAX_VALUE else 2,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                color = Color(0xFF121E30),
+                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                overflow = TextOverflow.Ellipsis
             )
 
             if (isExpanded && onDelete != null) {
@@ -73,9 +94,9 @@ fun JournalEntryCard(
                     OutlinedButton(
                         onClick = onDelete,
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red)
+                        border = BorderStroke(1.dp, Color.Red)
                     ) {
-                        Text("Delete")
+                        Text("Delete", fontFamily = Poppins)
                     }
                 }
             }
@@ -90,43 +111,136 @@ fun EmptyTodayCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .background(Color(0x80EDF5EF))
+            .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f))
+            .clickable { onClick() }
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = date, fontWeight = FontWeight.Medium, fontSize = 14.sp)
-                Text(text = dayOfWeek, fontSize = 14.sp, color = Color.Gray)
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
-                    .padding(10.dp)
-            ) {
-                Text("Type something...", color = Color.LightGray, fontSize = 14.sp)
+                Text(
+                    text = date,
+                    fontFamily = BigShouldersDisplay,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 24.sp,
+                    color = Color(0xFF121E30)
+                )
+                Text(
+                    text = dayOfWeek,
+                    fontFamily = BigShouldersDisplay,
+                    fontSize = 20.sp,
+                    color = Color(0xFF121E30)
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Reflecting on your week can help you stay aware of your habits.",
-                fontSize = 13.sp,
-                color = Color.Gray,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                text = "Type something...",
+                fontFamily = Poppins,
+                fontSize = 14.sp,
+                color = Color(0xFF121E30).copy(alpha = 0.3f)
             )
+
+            Spacer(modifier = Modifier.height(48.dp))
+        }
+    }
+}
+
+@Composable
+fun JournalEntryPager(
+    entries: List<JournalEntry>,
+    onDelete: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (entries.isEmpty()) return
+
+    val pagerState = rememberPagerState(pageCount = { entries.size })
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color(0x80EDF5EF))
+            .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f))
+    ) {
+        Column {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxWidth()
+            ) { page ->
+                val entry = entries[page]
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = entry.date,
+                            fontFamily = BigShouldersDisplay,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 24.sp,
+                            color = Color(0xFF121E30)
+                        )
+                        Text(
+                            text = entry.dayOfWeek,
+                            fontFamily = BigShouldersDisplay,
+                            fontSize = 20.sp,
+                            color = Color(0xFF121E30)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = entry.body,
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        color = Color(0xFF121E30),
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            // Dots + counter row (only if multiple entries)
+            if (entries.size > 1) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        entries.forEachIndexed { index, _ ->
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .background(
+                                        color = if (index == pagerState.currentPage)
+                                            Color(0xFF999999)
+                                        else
+                                            Color(0xFFCCCCCC),
+                                        shape = CircleShape
+                                    )
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "${pagerState.currentPage + 1}/${entries.size}",
+                        fontFamily = Poppins,
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                }
+            }
         }
     }
 }
