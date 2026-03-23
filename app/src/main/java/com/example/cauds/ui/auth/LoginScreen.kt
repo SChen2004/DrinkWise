@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -149,13 +150,20 @@ fun LoginScreen(
     }
 
     val isFormValid = email.isNotBlank() && password.isNotBlank()
+    val configuration = LocalConfiguration.current
+    val isShortScreen = configuration.screenHeightDp < 750
 
+    val verticalPadding = if (isShortScreen) 32.rdp() else 64.rdp()
+    val logoSize = if (isShortScreen) 80.rdp() else 90.rdp()
+    val logoToTitleGap = if (isShortScreen) 28.rdp() else 48.rdp()
+    val titleToFieldsGap = if (isShortScreen) 28.rdp() else 48.rdp()
+    val fieldGap = if (isShortScreen) 16.rdp() else 24.rdp()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundSand)
-            .padding(horizontal = 16.rdp(), vertical = 64.rdp()),
+            .padding(horizontal = 16.rdp(), vertical = verticalPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))
@@ -163,7 +171,7 @@ fun LoginScreen(
         // Logo Section
         Box(
             modifier = Modifier
-                .size(90.rdp())
+                .size(logoSize)
                 .background(BackgroundSand, shape = CircleShape),
             contentAlignment = Alignment.BottomCenter
         ) {
@@ -171,12 +179,12 @@ fun LoginScreen(
                 painter = painterResource(id = R.drawable.ic_logo_for_sign_in),
                 contentDescription = "Logo",
                 modifier = Modifier
-                    .size(90.rdp())
+                    .size(logoSize)
                     .clip(CircleShape)
             )
         }
 
-        Spacer(modifier = Modifier.height(48.rdp()))
+        Spacer(modifier = Modifier.height(logoToTitleGap))
 
         // Form Section
         Column(
@@ -184,19 +192,24 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 12.rdp()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(48.rdp())
+            verticalArrangement = Arrangement.spacedBy(titleToFieldsGap)
         ) {
             Text(
                 text = "Sign In",
                 fontFamily = BigShouldersDisplay,
                 fontWeight = FontWeight.Medium,
                 fontSize = 32.rsp(),
-                color = CloverDarker
+                color = CloverDarker,
+                style = TextStyle(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
             )
         
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(24.rdp())
+                verticalArrangement = Arrangement.spacedBy(fieldGap)
             ) {
                 // Email Field
                 AuthTextField(
@@ -230,7 +243,12 @@ fun LoginScreen(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.rsp(),
                     color = CloverNormal,
-                    modifier = Modifier.align(Alignment.Start).clickable { navController.navigate(Screen.ForgotPassword.route) }
+                    modifier = Modifier.align(Alignment.Start).clickable { navController.navigate(Screen.ForgotPassword.route) },
+                    style = TextStyle(
+                        platformStyle = PlatformTextStyle(
+                            includeFontPadding = false
+                        )
+                    )
                 )
             }
 
@@ -294,7 +312,7 @@ fun LoginScreen(
                     CircularProgressIndicator(modifier = Modifier.size(24.rdp()), color = Color.White)
                 } else {
                     Text(
-                        text = "Sign Up",
+                        text = "Sign In",
                         fontFamily = BigShouldersDisplay,
                         fontSize = 24.rsp(),
                         color = Color.White,
