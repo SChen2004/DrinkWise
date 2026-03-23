@@ -7,25 +7,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cauds.ui.theme.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.cauds.R
 import com.example.cauds.ui.navigation.Screen
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -36,7 +37,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     navController: NavController,
@@ -82,7 +82,7 @@ fun SignUpScreen(
                                 emailError = error
                                 passwordError = ""
                             } else {
-                                emailError = error
+                            emailError = error
                                 passwordError = ""
                             }
                         }
@@ -134,272 +134,301 @@ fun SignUpScreen(
         // Result handled by CallbackManager
     }
 
+    val isFormValid = email.isNotBlank() && password.isNotBlank()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(BackgroundSand)
+            .padding(horizontal = 16.rdp(), vertical = 64.rdp()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))
 
-        // App Icon
-        Image(
-            painter = painterResource(id = com.example.cauds.R.drawable.ic_launcher_foreground),
-            contentDescription = "App Logo",
+        // Logo Section
+        Box(
             modifier = Modifier
-                .size(72.dp)
-                .background(Color.Transparent)
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Title
-        Text(
-            text = "Sign Up",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Email Input
-        OutlinedTextField(
-            value = email,
-            onValueChange = { 
-                email = it
-                emailError = "" // Clear error on typing
-            },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            isError = emailError.isNotEmpty(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Gray,
-                errorBorderColor = Color.Red,
-                errorLabelColor = Color.Red
-            )
-        )
-
-        // Email error message
-        if (emailError.isNotEmpty()) {
-            Row(
+                .size(90.rdp())
+                .background(BackgroundSand, shape = CircleShape),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_logo_for_sign_in),
+                contentDescription = "Logo",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                verticalAlignment = Alignment.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Warning,
-                    contentDescription = "Error",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .size(14.dp)
-                        .padding(top = 2.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = emailError,
-                    color = Color.Red,
-                    fontSize = 10.sp,
-                    lineHeight = 14.sp
-                )
-            }
+                    .size(90.rdp())
+                    .clip(CircleShape)
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(48.rdp()))
 
-        // Password Input
-        OutlinedTextField(
-            value = password,
-            onValueChange = { 
-                password = it
-                passwordError = "" // Clear error on typing
-            },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            isError = passwordError.isNotEmpty(),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "Toggle password visibility")
-                }
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Gray,
-                errorBorderColor = Color.Red,
-                errorLabelColor = Color.Red
-            )
-        )
-
-        // Password error message
-        if (passwordError.isNotEmpty()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                verticalAlignment = Alignment.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Warning,
-                    contentDescription = "Error",
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .size(14.dp)
-                        .padding(top = 2.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = passwordError,
-                    color = Color.Red,
-                    fontSize = 10.sp,
-                    lineHeight = 14.sp
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // SIGN UP Submission & Validation Logic
-        // Performs strict local validation before contacting Firebase to save network calls:
-        // 1. Checks for empty email and malformed email strings.
-        // 2. Checks for empty password.
-        // 3. Runs Regex on the password (>= 8 chars, 1 number, 1 upper, 1 lower, 1 special character).
-        Button(
-            onClick = {
-                var hasError = false
-                emailError = ""
-                passwordError = ""
-                
-                if (email.isBlank()) {
-                    emailError = "Please enter an email address"
-                    hasError = true
-                } else if (!viewModel.isValidEmail(email)) {
-                    emailError = "Please enter a valid email address"
-                    hasError = true
-                }
-
-                if (password.isBlank()) {
-                    passwordError = "Please enter a password"
-                    hasError = true
-                } else if (!viewModel.isValidPassword(password)) {
-                    passwordError = "Must be at least 8 characters and contain 1 number, 1 uppercase, 1 lowercase, 1 special character"
-                    hasError = true
-                }
-
-                if (hasError) return@Button
-
-                isLoading = true
-
-                viewModel.performSignUp(
-                    email = email,
-                    pass = password,
-                    onSuccess = {
-                        isLoading = false
-                        // Sign up with email success -> Onboarding
-                        navController.navigate(Screen.OnboardingName.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
-                    },
-                    onError = { errorMsg ->
-                        isLoading = false
-                        if (errorMsg == "Email already exists") {
-                            emailError = errorMsg
-                        } else {
-                            emailError = errorMsg
-                        }
-                    }
-                )
-            },
+        // Form Section
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(0.dp)
+                .padding(horizontal = 12.rdp()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(48.rdp())
         ) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
-            } else {
-                Text("SIGN UP", color = Color.White, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Divider with text
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
             Text(
-                text = "Or sign up with",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                text = "Sign Up",
+                fontFamily = BigShouldersDisplay,
+                fontWeight = FontWeight.Medium,
+                fontSize = 32.rsp(),
+                color = CloverDarker
             )
-            HorizontalDivider(modifier = Modifier.weight(1f), color = Color.LightGray)
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Other sign up options
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // Google Button
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(4.dp))
-                    .clickable { googleLauncher.launch(googleSignInClient.signInIntent) },
-                contentAlignment = Alignment.Center
+        
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(24.rdp())
             ) {
-                Image(
-                    painter = painterResource(id = com.example.cauds.R.drawable.ic_google),
-                    contentDescription = "Sign up with Google",
-                    modifier = Modifier.size(48.dp)
+                // Email Field
+                AuthTextField(
+                    value = email,
+                    onValueChange = { 
+                        email = it
+                        emailError = "" 
+                    },
+                    placeholder = "Email",
+                    error = emailError,
+                    isPassword = false
+                )
+
+                // Password Field
+                AuthTextField(
+                    value = password,
+                    onValueChange = { 
+                        password = it
+                        passwordError = "" 
+                    },
+                    placeholder = "Password",
+                    error = passwordError,
+                    isPassword = true,
+                    passwordVisible = passwordVisible,
+                    onTogglePassword = { passwordVisible = !passwordVisible }
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Button(
+                onClick = {
+                    var hasError = false
+                    emailError = ""
+                    passwordError = ""
+                    
+                    if (email.isBlank()) {
+                        emailError = "Please enter an email address"
+                        hasError = true
+                    } else if (!viewModel.isValidEmail(email)) {
+                        emailError = "Please enter a valid email address"
+                        hasError = true
+                    }
 
-            // Facebook Button
-            Box(
+                    if (password.isBlank()) {
+                        passwordError = "Please enter a password"
+                        hasError = true
+                    } else if (!viewModel.isValidPassword(password)) {
+                        passwordError = "Must be at least 8 characters and contain 1 number, 1 uppercase, 1 lowercase, 1 special character"
+                        hasError = true
+                    }
+
+                    if (hasError) return@Button
+
+                    isLoading = true
+                    viewModel.performSignUp(
+                        email = email,
+                        pass = password,
+                        onSuccess = {
+                            isLoading = false
+                            navController.navigate(Screen.OnboardingName.route) {
+                                popUpTo(Screen.Login.route) { inclusive = true }
+                            }
+                        },
+                        onError = { errorMsg ->
+                            isLoading = false
+                            emailError = errorMsg
+                        }
+                    )
+                },
                 modifier = Modifier
-                    .size(48.dp)
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(4.dp))
-                    .clickable { facebookLauncher.launch(listOf("email", "public_profile")) },
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .height(44.rdp()),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFormValid) CobaltDarker else CobaltDarker.copy(alpha = 0.5f)
+                ),
+                shape = RoundedCornerShape(0.rdp())
             ) {
-                Image(
-                    painter = painterResource(id = com.example.cauds.R.drawable.ic_facebook),
-                    contentDescription = "Sign up with Facebook",
-                    modifier = Modifier.size(48.dp)
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.rdp()), color = Color.White)
+                } else {
+                    Text(
+                        text = "Sign Up",
+                        fontFamily = BigShouldersDisplay,
+                        fontSize = 24.rsp(),
+                        color = Color.White
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Login Link
-        Row(
-            modifier = Modifier.padding(bottom = 48.dp),
-            verticalAlignment = Alignment.CenterVertically
+        // OAuth Section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.rdp()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(32.rdp())
         ) {
-            Text(text = "Already have an account? ", color = Color.Black, fontSize = 12.sp)
-            Text(
-                text = "Log In",
-                color = Color(0xFF1976D2),
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                modifier = Modifier.clickable { navController.popBackStack() }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.rdp()),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(24.rdp())
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f), color = SkyDark, thickness = 0.5.dp)
+                Text(
+                    text = "Or sign up with",
+                    fontFamily = Poppins,
+                    fontSize = 10.rsp(),
+                    color = SkyDark
+                )
+                HorizontalDivider(modifier = Modifier.weight(1f), color = SkyDark, thickness = 0.5.dp)
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OAuthButton(
+                    iconResId = R.drawable.ic_google,
+                    onClick = { googleLauncher.launch(googleSignInClient.signInIntent) }
+                )
+                Spacer(modifier = Modifier.width(12.rdp()))
+                OAuthButton(
+                    iconResId = R.drawable.ic_facebook,
+                    onClick = { facebookLauncher.launch(listOf("email", "public_profile")) }
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.rdp())
+            ) {
+                Text(
+                    text = "Already have an account?",
+                    fontFamily = Poppins,
+                    fontSize = 12.rsp(),
+                    color = CloverDarker
+                )
+                Text(
+                    text = "Sign In",
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.rsp(),
+                    color = CloverNormal,
+                    modifier = Modifier.clickable { navController.popBackStack() }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AuthTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    error: String,
+    isPassword: Boolean,
+    passwordVisible: Boolean = false,
+    onTogglePassword: () -> Unit = {}
+) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.rdp())) {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = {
+                Text(
+                    text = placeholder,
+                    fontFamily = Poppins,
+                    fontSize = 16.rsp(),
+                    color = Color.Black.copy(alpha = 0.3f),
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            singleLine = true,
+            visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
+            trailingIcon = {
+                if (isPassword) {
+                    val iconRes = if (passwordVisible) R.drawable.ic_eye_open else R.drawable.ic_eye_closed
+                    IconButton(onClick = onTogglePassword) {
+                        Icon(
+                            painter = painterResource(id = iconRes),
+                            contentDescription = "Toggle password visibility",
+                            modifier = Modifier.size(20.rdp())
+                        )
+                    }
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                errorContainerColor = Color.Transparent,
+                focusedIndicatorColor = if (error.isNotEmpty()) ErrorRed else CloverDarker,
+                unfocusedIndicatorColor = if (error.isNotEmpty()) ErrorRed else CloverDarker.copy(alpha = 0.3f),
+                cursorColor = CloverDarker
+            ),
+            textStyle = LocalTextStyle.current.copy(
+                fontFamily = Poppins,
+                fontSize = 16.rsp(),
+                color = CloverDarker,
+                textAlign = TextAlign.Start
+            )
+        )
+
+        if (error.isNotEmpty()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.rdp())
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_alert),
+                    contentDescription = "Error",
+                    tint = ErrorRed,
+                    modifier = Modifier.size(12.rdp())
+                )
+                Text(
+                    text = error,
+                    fontFamily = Poppins,
+                    fontSize = 12.rsp(),
+                    color = ErrorRed
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OAuthButton(
+    iconResId: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.size(44.rdp()),
+        color = Color(0xFF3583A4).copy(alpha = 0.1f),
+        shape = RoundedCornerShape(0.rdp())
+    ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = iconResId),
+                contentDescription = null
             )
         }
     }
