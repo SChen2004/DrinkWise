@@ -11,3 +11,9 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val BackgroundSand = Color(0xFFFEF5DC)
+val CloverNormal = Color(0xFF4A9D5B)
+val CloverDarker = Color(0xFF1A3720)
+val CobaltDarker = Color(0xFF121E30)
+val SkyDark = Color(0xFF8397A5)
+val ErrorRed = Color(0xFFEA4335)
+

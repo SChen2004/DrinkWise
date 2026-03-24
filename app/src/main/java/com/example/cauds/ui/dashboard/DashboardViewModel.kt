@@ -49,9 +49,12 @@ class DashboardViewModel(
     var weekTotalSpent by mutableStateOf(0.0)
         private set
 
-    // Pure UI toggle for the "I didn't drink" chip's green dot.
-    // NOT persisted to Firestore — resets on app restart.
+    // Toggled state for the "I didn't drink" chip's green dot.
+    // Persisted to Firestore as an "ACTION_LOG" log.
     var didntDrinkToggled by mutableStateOf(false)
+        private set
+
+    var streakCount by mutableStateOf(0)
         private set
 
     // --- Journal state ---
@@ -97,15 +100,46 @@ class DashboardViewModel(
             if (success && logs != null) {
                 // Today's stats
                 val todayLogs = logs.filter { it.data.date == todayIso }
-                todayDrinkCount = todayLogs.size
-                todayTotalSpent = todayLogs.sumOf { it.data.drinkCost }
+                val actualTodayDrinks = todayLogs.filter { it.data.drinkType != "ACTION_LOG" }
+                todayDrinkCount = actualTodayDrinks.size
+                todayTotalSpent = actualTodayDrinks.sumOf { it.data.drinkCost }
+
+                didntDrinkToggled = todayLogs.any { it.data.drinkType == "ACTION_LOG" && it.data.drinkSize == "NONE" }
 
                 // Week stats — filter for logs where date >= weekStartIso.
                 // ISO date strings (e.g. "2026-03-11") compare correctly with >= and <=
                 // because they're lexicographically ordered (year-month-day).
-                val weekLogs = logs.filter { it.data.date >= weekStartIso && it.data.date <= todayIso }
+                val weekLogs = logs.filter { it.data.date >= weekStartIso && it.data.date <= todayIso && it.data.drinkType != "ACTION_LOG" }
                 weekDrinkCount = weekLogs.size
                 weekTotalSpent = weekLogs.sumOf { it.data.drinkCost }
+
+                // Streak Calculation
+                val actionDates = logs.mapNotNull { log ->
+                    log.data.timestamp?.toDate()?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+                }.toSet()
+
+                var currentStreak = 0
+                var checkDate = today
+                
+                if (actionDates.contains(checkDate)) {
+                    currentStreak = 1
+                    checkDate = checkDate.minusDays(1)
+                    while (actionDates.contains(checkDate)) {
+                        currentStreak++
+                        checkDate = checkDate.minusDays(1)
+                    }
+                } else {
+                    checkDate = checkDate.minusDays(1)
+                    if (actionDates.contains(checkDate)) {
+                        currentStreak = 1
+                        checkDate = checkDate.minusDays(1)
+                        while (actionDates.contains(checkDate)) {
+                            currentStreak++
+                            checkDate = checkDate.minusDays(1)
+                        }
+                    }
+                }
+                streakCount = currentStreak
             }
             isLoading = false
         }
@@ -148,9 +182,42 @@ class DashboardViewModel(
         }
     }
 
-    /** Flips the "I didn't drink" green dot on or off. No Firestore involved. */
+    /** Flips the "I didn't drink" status and persists an ACTION_LOG to Firestore. */
     fun toggleDidntDrink() {
-        didntDrinkToggled = !didntDrinkToggled
+        val userId = authRepository.getUserId() ?: return
+        val newState = !didntDrinkToggled
+        didntDrinkToggled = newState
+        
+        val todayIso = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+        if (newState) {
+            // "I didn't drink" ACTION_LOG uses drinkSize = "NONE" to distinguish it from a regular logged action
+            val actionLog = com.example.cauds.data.model.LogData(
+                date = todayIso,
+                drinkType = "ACTION_LOG",
+                drinkSize = "NONE",
+                drinkCost = 0.0
+            )
+            logRepository.saveLog(userId, actionLog) { success, _, _ ->
+                if (success) {
+                    loadTodaySummary()
+                } else {
+                    didntDrinkToggled = false
+                }
+            }
+        } else {
+            logRepository.fetchLogs(userId) { success, logs, _ ->
+                if (success && logs != null) {
+                    // Find ACTION_LOGs for today that are specifically "NONE" (the SOBER markers)
+                    val soberLogsToday = logs.filter { it.data.date == todayIso && it.data.drinkType == "ACTION_LOG" && it.data.drinkSize == "NONE" }
+                    soberLogsToday.forEach { log ->
+                        logRepository.deleteLog(log.id) { delSuccess, _ ->
+                            if (delSuccess) loadTodaySummary()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -180,7 +247,7 @@ class DashboardViewModel(
         logRepository.fetchLogsInRange(userId, startTimestamp, endTimestamp) { success, logs, _ ->
             if (success && logs != null) {
 
-                drinkCountByDay = logs.mapNotNull { item ->
+                drinkCountByDay = logs.filter { it.data.drinkType != "ACTION_LOG" }.mapNotNull { item ->
                     try {
                         // Use the actually date
                         LocalDate.parse(item.data.date, DateTimeFormatter.ISO_LOCAL_DATE)
