@@ -54,10 +54,7 @@ fun getDefaultSizeForDrink(drinkName: String, category: String): String {
 // Hardcoded list of default drinks a user can select
 val availableDrinks = listOf(
     DrinkType("Ale", "Beer"),
-    DrinkType("Cider", "Fermented"), 
-    DrinkType("Rum", "Spirit"),
-    DrinkType("Sauvignon", "Wine"),
-    DrinkType("Seltzer", "Fermented"),
+    DrinkType("Cider", "Fermented"),
     DrinkType("Whiskey", "Spirit")
 )
 
@@ -157,8 +154,8 @@ class DrinkLogViewModel(
         val userId = authRepository.getUserId() ?: return
         logRepository.fetchLogs(userId) { success, logs, _ ->
             if (success && logs != null) {
-                // Filter by the matching selected date
-                val dayLogs = logs.filter { it.data.date == isoDateStr }.map {
+                // Filter by the matching selected date and exclude ACTION_LOG markers
+                val dayLogs = logs.filter { it.data.date == isoDateStr && it.data.drinkType != "ACTION_LOG" }.map {
                     LogDataWrapper(
                         id = it.id,
                         type = it.data.drinkType,
@@ -286,9 +283,27 @@ class DrinkLogViewModel(
         }
 
         // Save to Firebase
+        val isoDate = current.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        
+        // Ensure of a persistent ACTION_LOG exists for today so the streak persists even if individual drinks are deleted
+        logRepository.fetchLogs(userId) { success, logs, _ ->
+            if (success && logs != null) {
+                val hasActionLog = logs.any { it.data.date == isoDate && it.data.drinkType == "ACTION_LOG" }
+                if (!hasActionLog) {
+                    val actionLog = LogData(
+                        date = isoDate,
+                        drinkType = "ACTION_LOG",
+                        drinkSize = "LOGGED",
+                        drinkCost = 0.0
+                    )
+                    logRepository.saveLog(userId, actionLog) { _, _, _ -> }
+                }
+            }
+        }
+
         newLogs.forEach { wrapper ->
             val logData = LogData(
-                date = current.selectedDateObj.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                date = isoDate,
                 drinkType = wrapper.type,
                 drinkSize = wrapper.drinkSize,
                 drinkCost = wrapper.cost

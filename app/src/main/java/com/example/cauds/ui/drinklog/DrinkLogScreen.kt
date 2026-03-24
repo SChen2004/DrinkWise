@@ -47,6 +47,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.DpOffset
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -137,37 +138,43 @@ fun DrinkLogScreen(
             )
         },
         bottomBar = {
-            // The bottom of the screen with the "ADD" button
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(BackgroundSand)
-                    .padding(vertical = 16.rdp()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Fixed "ADD" or "SAVE" Button
-                Button(
-                    onClick = { 
-                        if (uiState.editModeId != null) viewModel.saveDrink()
-                        else viewModel.addDrink()
-                    },
+                // The bottom of the screen with the "ADD" button
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.rdp())
-                        .height(52.rdp()),
-                    shape = RoundedCornerShape(0.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30))
+                        .background(BackgroundSand),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        if (uiState.editModeId != null) "Save" else "Add", 
-                        color = Color.White, 
-                        fontSize = 24.rsp(), 
-                        fontFamily = BigShouldersDisplay, 
-                        fontWeight = FontWeight.Normal,
-                        letterSpacing = 0.rsp()
-                    )
+                    HorizontalDivider(color = Color(0xFFC0CBDB), thickness = 0.5.dp)
+                    Spacer(modifier = Modifier.height(16.rdp()))
+                    // Fixed "ADD" or "SAVE" Button
+                    Button(
+                        onClick = { 
+                            if (uiState.editModeId != null) viewModel.saveDrink()
+                            else viewModel.addDrink()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.rdp())
+                            .height(44.rdp()),
+                        shape = RoundedCornerShape(0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30)),
+                        contentPadding = PaddingValues(0.dp) // Prevent clipping of descenders like 'g'
+                    ) {
+                        Text(
+                            if (uiState.editModeId != null) "Save" else "Add", 
+                            color = Color.White, 
+                            fontSize = 24.rsp(), 
+                            style = LocalTextStyle.current.copy(
+                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                            ),
+                            fontFamily = BigShouldersDisplay, 
+                            fontWeight = FontWeight.Normal,
+                            letterSpacing = 0.rsp()
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(24.rdp()))
                 }
-            }
         }
     ) { innerPadding ->
         // Root container for everything underneath the TopBar but above the BottomBar
@@ -230,7 +237,12 @@ fun DrinkLogScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_chevron_right),
                         contentDescription = "Next", 
-                        modifier = Modifier.size(24.rdp()).clickable { viewModel.nextDay() },
+                        modifier = Modifier
+                            .size(24.rdp())
+                            .alpha(if (uiState.selectedDateObj >= java.time.LocalDate.now()) 0.2f else 1f)
+                            .clickable(enabled = uiState.selectedDateObj < java.time.LocalDate.now()) { 
+                                viewModel.nextDay() 
+                            },
                         tint = Color(0xFF1A3720)
                     )
                 }
@@ -413,7 +425,7 @@ fun DrinkLogScreen(
                             Text(
                                 text = uiState.quantity.toString(),
                                 fontWeight = FontWeight.Normal,
-                                fontFamily = Roboto,
+                                fontFamily = Poppins,
                                 fontSize = 18.rsp(),
                                 color = Color.Black
                             )
@@ -439,7 +451,7 @@ fun DrinkLogScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "$",  color = if(uiState.costInput.isNotEmpty()) Color.Black else Color.Black.copy(alpha = 0.3f), fontSize = 20.rsp(), fontFamily = Roboto, fontWeight = FontWeight.Normal)
+                            Text(text = "$",  color = if(uiState.costInput.isNotEmpty()) Color.Black else Color.Black.copy(alpha = 0.3f), fontSize = 20.rsp(), fontFamily = Poppins, fontWeight = FontWeight.Normal)
                             BasicTextField(
                                 value = uiState.costInput,
                                 onValueChange = { newText ->
@@ -450,7 +462,7 @@ fun DrinkLogScreen(
                                     // Pure black text vs LightGray hint text
                                     color = if(uiState.costInput.isNotEmpty()) Color.Black else Color.Black.copy(alpha = 0.3f),
                                     fontSize = 20.rsp(),
-                                    fontFamily = Roboto,
+                                    fontFamily = Poppins,
                                     fontWeight = FontWeight.Normal,
                                     textAlign = TextAlign.End
                                 ),
@@ -464,7 +476,7 @@ fun DrinkLogScreen(
                                     ) {
                                         // Simulated placeholder Hint text when completely empty
                                         if (uiState.costInput.isEmpty()) {
-                                            Text(text = "0.00", color = Color.Black.copy(alpha = 0.3f), fontSize = 20.rsp(), fontFamily = Roboto, textAlign = TextAlign.End)
+                                            Text(text = "0.00", color = Color.Black.copy(alpha = 0.3f), fontSize = 20.rsp(), fontFamily = Poppins, textAlign = TextAlign.End)
                                         }
                                         innerTextField()
                                     }
@@ -538,7 +550,7 @@ fun DrinkLogScreen(
                 onClick = { navController.navigate(Screen.ManageDrinks.route) },
                 modifier = Modifier.height(36.rdp()),
                 shape = RoundedCornerShape(0.dp),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
+                border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.2f)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF121E30), containerColor = Color(0xFFAFC9DC)),
                 contentPadding = PaddingValues(
                     start = 12.rdp(),
@@ -703,13 +715,26 @@ fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, o
                     .height(itemHeight)
                     .clickable { 
                         coroutineScope.launch {
-                        // Smoothly animates center-selection if user clicks an off-center item
                             pagerState.animateScrollToPage(page)
                         }
                     }
                     .wrapContentHeight(Alignment.CenterVertically)
             )
         }
+
+        // Gradient shadow overlays at top and bottom edges (to match Figma's fade effect)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        0f to LightSectionBlue,
+                        0.15f to Color.Transparent,
+                        0.85f to Color.Transparent,
+                        1f to LightSectionBlue
+                    )
+                )
+        )
     }
 }
 
@@ -741,7 +766,9 @@ fun BatchHeaderRow(
     var showDelete by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    val batchBgColor = Color(0xFFF5F5E5)
+
+    Box(modifier = Modifier.fillMaxWidth().background(batchBgColor)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -779,10 +806,8 @@ fun BatchHeaderRow(
                     contentDescription = null,
                     modifier = Modifier
                         .size(32.rdp())
-                        .background(Color(0xFFAFC9DC), CircleShape)
                         .padding(4.rdp())
-                        //.clip(CircleShape)
-)
+                )
                 Spacer(modifier = Modifier.width(16.rdp()))
                 Text(
                     text = type, 
@@ -834,42 +859,58 @@ fun BatchHeaderRow(
             }
         }
         
-        DropdownMenu(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false },
-            modifier = Modifier.background(Color.White)
-        ) {
-            DropdownMenuItem(
-                text = { Text("Delete", fontFamily = Poppins, fontSize = 14.rsp()) },
-                onClick = {
-                    showMenu = false
-                    onRemove()
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.rdp())
+                    .size(0.dp)
+            ) {
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    modifier = Modifier.background(Color(0xFFF5F5E5)),
+                    offset = DpOffset(x = (-130).rdp(), y = 0.rdp())
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Delete", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        onClick = {
+                            showMenu = false
+                            onRemove()
+                        }
+                    )
+                    HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.rdp())
+                    DropdownMenuItem(
+                        text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        onClick = {
+                            showMenu = false
+                            onDuplicate()
+                        }
+                    )
                 }
-            )
-            HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
-            DropdownMenuItem(
-                text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.rsp()) },
-                onClick = {
-                    showMenu = false
-                    onDuplicate()
-                }
-            )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, onDuplicate: () -> Unit = {}) {
+fun LogItemRow(
+    log: LogDataWrapper, 
+    onClick: () -> Unit, 
+    onRemove: () -> Unit, 
+    onDuplicate: () -> Unit = {}
+) {
     var showDelete by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    val logBgColor = Color(0xFFF5F5E5)
+
+    Box(modifier = Modifier.fillMaxWidth().background(logBgColor)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(34.rdp())
-                .background(Color(0xFFFFEFC6).copy(alpha = 0.5f))
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { _, dragAmount ->
                         if (dragAmount < -15) showDelete = true
@@ -934,26 +975,36 @@ fun LogItemRow(log: LogDataWrapper, onClick: () -> Unit, onRemove: () -> Unit, o
             }
         }
         
-        DropdownMenu(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false },
-            modifier = Modifier.background(Color.White)
-        ) {
-            DropdownMenuItem(
-                text = { Text("Delete", fontFamily = Poppins, fontSize = 14.rsp()) },
-                onClick = {
-                    showMenu = false
-                    onRemove()
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.rdp())
+                    .size(0.dp)
+            ) {
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+                    modifier = Modifier.background(Color(0xFFF5F5E5)),
+                    offset = DpOffset(x = (-130).rdp(), y = 0.rdp())
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Delete", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        onClick = {
+                            showMenu = false
+                            onRemove()
+                        }
+                    )
+                    HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.rdp())
+                    DropdownMenuItem(
+                        text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        onClick = {
+                            showMenu = false
+                            onDuplicate()
+                        }
+                    )
                 }
-            )
-            HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.rdp())
-            DropdownMenuItem(
-                text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.rsp()) },
-                onClick = {
-                    showMenu = false
-                    onDuplicate()
-                }
-            )
+            }
         }
     }
 }
