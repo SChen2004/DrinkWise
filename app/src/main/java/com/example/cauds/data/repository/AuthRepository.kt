@@ -76,7 +76,13 @@ class AuthRepository {
     fun sendPasswordResetEmail(email: String, onResult: (Boolean, String?) -> Unit) {
         auth.sendPasswordResetEmail(email)
             .addOnSuccessListener { onResult(true, null) }
-            .addOnFailureListener { e -> onResult(false, e.message ?: "Unknown error") }
+            .addOnFailureListener { e ->
+                val errorMessage = when (e) {
+                    is com.google.firebase.auth.FirebaseAuthInvalidUserException -> "Email does not exist"
+                    else -> e.message ?: "Unknown error"
+                }
+                onResult(false, errorMessage)
+            }
     }
 
     // Log out
