@@ -19,53 +19,46 @@ class DrinkRepository(
 
     // Default drinks provided if no custom selection exists
     private val defaultDrinks = listOf(
+        // Selected defaults
         DrinkData(name = "Ale", category = "Beer", defaultSize = "PINT", isSelected = true),
         DrinkData(name = "Cider", category = "Fermented", defaultSize = "REGULAR", isSelected = true),
-        DrinkData(name = "Rose", category = "Wine", defaultSize = "GLASS", isSelected = true),
-        DrinkData(name = "Sauvignon", category = "Wine", defaultSize = "GLASS", isSelected = true),
-        DrinkData(name = "Seltzer", category = "Fermented", defaultSize = "REGULAR", isSelected = true),
+        DrinkData(name = "Rosé", category = "Wine", defaultSize = "GLASS", isSelected = true),
+        DrinkData(name = "Hard Seltzer", category = "Fermented", defaultSize = "REGULAR", isSelected = true),
         DrinkData(name = "Rum", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = true),
         DrinkData(name = "Whiskey", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = true),
+        DrinkData(name = "Margarita", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = true),
 
-        
-        // Other defaults (not selected by default)
+        // Beer
         DrinkData(name = "Pilsner", category = "Beer", defaultSize = "PINT", isSelected = false),
         DrinkData(name = "Pale Ale", category = "Beer", defaultSize = "PINT", isSelected = false),
         DrinkData(name = "Lager", category = "Beer", defaultSize = "PINT", isSelected = false),
         DrinkData(name = "Stout", category = "Beer", defaultSize = "PINT", isSelected = false),
         DrinkData(name = "Porter", category = "Beer", defaultSize = "PINT", isSelected = false),
+        DrinkData(name = "IPA", category = "Beer", defaultSize = "PINT", isSelected = false),
         DrinkData(name = "Double IPA", category = "Beer", defaultSize = "PINT", isSelected = false),
         DrinkData(name = "Gose", category = "Beer", defaultSize = "PINT", isSelected = false),
-        DrinkData(name = "IPA", category = "Beer", defaultSize = "PINT", isSelected = false),
-        DrinkData(name = "Wheat Beer", category = "Beer", defaultSize = "PINT", isSelected = false),
+        DrinkData(name = "Wheat Beer (Hefeweizen/Witbier)", category = "Beer", defaultSize = "PINT", isSelected = false),
         
-        DrinkData(name = "Pino Noir", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Merlot", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Shiraz", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Malbec", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Zinfandel", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Chardonnay", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Sauvignon Blanc", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Pinot Grigio", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Riesling", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Moscato", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Port", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Sherry", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Champagne", category = "Wine", defaultSize = "GLASS", isSelected = false),
-        DrinkData(name = "Prosecco", category = "Wine", defaultSize = "GLASS", isSelected = false),
+        // Wine
+        DrinkData(name = "White Wine", category = "Wine", defaultSize = "GLASS", isSelected = false),
+        DrinkData(name = "Red Wine", category = "Wine", defaultSize = "GLASS", isSelected = false),
         DrinkData(name = "Sparkling Wine", category = "Wine", defaultSize = "GLASS", isSelected = false),
+        DrinkData(name = "Dessert Wine", category = "Wine", defaultSize = "GLASS", isSelected = false),
+        DrinkData(name = "Fortified Wine (Port, Sherry)", category = "Wine", defaultSize = "GLASS", isSelected = false),
         
+        // Fermented
         DrinkData(name = "Sake", category = "Fermented", defaultSize = "REGULAR", isSelected = false),
         DrinkData(name = "Malt Liquor", category = "Fermented", defaultSize = "REGULAR", isSelected = false),
         
+        // Spirit
         DrinkData(name = "Gin", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
         DrinkData(name = "Vodka", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
         DrinkData(name = "Brandy", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
         DrinkData(name = "Tequila", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
-        DrinkData(name = "Flavoured Liqueur", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
+        DrinkData(name = "Flavoured Liqueurs", category = "Spirit", defaultSize = "REGULAR SHOT", isSelected = false),
         
+        // Cocktail/Mixed
         DrinkData(name = "Old Fashioned", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
-        DrinkData(name = "Margarita", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
         DrinkData(name = "Negroni", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
         DrinkData(name = "Manhattan", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
         DrinkData(name = "Martini (vodka)", category = "Cocktail/Mixed", defaultSize = "SINGLE", isSelected = false),
