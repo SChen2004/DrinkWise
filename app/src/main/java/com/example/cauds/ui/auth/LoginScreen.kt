@@ -243,7 +243,13 @@ fun LoginScreen(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.rsp(),
                     color = CloverNormal,
-                    modifier = Modifier.align(Alignment.Start).clickable { navController.navigate(Screen.ForgotPassword.route) },
+                    modifier = Modifier.align(Alignment.Start).clickable { 
+                        if (navController.currentDestination?.route == Screen.Login.route) {
+                            navController.navigate(Screen.ForgotPassword.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                    },
                     style = TextStyle(
                         platformStyle = PlatformTextStyle(
                             includeFontPadding = false
@@ -383,108 +389,16 @@ fun LoginScreen(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 12.rsp(),
                     color = CloverNormal,
-                    modifier = Modifier.clickable { navController.navigate(Screen.SignUp.route) }
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AuthTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    error: String,
-    isPassword: Boolean,
-    passwordVisible: Boolean = false,
-    onTogglePassword: () -> Unit = {}
-) {
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.rdp())) {
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(
-                    text = placeholder,
-                    fontFamily = Poppins,
-                    fontSize = 16.rsp(),
-                    color = Color.Black.copy(alpha = 0.3f),
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            singleLine = true,
-            visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
-            trailingIcon = {
-                if (isPassword) {
-                    val iconRes = if (passwordVisible) R.drawable.ic_eye_open else R.drawable.ic_eye_closed
-                    IconButton(onClick = onTogglePassword) {
-                        Icon(
-                            painter = painterResource(id = iconRes),
-                            contentDescription = "Toggle password visibility",
-                            modifier = Modifier.size(20.rdp())
-                        )
+                    modifier = Modifier.clickable { 
+                        if (navController.currentDestination?.route == Screen.Login.route) {
+                            navController.navigate(Screen.SignUp.route) {
+                                launchSingleTop = true
+                            }
+                        }
                     }
-                }
-            },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                errorContainerColor = Color.Transparent,
-                focusedIndicatorColor = if (error.isNotEmpty()) ErrorRed else com.example.cauds.ui.theme.CloverDarker,
-                unfocusedIndicatorColor = if (error.isNotEmpty()) ErrorRed else com.example.cauds.ui.theme.CloverDarker.copy(alpha = 0.3f),
-                cursorColor = CloverDarker
-            ),
-            textStyle = LocalTextStyle.current.copy(
-                fontFamily = Poppins,
-                fontSize = 16.rsp(),
-                color = CloverDarker,
-                textAlign = TextAlign.Start
-            )
-        )
-
-        if (error.isNotEmpty()) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.rdp())
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_alert),
-                    contentDescription = "Error",
-                    tint = ErrorRed,
-                    modifier = Modifier.size(12.rdp())
-                )
-                Text(
-                    text = error,
-                    fontFamily = Poppins,
-                    fontSize = 12.rsp(),
-                    color = ErrorRed
                 )
             }
         }
     }
 }
 
-@Composable
-private fun OAuthButton(
-    iconResId: Int,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.size(44.rdp()),
-        color = Color(0xFF3583A4).copy(alpha = 0.1f),
-        shape = RoundedCornerShape(0.rdp())
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = iconResId),
-                contentDescription = null
-            )
-        }
-    }
-}
