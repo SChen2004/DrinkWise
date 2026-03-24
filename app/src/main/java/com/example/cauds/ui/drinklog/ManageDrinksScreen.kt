@@ -77,27 +77,44 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
             )
         },
         bottomBar = {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(backgroundColor)
-                    .padding(horizontal = 24.rdp())
-                    .padding(vertical = 16.rdp())
             ) {
+                HorizontalDivider(color = Color(0xFFC0CBDB), thickness = 0.5.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.rdp())
+                        .padding(top = 16.rdp(), bottom = 24.rdp())
+                ) {
                 Button(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.rdp()),
                     shape = RoundedCornerShape(0.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF121E30)),
+                    contentPadding = PaddingValues(0.dp) // Removed default padding to prevent vertical clipping
                 ) {
-                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.rsp())
+                    Text(
+                        "Save", 
+                        color = Color.White, 
+                        fontSize = 24.rsp(),
+                        style = LocalTextStyle.current.copy(
+                            platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        fontWeight = FontWeight.Normal, 
+                        fontFamily = BigShouldersDisplay, 
+                        letterSpacing = 0.rsp()
+                    )
                 }
             }
-        },
-        containerColor = backgroundColor
-    ) { paddingValues ->
+        }
+    },
+    containerColor = backgroundColor
+) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -111,9 +128,9 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.rdp()),
-                placeholder = { Text("Search", color = Color.Gray, fontFamily = Poppins, fontSize = 14.rsp()) },
-                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins, fontSize = 14.rsp()),
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.Black) },
+                placeholder = { Text("Search", color = Color.Black.copy(alpha = 0.4f), fontFamily = Poppins, fontSize = 14.rsp()) },
+                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins, fontSize = 14.rsp(), color = Color.Black),
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.Black, modifier = Modifier.size(16.rdp())) },
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.updateSearchQuery("") }) {
@@ -121,12 +138,12 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                         }
                     }
                 },
-                shape = RoundedCornerShape(2.dp),
+                shape = RoundedCornerShape(0.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.Black,
+                    unfocusedBorderColor = Color.Black.copy(alpha = 0.5f),
                     focusedBorderColor = Color.Black,
-                    unfocusedContainerColor = Color(0xFFF2E7C9),
-                    focusedContainerColor = Color(0xFFF2E7C9)
+                    unfocusedContainerColor = Color(0xFFFFEFC6).copy(alpha = 0.5f),
+                    focusedContainerColor = Color(0xFFFFEFC6).copy(alpha = 0.5f)
                 ),
                 singleLine = true
             )
@@ -190,7 +207,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 Column(
                                     modifier = Modifier
                                         .padding(horizontal = 16.rdp(), vertical = 16.rdp())
-                                        .border(1.dp, Color.Black)
+                                        .border(0.5.dp, Color.Black.copy(alpha = 0.5f))
                                 ) {
                                     filteredDrinks.forEachIndexed { index, drink ->
                                         DrinkRowItem(
@@ -199,7 +216,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                             onDelete = { viewModel.deleteDrink(drink) }
                                         )
                                         if (index < filteredDrinks.size - 1) {
-                                            HorizontalDivider(color = Color.Black, thickness = 1.dp)
+                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
                                         }
                                     }
                                 }
@@ -220,7 +237,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 Icons.Default.Add,
                                 contentDescription = "Add New Drink",
                                 tint = Color.Black,
-                                modifier = Modifier.size(32.rdp())
+                                modifier = Modifier.size(24.rdp())
                             )
                             Spacer(modifier = Modifier.height(8.rdp()))
                             Text(
@@ -254,7 +271,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 Column(
                                     modifier = Modifier
                                         .padding(horizontal = 16.rdp())
-                                        .border(1.dp, Color.Black)
+                                        .border(0.5.dp, Color.Black.copy(alpha = 0.5f))
                                 ) {
                                     selectedDrinks.forEachIndexed { index, drink ->
                                         DrinkRowItem(
@@ -263,7 +280,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                             onDelete = { viewModel.deleteDrink(drink) }
                                         )
                                         if (index < selectedDrinks.size - 1) {
-                                            HorizontalDivider(color = Color.Black, thickness = 1.dp)
+                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
                                         }
                                     }
                                 }
@@ -288,7 +305,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                     Column(
                                         modifier = Modifier
                                             .padding(horizontal = 16.rdp())
-                                            .border(1.dp, Color.Black)
+                                            .border(0.5.dp, Color.Black.copy(alpha = 0.5f))
                                     ) {
                                         CategoryHeader(
                                             title = category,
@@ -297,7 +314,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                         )
                                         
                                         if (isExpanded) {
-                                            HorizontalDivider(color = Color.Black, thickness = 1.dp)
+                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
                                             categoryDrinks.forEachIndexed { index, drink ->
                                                 DrinkRowItem(
                                                     drink = drink,
@@ -305,7 +322,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                                     onDelete = { viewModel.deleteDrink(drink) }
                                                 )
                                                 if (index < categoryDrinks.size - 1) {
-                                                    HorizontalDivider(color = Color.Black, thickness = 1.dp)
+                                                    HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
                                                 }
                                             }
                                         }
@@ -357,7 +374,7 @@ fun SectionHeader(
 
 @Composable
 fun CategoryHeader(title: String, isExpanded: Boolean, onClick: () -> Unit) {
-    val backgroundColor = BackgroundSand
+    val backgroundColor = Color(0xFFEDF5EF).copy(alpha = 0.5f) 
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -392,7 +409,7 @@ fun DrinkRowItem(
     var showDelete by remember { mutableStateOf(false) }
     val backgroundColor = BackgroundSand
 
-    Box(modifier = Modifier.fillMaxWidth().height(50.dp).background(backgroundColor)) {
+    Box(modifier = Modifier.fillMaxWidth().height(50.rdp()).background(Color(0xFFEDF5EF).copy(alpha = 0.5f))) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -410,9 +427,10 @@ fun DrinkRowItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 16.dp).weight(1f),
+                modifier = Modifier.padding(horizontal = 16.rdp()).weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Original category icons
                 val iconRes = when (drink.data.category) {
                     "Beer" -> R.drawable.ic_beer_o
                     "Wine" -> R.drawable.ic_wine_o
@@ -444,8 +462,8 @@ fun DrinkRowItem(
                 // Custom Checkbox [X] vs [ ]
                 Box(
                     modifier = Modifier
-                        .size(20.dp)
-                        .border(1.dp, Color.Black, RoundedCornerShape(0.dp))
+                        .size(20.rdp())
+                        .border(0.5.dp, Color.Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
                         .background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
@@ -453,11 +471,13 @@ fun DrinkRowItem(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Selected",
-                            modifier = Modifier.size(16.dp),
+                            modifier = Modifier.size(14.rdp()),
                             tint = Color.Black
                         )
                     }
                 }
+                
+                Spacer(modifier = Modifier.width(16.rdp()))
 
                 if (showDelete) {
                     Spacer(modifier = Modifier.width(16.rdp()))

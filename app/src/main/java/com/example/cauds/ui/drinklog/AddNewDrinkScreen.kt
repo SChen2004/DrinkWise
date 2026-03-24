@@ -79,13 +79,18 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
             val canSave = drinkName.isNotBlank() && selectedCategory != "Select Category"
             val saveButtonColor = if (canSave) Color(0xFF121E30) else Color(0xFF121E30).copy(alpha = 0.5f)
 
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(backgroundColor)
-                    .padding(horizontal = 24.rdp())
-                    .padding(vertical = 16.rdp())
             ) {
+                HorizontalDivider(color = Color(0xFFC0CBDB), thickness = 0.5.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.rdp())
+                        .padding(top = 16.rdp(), bottom = 24.rdp())
+                ) {
                 Button(
                     onClick = {
                         if (canSave) {
@@ -113,15 +118,27 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         .fillMaxWidth()
                         .height(44.rdp()),
                     shape = RoundedCornerShape(0.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = saveButtonColor)
+                    colors = ButtonDefaults.buttonColors(containerColor = saveButtonColor),
+                    contentPadding = PaddingValues(0.dp)
                 ) {
-                    Text("Save", color = Color.White, fontWeight = FontWeight.Normal, fontFamily = BigShouldersDisplay, letterSpacing = 0.rsp())
+                    Text(
+                        "Save", 
+                        color = Color.White, 
+                        fontSize = 24.rsp(),
+                        style = LocalTextStyle.current.copy(
+                            platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+                        ),
+                        fontWeight = FontWeight.Normal, 
+                        fontFamily = BigShouldersDisplay, 
+                        letterSpacing = 0.rsp()
+                    )
                 }
             }
-        },
-        containerColor = backgroundColor
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        }
+    },
+    containerColor = backgroundColor
+) { paddingValues ->
+    Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -205,14 +222,14 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.rdp()),
+                        .height(180.rdp()),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = iconRes),
                         contentDescription = currentCategory,
                         modifier = Modifier
-                            .size(160.rdp()),
+                            .size(140.rdp()),
                         colorFilter = if (currentCategory == "Select Category") ColorFilter.tint(Color(0xFFE8E1CE)) else null,
                         contentScale = ContentScale.Fit
                     )
@@ -247,7 +264,7 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                         Text(
                             text = displayText,
                             fontSize = if (isCenter) 20.rsp() else 16.rsp(),
-                            fontWeight = if (isCenter) FontWeight.Normal else FontWeight.Normal,
+                            fontWeight = FontWeight.Normal,
                             fontFamily = BigShouldersDisplay,
                             color = if (isCenter) Color.Black else Color.Black.copy(alpha = 0.1f),
                             modifier = Modifier

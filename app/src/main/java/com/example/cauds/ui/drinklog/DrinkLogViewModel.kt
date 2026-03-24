@@ -54,10 +54,7 @@ fun getDefaultSizeForDrink(drinkName: String, category: String): String {
 // Hardcoded list of default drinks a user can select
 val availableDrinks = listOf(
     DrinkType("Ale", "Beer"),
-    DrinkType("Cider", "Fermented"), 
-    DrinkType("Rum", "Spirit"),
-    DrinkType("Sauvignon", "Wine"),
-    DrinkType("Seltzer", "Fermented"),
+    DrinkType("Cider", "Fermented"),
     DrinkType("Whiskey", "Spirit")
 )
 
