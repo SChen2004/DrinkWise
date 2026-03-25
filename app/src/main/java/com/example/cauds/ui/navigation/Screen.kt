@@ -14,7 +14,9 @@ sealed class Screen(val route: String) {
     object AudQuiz : Screen("aud_quiz")
     object QuizLoading : Screen("quiz_loading")
     object QuizResult : Screen("quiz_result")
-    object NotificationPreferences : Screen("notification_preferences")
+    object NotificationPreferences : Screen("notification_preferences?fromAccount={fromAccount}") {
+        fun createRoute(fromAccount: Boolean = false) = "notification_preferences?fromAccount=$fromAccount"
+    }
     object FavouriteDrinks : Screen("favourite_drinks")
 
     // Dashboard

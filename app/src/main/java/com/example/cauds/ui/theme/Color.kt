@@ -16,4 +16,6 @@ val CloverDarker = Color(0xFF1A3720)
 val CobaltDarker = Color(0xFF121E30)
 val SkyDark = Color(0xFF8397A5)
 val ErrorRed = Color(0xFFEA4335)
+val SandActive = Color(0xFFCBC4B0)
+val CobaltLight = Color(0xFFC0CBDB)
 

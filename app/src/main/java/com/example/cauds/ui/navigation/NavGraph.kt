@@ -68,7 +68,18 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.OnboardingName.route) { OnboardingNameScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingSex.route) { OnboardingSexScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingPurpose.route) { OnboardingPurposeScreen(navController, onboardingViewModel) }
-        composable(Screen.NotificationPreferences.route) { NotificationPreferencesScreen(navController, onboardingViewModel)}
+        composable(
+            route = Screen.NotificationPreferences.route,
+            arguments = listOf(
+                androidx.navigation.navArgument("fromAccount") {
+                    type = androidx.navigation.NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
+            val fromAccount = backStackEntry.arguments?.getBoolean("fromAccount") ?: false
+            NotificationPreferencesScreen(navController, onboardingViewModel, fromAccount)
+        }
         composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home

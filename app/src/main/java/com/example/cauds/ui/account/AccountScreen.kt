@@ -67,7 +67,7 @@ fun AccountScreen(
                     modifier = Modifier.weight(1f)
                 )
                 Button(
-                    onClick = { navController.navigate(Screen.NotificationPreferences.route) },
+                    onClick = { navController.navigate(Screen.NotificationPreferences.createRoute(fromAccount = true)) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                     shape = MaterialTheme.shapes.small,
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -180,7 +180,7 @@ fun AccountScreen(
         )
         HorizontalDivider()
         AccountActionRow(label = "Notifications") {
-            navController.navigate(Screen.NotificationPreferences.route)
+            navController.navigate(Screen.NotificationPreferences.createRoute(fromAccount = true))
         }
         HorizontalDivider()
 
