@@ -24,6 +24,7 @@ import com.example.cauds.ui.calendar.DaySummaryScreen
 import com.example.cauds.ui.dashboard.DashboardViewModel
 import com.example.cauds.ui.onboarding.OnboardingViewModel
 import com.example.cauds.ui.drinklog.DrinkLogScreen
+import com.example.cauds.ui.drinklog.DrinkLogViewModel
 import com.example.cauds.ui.learning.ArticleScreen
 import com.example.cauds.ui.learning.LearningPageScreen
 import com.example.cauds.ui.learning.LearningViewModel
@@ -45,6 +46,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
     val dashboardViewModel: DashboardViewModel = viewModel()
     val onboardingViewModel: OnboardingViewModel = viewModel()
     val journalViewModel: JournalViewModel = viewModel()
+    val drinkLogViewModel: DrinkLogViewModel = viewModel()
     val context = LocalContext.current.applicationContext
     val articleRepo = ArticleRepository(context)
     val learningViewModel: LearningViewModel = viewModel(
@@ -75,7 +77,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.Dashboard.route) { DashboardScreen(navController, dashboardViewModel) }
 
         // Main Sections (Accessible from Dashboard or Bottom Nav)
-        composable(Screen.Tracking.route) { DrinkLogScreen(navController) }
+        composable(Screen.Tracking.route) { DrinkLogScreen(navController, drinkLogViewModel) }
         composable(Screen.ManageDrinks.route) { backStackEntry ->
             val manageDrinksViewModel: com.example.cauds.ui.drinklog.ManageDrinksViewModel = viewModel()
             com.example.cauds.ui.drinklog.ManageDrinksScreen(navController, viewModel = manageDrinksViewModel)
@@ -96,9 +98,10 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.LearningPage.route) { LearningPageScreen(navController, learningViewModel) }
         composable(Screen.ArticlePage.route) { ArticleScreen(navController, learningViewModel) }
 
-
+        // Calendar
         composable(Screen.Calendar.route) { CalendarScreen(
-            onDayClick = { date -> navController.navigate("day_summary/${date}") }
+            onDayClick = { date -> navController.navigate("day_summary/$date") },
+            onBack = { navController.popBackStack() }
         ) }
         composable(Screen.AccountTest.route) { AccountTestScreen(navController) }
         composable(Screen.Account.route) { AccountScreen(navController) }
@@ -114,7 +117,10 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
             DaySummaryScreen(
                 date = dateStr,
+                navController= navController,
+                journalViewModel = journalViewModel,
                 calendarViewModel = calendarViewModel,
+                drinkLogViewModel = drinkLogViewModel,
                 onBack = { navController.popBackStack() }
             )
         }

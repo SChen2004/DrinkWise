@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.cauds.ui.navigation.Screen
 import com.example.cauds.viewmodel.JournalViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -23,18 +24,22 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
 
     var entryText by remember { mutableStateOf("") }
 
-    val todayDate = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date())
-    val todayDayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
-
     // After a successful save we want to go back to the journal screen.
     // We also reload entries so the new one shows up immediately.
     LaunchedEffect(viewModel.saveSuccess) {
         if (viewModel.saveSuccess) {
-            viewModel.onSaveHandled()   // reset the flag so it doesn't trigger again
-            viewModel.loadEntries()     // refresh the list
+            viewModel.onSaveHandled()
+            viewModel.loadEntries()
             navController.popBackStack()
         }
     }
+    val displayDate = viewModel.selectedDate?.let {
+        java.time.format.DateTimeFormatter.ofPattern("MMM d", Locale.getDefault()).format(it)
+    } ?: SimpleDateFormat("MMM d", Locale.getDefault()).format(Date())
+
+    val displayDayOfWeek = viewModel.selectedDate?.let {
+        it.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault())
+    } ?: SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
 
     Column(
         modifier = Modifier
@@ -58,8 +63,8 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = todayDate, fontSize = 16.sp)
-                Text(text = todayDayOfWeek, fontSize = 16.sp, color = Color.Gray)
+                Text(text = displayDate, fontSize = 16.sp)
+                Text(text = displayDayOfWeek, fontSize = 16.sp, color = Color.Gray)
             }
 
             HorizontalDivider(modifier = Modifier.padding(top = 12.dp))

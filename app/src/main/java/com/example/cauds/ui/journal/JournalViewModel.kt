@@ -8,7 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.cauds.data.model.JournalData
 import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.JournalRepository
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.model.Values.timestamp
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 
 class JournalViewModel(
     private val journalRepo: JournalRepository = JournalRepository(),
@@ -35,6 +40,13 @@ class JournalViewModel(
 
     var saveError by mutableStateOf<String?>(null)
         private set
+
+    var selectedDate by mutableStateOf<LocalDate?>(null)
+        private set
+
+    fun setEntryDate(date: LocalDate) {
+        selectedDate = date
+    }
 
     // saveSuccess acts as a one-shot signal to the screen that the save worked.
     // The screen watches this, navigates away when it flips to true, then calls
@@ -64,11 +76,20 @@ class JournalViewModel(
         val userId = authRepo.getUserId() ?: return
         if (text.isBlank()) return
 
+        android.util.Log.d("JournalVM", "saveEntry called, userId=$userId, text=$text, selectedDate=$selectedDate")
         viewModelScope.launch {
             isSaving = true
             saveError = null
 
-            val journalData = JournalData(entry = text)
+            // Use the selected date if set, otherwise default to now
+            val timestamp = selectedDate?.let {
+                val instant = it.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                Timestamp(Date.from(instant))
+            } ?: Timestamp.now()
+
+            android.util.Log.d("JournalVM", "timestamp=$timestamp, class=${timestamp.javaClass}")
+
+            val journalData = JournalData(entry = text, createdAt = timestamp)
 
             journalRepo.saveJournalEntry(userId, journalData) { success, error, _ ->
                 isSaving = false
@@ -76,6 +97,8 @@ class JournalViewModel(
                     saveSuccess = true
                 } else {
                     saveError = error ?: "Failed to save entry"
+                    android.util.Log.d("JournalVM", "errormsg=failed to save message")
+
                 }
             }
         }
@@ -85,6 +108,7 @@ class JournalViewModel(
     // doesn't keep triggering on recomposition.
     fun onSaveHandled() {
         saveSuccess = false
+        selectedDate = null
     }
 
     fun deleteEntry(documentId: String) {
