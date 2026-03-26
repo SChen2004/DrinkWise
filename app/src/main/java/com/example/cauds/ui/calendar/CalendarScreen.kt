@@ -1,248 +1,305 @@
 package com.example.cauds.ui.calendar
 
-import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.cauds.ui.components.DrinkDots
+import com.example.cauds.ui.theme.BigShouldersDisplay
+import com.example.cauds.ui.theme.Poppins
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 
-/**
- * Front-end calendar for any month.
- *
- * Later, when you fetch logs for a month, you can pass something like:
- * - a set of days that have logs (loggedDays)
- * - or a map of LocalDate -> count/sum/etc.
- */
+private val CalendarBlue = Color(0xFFAFC9DC)
+private val CreamBackground = Color(0xFFFEF5DC)
+private val DarkNavy = Color(0xFF121E30)
+private val WeekendColor = Color(0x9933578A)
+private val LoggedDayCircle = Color(0xFFB0BEC5)
+private val RowDivider = Color(0x4D000000)
+private val JournalCircle = Color(0xFF9EB5C6)
+
 
 @Composable
 fun CalendarScreen(
     modifier: Modifier = Modifier,
     viewModel: CalendarViewModel = viewModel(),
-    onDayClick: (LocalDate) -> Unit = {}
+    onDayClick: (LocalDate) -> Unit = {},
+    onBack: () -> Unit
 ) {
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val topPadding = if (screenHeight > 700) 64.dp else 48.dp
+    val calendarFontSize = if (screenHeight > 700) 16.sp else 14.sp
+    val daycellPadding = if (screenHeight > 700) 58.dp else 54.dp
+
     val currentMonth = viewModel.currentMonth
-    val loggedDays = viewModel.loggedDays
-    val summary = viewModel.monthSummary
 
-    Column(modifier = modifier.fillMaxSize().padding(16.dp)) {
-
-        MonthHeader(
-            yearMonth = currentMonth,
-            onPrev = { viewModel.goPrevMonth() },
-            onNext = { viewModel.goNextMonth() }
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-        WeekdayRow()
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val cells = remember(currentMonth) { buildMonthCells(currentMonth) }
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            modifier = Modifier.fillMaxWidth(),
-            userScrollEnabled = false,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            items(cells) { cell ->
-                DayCell(
-                    cell = cell,
-                    hasLog = cell.date?.let { it in loggedDays } == true,
-                    onClick = { date ->
-                        if (date != null) onDayClick(date)
-                    }
-                )
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadMonth(viewModel.currentMonth)
+                viewModel.loadJournalDays()
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (viewModel.isLoading) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(12.dp))
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
-
-        viewModel.errorMessage?.let { msg ->
-            Text(msg, color = MaterialTheme.colorScheme.error)
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        // MonthSummaryCard(summary = summary)
     }
-}
 
-@Composable
-private fun MonthHeader(
-    yearMonth: YearMonth,
-    onPrev: () -> Unit,
-    onNext: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(CalendarBlue)
     ) {
-        TextButton(onClick = onPrev) {
-            Text("Prev")
+        // ── Top cream section (back arrow + month title) ──────
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(CreamBackground)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(topPadding))
+
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = DarkNavy,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val monthName = currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+                Text(
+                    text = "$monthName ${currentMonth.year}",
+                    fontFamily = BigShouldersDisplay,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = DarkNavy
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                IconButton(
+                    onClick = { viewModel.goPrevMonth() },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Previous month",
+                        tint = DarkNavy
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = { viewModel.goNextMonth() },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Next month",
+                        tint = DarkNavy
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        // ── Calendar grid section (blue background) ───────────
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(modifier = Modifier.height(12.dp))
 
-        val monthName = yearMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-        Text(
-            text = "$monthName ${yearMonth.year}",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center
-        )
+            // ── Weekday labels ────────────────────────────────
+            Row(modifier = Modifier.fillMaxWidth()) {
+                val days = listOf(
+                    DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
+                    DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY,
+                    DayOfWeek.FRIDAY, DayOfWeek.SATURDAY
+                )
+                days.forEach { dow ->
+                    val isWeekend = dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY
+                    Text(
+                        text = dow.getDisplayName(TextStyle.SHORT, Locale.getDefault()).first().uppercase(),
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center,
+                        fontFamily = Poppins,
+                        fontSize = calendarFontSize,
+                        fontWeight = FontWeight.Normal,
+                        color = if (isWeekend) WeekendColor else DarkNavy
+                    )
+                }
+            }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(48.dp))
 
-        TextButton(onClick = onNext) {
-            Text("Next")
+            // ── Day rows with dividers ────────────────────────
+            val cells = remember(currentMonth) { buildMonthCells(currentMonth) }
+            val rows = cells.chunked(7)
+
+            rows.forEachIndexed { index, rowCells ->
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    rowCells.forEach { cell ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            DayCell(
+                                cell = cell,
+                                hasJournal = cell.date?.let { it in viewModel.journalDays } == true,
+                                drinkCount = cell.date?.let { viewModel.logCountByDay[it] } ?: 0,
+                                isToday = cell.date == LocalDate.now(),
+                                fontSize = calendarFontSize,
+                                daycellPadding = daycellPadding,
+                                onClick = { date ->
+                                    if (date != null) onDayClick(date)
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (index < rows.size - 1) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(
+                        thickness = 0.5.dp,
+                        color = RowDivider
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+            }
         }
     }
 }
 
-@Composable
-private fun WeekdayRow() {
-    // Common calendar layout: Mon..Sun
-    val days = listOf(
-        DayOfWeek.SUNDAY,
-        DayOfWeek.MONDAY,
-        DayOfWeek.TUESDAY,
-        DayOfWeek.WEDNESDAY,
-        DayOfWeek.THURSDAY,
-        DayOfWeek.FRIDAY,
-        DayOfWeek.SATURDAY
-    )
 
-    Row(modifier = Modifier.fillMaxWidth()) {
-        days.forEach { dow ->
-            Text(
-                text = dow.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-    }
-}
+// ── Day cell ──────────────────────────────────────────────────
 
-/**
- * A calendar grid cell.
- * - If date == null, it's a blank filler cell (before the 1st or after the last day).
- */
 private data class CalendarCell(
-    val date: LocalDate? // null = blank cell
+    val date: LocalDate?
 )
 
 private fun buildMonthCells(yearMonth: YearMonth): List<CalendarCell> {
     val firstDay = yearMonth.atDay(1)
     val daysInMonth = yearMonth.lengthOfMonth()
-
-    // sunday == 0, sat == 6
     val startOffset = firstDay.dayOfWeek.value % 7
 
-
     val cells = mutableListOf<CalendarCell>()
-
-    // leading blanks
     repeat(startOffset) { cells.add(CalendarCell(date = null)) }
-
-    // actual days
     for (day in 1..daysInMonth) {
         cells.add(CalendarCell(date = yearMonth.atDay(day)))
     }
-
-    // trailing blanks to complete final row (optional, but looks nicer)
     while (cells.size % 7 != 0) {
         cells.add(CalendarCell(date = null))
     }
-
     return cells
 }
 
 @Composable
 private fun DayCell(
     cell: CalendarCell,
-    hasLog: Boolean,
+    hasJournal: Boolean,
+    drinkCount: Int,
+    isToday: Boolean,
+    fontSize: TextUnit = 14.sp,
+    daycellPadding: Dp = 54.dp,
     onClick: (LocalDate?) -> Unit
 ) {
     val date = cell.date
     val isBlank = date == null
-    
-    val containerColor =
-        if (isBlank) MaterialTheme.colorScheme.surface
-        else if (hasLog) MaterialTheme.colorScheme.secondaryContainer
-        else MaterialTheme.colorScheme.surfaceVariant
+    val isWeekend = date?.dayOfWeek?.value == 6 || date?.dayOfWeek?.value == 7
 
-    val textColor =
-        if (isBlank) MaterialTheme.colorScheme.onSurface.copy(alpha = 0f)
-        else MaterialTheme.colorScheme.onSurfaceVariant
-
-    Surface(
-        color = containerColor,
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = if (hasLog) 8.dp else 0.dp,
+    Box(
         modifier = Modifier
-            .aspectRatio(1f) // makes it square
             .fillMaxWidth()
+            .height(daycellPadding)
             .then(
-                if (!isBlank) Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = LocalIndication.current
-                ) { onClick(date) } else Modifier
-            )
+                if (!isBlank) Modifier.clickable { onClick(date) } else Modifier
+            ),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(top = 2.dp)
         ) {
-            Text(
-                text = date?.dayOfMonth?.toString() ?: "",
-                color = textColor,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Box(
+                modifier = Modifier.size(36.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!isBlank && isToday) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(DarkNavy, CircleShape)
+                    )
+                } else if (!isBlank && hasJournal) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .background(JournalCircle, CircleShape)
+                    )
+                }
+
+                Text(
+                    text = date?.dayOfMonth?.toString() ?: "",
+                    fontFamily = Poppins,
+                    fontSize = fontSize,
+                    fontWeight = FontWeight.Normal,
+                    color = when {
+                        isBlank -> Color.Transparent
+                        isToday -> Color.White
+                        isWeekend -> WeekendColor
+                        else -> DarkNavy
+                    },
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            if (drinkCount > 0) {
+                Spacer(modifier = Modifier.height(6.dp))
+                DrinkDots(count = drinkCount)
+            }
         }
-    }
-}
-
-@Composable
-private fun MonthSummaryCard(summary: CalendarViewModel.MonthSummary, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("Month summary", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            SummaryRow(label = "Total drinks", value = summary.totalDrinks.toString())
-            SummaryRow(label = "Total spent", value = "$${summary.totalMoneySpent}")
-            SummaryRow(
-                label = "Avg drinks / day",
-                value = String.format("%.2f", summary.avgDrinksPerDay)
-            )
-        }
-    }
-}
-
-@Composable
-private fun SummaryRow(label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-        Text(value, style = MaterialTheme.typography.bodyMedium)
     }
 }

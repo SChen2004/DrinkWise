@@ -9,6 +9,7 @@ import com.example.cauds.data.model.JournalData
 import com.example.cauds.data.repository.AuthRepository
 import com.example.cauds.data.repository.JournalRepository
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.model.Values.timestamp
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
@@ -75,6 +76,7 @@ class JournalViewModel(
         val userId = authRepo.getUserId() ?: return
         if (text.isBlank()) return
 
+        android.util.Log.d("JournalVM", "saveEntry called, userId=$userId, text=$text, selectedDate=$selectedDate")
         viewModelScope.launch {
             isSaving = true
             saveError = null
@@ -85,6 +87,8 @@ class JournalViewModel(
                 Timestamp(Date.from(instant))
             } ?: Timestamp.now()
 
+            android.util.Log.d("JournalVM", "timestamp=$timestamp, class=${timestamp.javaClass}")
+
             val journalData = JournalData(entry = text, createdAt = timestamp)
 
             journalRepo.saveJournalEntry(userId, journalData) { success, error, _ ->
@@ -93,6 +97,8 @@ class JournalViewModel(
                     saveSuccess = true
                 } else {
                     saveError = error ?: "Failed to save entry"
+                    android.util.Log.d("JournalVM", "errormsg=failed to save message")
+
                 }
             }
         }

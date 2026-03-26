@@ -73,7 +73,7 @@ class JournalRepository (
         db.collection(JOURNAL)
             .whereEqualTo("userId", userId)
             .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(20)
+            .limit(200)
             .get()
             .addOnSuccessListener { snapshot ->
 

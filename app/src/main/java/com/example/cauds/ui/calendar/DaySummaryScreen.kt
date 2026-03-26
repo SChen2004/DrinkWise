@@ -38,16 +38,22 @@ import com.example.cauds.R
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.unit.TextUnit
 import com.example.cauds.components.EmptyTodayCard
 import com.example.cauds.components.JournalEntryPager
+import com.example.cauds.ui.components.DrinkDots
+import com.example.cauds.ui.drinklog.DrinkLogViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 
 private val CreamBackground = Color(0xFFFEF5DC)
 private val CalendarBlue     = Color(0xFFAFC9DC)
 private val DarkNavy         = Color(0xFF121E30)
 private val WeekendColor     = Color(0x9933578A)
+private val JournalCircle    = Color(0xFF9EB5C6)
 
 
 @Composable
@@ -55,20 +61,43 @@ fun DaySummaryScreen(
     date: String,
     calendarViewModel: CalendarViewModel,
     journalViewModel: JournalViewModel,
+    drinkLogViewModel: DrinkLogViewModel,
     navController: NavController,
     onBack: () -> Unit
 ) {
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val calendarTopPadding = if (screenHeight > 700) 64.dp else 48.dp
+    val calendarFontSize = if (screenHeight > 700) 16.sp else 14.sp
 
-    var currentDate by remember { mutableStateOf(LocalDate.parse(date)) }
+    // DO NOT REMOVE: This makes it so when you log something, it returns to the same day!
+    var currentDate by remember {
+        mutableStateOf(calendarViewModel.viewedDate ?: LocalDate.parse(date))
+    }
+    LaunchedEffect(currentDate) {
+        calendarViewModel.viewedDate = currentDate
+    }
+
+    // DO NOT REMOVE:
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                calendarViewModel.loadMonth(calendarViewModel.currentMonth)
+                calendarViewModel.loadJournalDays()
+                journalViewModel.loadEntries()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     val dateString = currentDate.toString()
-
     LaunchedEffect(dateString) {
         journalViewModel.loadEntries()
     }
-
 
     val logsForDay = remember(calendarViewModel.monthLogs, dateString) {
         calendarViewModel.monthLogs.filter { it.data.date == dateString }
@@ -103,7 +132,10 @@ fun DaySummaryScreen(
             WeekHeader(
                 selectedDate = currentDate,
                 onBack = onBack,
-                onDayClick = { newDate -> currentDate = newDate }
+                onDayClick = { newDate -> currentDate = newDate },
+                logCountByDay = calendarViewModel.logCountByDay,
+                journalDays = calendarViewModel.journalDays,
+                fontSize = calendarFontSize
             )
         }
 
@@ -148,7 +180,10 @@ fun DaySummaryScreen(
                         tint = DarkNavy,
                         modifier = Modifier
                             .size(22.dp)
-                            .clickable { navController.navigate(Screen.Tracking.route) }
+                            .clickable {
+                                drinkLogViewModel.selectDate(currentDate)
+                                navController.navigate(Screen.Tracking.route)
+                            }
                     )
                 }
 
@@ -265,7 +300,10 @@ fun DaySummaryScreen(
 private fun WeekHeader(
     selectedDate: LocalDate,
     onBack: () -> Unit,
-    onDayClick: (LocalDate) -> Unit
+    onDayClick: (LocalDate) -> Unit,
+    logCountByDay: Map<LocalDate, Int> = emptyMap(),
+    journalDays: Set<LocalDate> = emptySet(),
+    fontSize: TextUnit = 14.sp
 ) {
     val startOfWeek = selectedDate.minusDays(
         (selectedDate.dayOfWeek.value % 7).toLong()
@@ -314,7 +352,7 @@ private fun WeekHeader(
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     fontFamily = Poppins,
-                    fontSize = 14.sp,
+                    fontSize = fontSize,
                     fontWeight = FontWeight.Normal,
                     color = if (isWeekend) WeekendColor else DarkNavy
                 )
@@ -323,44 +361,65 @@ private fun WeekHeader(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ── Date numbers ──────────────────────────────────────
+        // ── Date numbers + dots ───────────────────────────────
         Row(modifier = Modifier.fillMaxWidth()) {
             weekDates.forEach { d ->
                 val isSelected = d == selectedDate
+                val count = logCountByDay[d] ?: 0
+                val hasJournal = d in journalDays
 
-                Box(
+                Column(
                     modifier = Modifier
                         .weight(1f)
                         .clickable { onDayClick(d) },
-                    contentAlignment = Alignment.Center
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (isSelected) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .background(DarkNavy, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
+                    Box(
+                        modifier = Modifier.height(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isSelected) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .background(DarkNavy, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = d.dayOfMonth.toString(),
+                                    fontFamily = Poppins,
+                                    fontSize = fontSize,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else {
+                            val isWeekend = d.dayOfWeek.value == 6 || d.dayOfWeek.value == 7
+
+                            if (hasJournal) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .background(JournalCircle, CircleShape)
+                                )
+                            }
+
+                            // Unselected date text
                             Text(
                                 text = d.dayOfMonth.toString(),
                                 fontFamily = Poppins,
-                                fontSize = 16.sp,
+                                fontSize = fontSize,
                                 fontWeight = FontWeight.Normal,
-                                color = Color.White,
+                                color = if (isWeekend) WeekendColor else DarkNavy,
                                 textAlign = TextAlign.Center
                             )
                         }
-                    } else {
-                        val isWeekend = d.dayOfWeek.value == 6 || d.dayOfWeek.value == 7
-                        Text(
-                            text = d.dayOfMonth.toString(),
-                            fontFamily = Poppins,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = if (isWeekend) WeekendColor else DarkNavy,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
+                    }
+
+                    if (count > 0) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DrinkDots(count = count)
                     }
                 }
             }
@@ -537,7 +596,7 @@ private fun SwipeToDeleteRow(
 }
 
 
-// ── Drink dot color mapper ────────────────────────────────────
+// ── Drink icon mapper ─────────────────────────────────────────
 
 private fun drinkIconRes(drinkType: String): Int {
     val lower = drinkType.lowercase()

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.cauds.data.model.LogItem
 import com.example.cauds.data.repository.AuthRepository
+import com.example.cauds.data.repository.JournalRepository
 import com.example.cauds.data.repository.LogRepository
 import com.google.firebase.Timestamp
 import java.time.LocalDate
@@ -20,8 +21,14 @@ class CalendarViewModel : ViewModel() {
         val totalMoneySpent: Int,
         val avgDrinksPerDay: Double
     )
+
     private val logRepo = LogRepository()
     private val authRepo = AuthRepository()
+
+    private val journalRepo = JournalRepository()
+
+    var journalDays by mutableStateOf<Set<LocalDate>>(emptySet())
+        private set
 
     var currentMonth by mutableStateOf(YearMonth.now())
         private set
@@ -30,6 +37,9 @@ class CalendarViewModel : ViewModel() {
         private set
 
     var loggedDays by mutableStateOf<Set<LocalDate>>(emptySet())
+        private set
+
+    var logCountByDay by mutableStateOf<Map<LocalDate, Int>>(emptyMap())
         private set
 
     var monthSummary by mutableStateOf(
@@ -46,8 +56,8 @@ class CalendarViewModel : ViewModel() {
         private set
 
     init {
-        // load current month on first open
         loadMonth(currentMonth)
+        loadJournalDays()
     }
 
     fun goPrevMonth() = loadMonth(currentMonth.minusMonths(1))
@@ -82,17 +92,20 @@ class CalendarViewModel : ViewModel() {
                 val list = logs ?: emptyList()
                 monthLogs = list
 
-                // Convert logs -> Set<LocalDate> to highlight days
-                loggedDays = list.mapNotNull { item ->
-                    item.data.timestamp?.toDate()?.toInstant()
-                        ?.atZone(ZoneId.systemDefault())
-                        ?.toLocalDate()
-                }.toSet()
+                val dates = list.mapNotNull { item ->
+                    if (item.data.date.isNotBlank()) LocalDate.parse(item.data.date) else null
+                }
 
+                loggedDays = dates.toSet()
+                logCountByDay = dates.groupingBy { it }.eachCount()
+
+                loggedDays = dates.toSet()
+                logCountByDay = dates.groupingBy { it }.eachCount()
                 monthSummary = computeMonthSummary(yearMonth, list)
             } else {
                 monthLogs = emptyList()
                 loggedDays = emptySet()
+                logCountByDay = emptyMap()
                 monthSummary = MonthSummary(0, 0, 0.0)
                 errorMessage = error ?: "Unknown error"
             }
@@ -117,12 +130,31 @@ class CalendarViewModel : ViewModel() {
         logRepo.deleteLog(logId) { success, error ->
             if (success) {
                 monthLogs = monthLogs.filter { it.id != logId }
-                loggedDays = monthLogs.mapNotNull { item ->
-                    item.data.timestamp?.toDate()?.toInstant()
+
+                val dates = monthLogs.mapNotNull { item ->
+                    if (item.data.date.isNotBlank()) LocalDate.parse(item.data.date) else null
+                }
+
+                loggedDays = dates.toSet()
+                logCountByDay = dates.groupingBy { it }.eachCount()
+
+                loggedDays = dates.toSet()
+                logCountByDay = dates.groupingBy { it }.eachCount()
+                monthSummary = computeMonthSummary(currentMonth, monthLogs)
+            }
+        }
+    }
+
+    fun loadJournalDays() {
+        val userId = authRepo.getUserId() ?: return
+
+        journalRepo.getJournalEntries(userId) { success, result, _ ->
+            if (success && result != null) {
+                journalDays = result.mapNotNull { (_, data) ->
+                    data.createdAt?.toDate()?.toInstant()
                         ?.atZone(ZoneId.systemDefault())
                         ?.toLocalDate()
                 }.toSet()
-                monthSummary = computeMonthSummary(currentMonth, monthLogs)
             }
         }
     }
