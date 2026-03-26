@@ -26,6 +26,8 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.example.cauds.data.model.Sex
 import com.example.cauds.ui.navigation.Screen
 import com.example.cauds.ui.theme.*
@@ -108,7 +110,7 @@ fun AccountScreen(
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(
-                    Icons.Default.ArrowBack, 
+                    painter = painterResource(id = R.drawable.ic_arrow_left),
                     contentDescription = "Back",
                     tint = CloverDarker
                 )
@@ -170,7 +172,7 @@ fun AccountScreen(
                         .height(100.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    // Selection Highlight Box
+                    // Selection Highlight Box (H: 40dp, W: 300dp)
                     Box(
                         modifier = Modifier
                             .width(300.dp)
@@ -184,28 +186,27 @@ fun AccountScreen(
                             .fillMaxWidth()
                             .height(100.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        contentPadding = PaddingValues(vertical = 30.dp),
-                        pageSpacing = 10.dp
+                        contentPadding = PaddingValues(vertical = 30.dp) // (100-40)/2
                     ) { page ->
                         val optionText = sexOptions[page]
                         val isSelected = pagerState.currentPage == page
                         val isPlaceholder = optionText == "Select Sex"
                         val alpha = if (isSelected) 1f else 0.2f
+                        val interactionSource = remember { MutableInteractionSource() }
 
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(30.dp),
+                                .height(40.dp), 
                             contentAlignment = Alignment.Center
                         ) {
                             if (isPlaceholder) {
-                                // Placeholder item with dividers 
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    HorizontalDivider(modifier = Modifier.width(32.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f))
+                                    HorizontalDivider(modifier = Modifier.width(36.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f))
                                     Text(
                                         text = optionText,
                                         style = TextStyle(
@@ -217,7 +218,7 @@ fun AccountScreen(
                                         modifier = Modifier.padding(horizontal = 12.dp),
                                         textAlign = TextAlign.Center
                                     )
-                                    HorizontalDivider(modifier = Modifier.width(32.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f))
+                                    HorizontalDivider(modifier = Modifier.width(36.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f))
                                 }
                             } else {
                                 Text(
@@ -230,7 +231,10 @@ fun AccountScreen(
                                     color = CloverDarker.copy(alpha = alpha),
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier
-                                        .clickable {
+                                        .clickable(
+                                            interactionSource = interactionSource,
+                                            indication = null
+                                        ) {
                                             coroutineScope.launch {
                                                 pagerState.animateScrollToPage(page)
                                                 val matchedEnum = Sex.entries.find { it.displayName == optionText }
@@ -244,6 +248,30 @@ fun AccountScreen(
                             }
                         }
                     }
+
+                    // Top and Bottom Gradients (fade out effect)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .align(Alignment.TopCenter)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(BackgroundSand, Color.Transparent)
+                                )
+                            )
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(30.dp)
+                            .align(Alignment.BottomCenter)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, BackgroundSand)
+                                )
+                            )
+                    )
                 }
             }
         }
@@ -308,7 +336,10 @@ fun AccountScreen(
             color = CloverDarker,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
                     viewModel.performLogout()
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0)
@@ -348,7 +379,16 @@ fun AccountInfoRow(label: String, value: String, onClick: (() -> Unit)? = null) 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onClick() }
+                } else {
+                    Modifier
+                }
+            )
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -379,7 +419,10 @@ fun AccountActionRow(label: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onClick() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
