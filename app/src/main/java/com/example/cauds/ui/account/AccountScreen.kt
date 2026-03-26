@@ -1,12 +1,12 @@
 package com.example.cauds.ui.account
 
+import com.example.cauds.R
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,8 +24,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import com.example.cauds.data.model.Sex
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.*
 import kotlinx.coroutines.launch
 
 
@@ -47,8 +50,7 @@ fun AccountScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
+            .background(BackgroundSand)
             .verticalScroll(rememberScrollState())
     ) {
         // Notification Banner
@@ -56,60 +58,91 @@ fun AccountScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Black)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .background(CobaltDarker)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Notifications are off. Would you\nlike to receive notifications?",
+                    text = "Notifications are off. Would you like to receive notifications?",
                     color = Color.White,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = TextStyle(
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
                     modifier = Modifier.weight(1f)
                 )
+                Spacer(modifier = Modifier.width(32.dp))
                 Button(
-                    onClick = { navController.navigate(Screen.NotificationPreferences.route) },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-                    shape = MaterialTheme.shapes.small,
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    onClick = { navController.navigate(Screen.NotificationPreferences.createRoute(fromAccount = true)) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFAFC9DC),
+                        contentColor = CobaltDarker
+                    ),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp)
                 ) {
-                    Text("Enable", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "Enable",
+                        style = TextStyle(
+                            fontFamily = BigShouldersDisplay,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    )
                 }
             }
         }
+        
+        Spacer(modifier = Modifier.height(26.dp))
+
         // Top Bar
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    Icons.Default.ArrowBack, 
+                    contentDescription = "Back",
+                    tint = CloverDarker
+                )
             }
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
         
         Text(
             text = "You",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Normal,
+            style = TextStyle(
+                fontFamily = BigShouldersDisplay,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            color = CloverDarker,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 24.dp)
+                .padding(bottom = 48.dp)
         )
 
-        // Personal Section
-        Text(
-            "PERSONAL",
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        HorizontalDivider()
+        // Sections
         
-        AccountInfoRow(label = "Name", value = user.name)
-        HorizontalDivider()
-        AccountInfoRow(label = "Email", value = userEmail)
-        HorizontalDivider()
-        val sexDisplay = user.sex.name.lowercase().replaceFirstChar { it.uppercase() }.replace("_", " ")
-        AccountInfoRow(label = "Sex", value = sexDisplay, onClick = { showSexPicker = !showSexPicker })
+        // Personal Section
+        AccountSectionHeader("Personal")
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
+        
+        AccountInfoRow(label = "NAME", value = user.name)
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
+        AccountInfoRow(label = "EMAIL", value = userEmail)
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
+        val sexDisplay = user.sex.displayName
+        AccountInfoRow(label = "SEX", value = sexDisplay, onClick = { showSexPicker = !showSexPicker })
         
         AnimatedVisibility(
             visible = showSexPicker,
@@ -126,114 +159,153 @@ fun AccountScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .background(BackgroundSand),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                VerticalPager(
-                    state = pagerState,
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
+
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    contentPadding = PaddingValues(vertical = 40.dp)
-                ) { page ->
-                    val optionText = sexOptions[page]
-                    val isSelected = pagerState.currentPage == page
-                    val isPlaceholder = optionText == "Select Sex"
-
-                    Text(
-                        text = if (isPlaceholder) "Select Sex" else optionText,
-                        style = if (isSelected) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected && !isPlaceholder) MaterialTheme.colorScheme.onSurface else Color.LightGray,
-                        textAlign = TextAlign.Center,
+                        .height(100.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Selection Highlight Box
+                    Box(
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(40.dp)
+                            .background(Color(0xFF3583A4).copy(alpha = 0.1f))
+                    )
+                    
+                    VerticalPager(
+                        state = pagerState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable(enabled = !isPlaceholder) { // Disable clicking on Select Sex
-                                coroutineScope.launch {
-                                    // 1. Animate wheel snap
-                                    pagerState.animateScrollToPage(page)
-                                    // 2. Map string back to Enum
-                                    val matchedEnum = Sex.entries.find { it.displayName == optionText }
-                                    if (matchedEnum != null) {
-                                        viewModel.updateUserSex(matchedEnum)
-                                        // 3. Immediately collapse accordion
-                                        showSexPicker = false
-                                    }
+                            .height(100.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        contentPadding = PaddingValues(vertical = 30.dp),
+                        pageSpacing = 10.dp
+                    ) { page ->
+                        val optionText = sexOptions[page]
+                        val isSelected = pagerState.currentPage == page
+                        val isPlaceholder = optionText == "Select Sex"
+                        val alpha = if (isSelected) 1f else 0.2f
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(30.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isPlaceholder) {
+                                // Placeholder item with dividers 
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    HorizontalDivider(modifier = Modifier.width(32.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f))
+                                    Text(
+                                        text = optionText,
+                                        style = TextStyle(
+                                            fontFamily = BigShouldersDisplay,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Normal
+                                        ),
+                                        color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f),
+                                        modifier = Modifier.padding(horizontal = 12.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    HorizontalDivider(modifier = Modifier.width(32.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = if (isSelected) 0.6f else 0.2f))
                                 }
+                            } else {
+                                Text(
+                                    text = optionText,
+                                    style = TextStyle(
+                                        fontFamily = BigShouldersDisplay,
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Normal
+                                    ),
+                                    color = CloverDarker.copy(alpha = alpha),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .clickable {
+                                            coroutineScope.launch {
+                                                pagerState.animateScrollToPage(page)
+                                                val matchedEnum = Sex.entries.find { it.displayName == optionText }
+                                                if (matchedEnum != null) {
+                                                    viewModel.updateUserSex(matchedEnum)
+                                                    showSexPicker = false
+                                                }
+                                            }
+                                        }
+                                )
                             }
-                            .padding(vertical = 8.dp)
-                    )
+                        }
+                    }
                 }
             }
         }
-        HorizontalDivider()
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
 
         Spacer(modifier = Modifier.height(48.dp))
 
         // Notifications Section
-        Text(
-            "NOTIFICATIONS",
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        HorizontalDivider()
+        AccountSectionHeader("Notifications")
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
         AccountActionRow(label = "Notifications") {
-            navController.navigate(Screen.NotificationPreferences.route)
+            navController.navigate(Screen.NotificationPreferences.createRoute(fromAccount = true))
         }
-        HorizontalDivider()
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // AUD Test Section
-        Text(
-            "AUD TEST",
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        HorizontalDivider()
+        // Drink Assessment Section
+        AccountSectionHeader("Drink Assessment")
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
         
         when (audTestState) {
             AudTestState.UNTAKEN -> {
-                AccountActionRow(label = "Take Test") {
+                AccountActionRow(label = "Take Assessment") {
                     navController.navigate(Screen.AudQuiz.route)
                 }
-                HorizontalDivider()
             }
             AudTestState.IN_PROGRESS -> {
-                AccountActionRow(label = "Continue Test") {
+                AccountActionRow(label = "Continue Assessment") {
                     navController.navigate(Screen.AudQuiz.route)
                 }
-                HorizontalDivider()
             }
             AudTestState.COMPLETED -> {
-                AccountActionRow(label = "Retake Test") {
+                AccountActionRow(label = "Retake Assessment") {
                     navController.navigate(Screen.AudQuiz.route)
                 }
-                HorizontalDivider()
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
                 AccountActionRow(label = "View My Results") {
                     navController.navigate(Screen.QuizResult.route)
                 }
-                HorizontalDivider()
             }
         }
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Other Actions
-        AccountActionRow(label = "Change Password") {
-            // Placeholder for now
-        }
-        HorizontalDivider()
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
         
-        Spacer(modifier = Modifier.height(16.dp))
+        AccountActionRow(label = "Change Password") {
+            navController.navigate(Screen.ChangePassword.route)
+        }
+        
+        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
         
         Text(
             text = "Log out",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold,
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            color = CloverDarker,
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
@@ -242,10 +314,32 @@ fun AccountScreen(
                         popUpTo(0)
                     }
                 }
-                .padding(vertical = 12.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         )
-        HorizontalDivider()
+        HorizontalDivider(thickness = 0.5.dp, color = CloverDarker.copy(alpha = 0.4f))
         
+        Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+@Composable
+fun AccountSectionHeader(title: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 0.dp, bottom = 10.dp, start = 16.dp, end = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(
+            text = title,
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            color = CloverDarker,
+            textAlign = TextAlign.Start
+        )
     }
 }
 
@@ -255,11 +349,28 @@ fun AccountInfoRow(label: String, value: String, onClick: (() -> Unit)? = null) 
         modifier = Modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .padding(vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        Text(
+            text = label, 
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Normal
+            ), 
+            color = CloverDarker.copy(alpha = 0.4f)
+        )
+        Text(
+            text = value, 
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            color = CloverDarker
+        )
     }
 }
 
@@ -269,11 +380,24 @@ fun AccountActionRow(label: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = label, 
+            style = TextStyle(
+                fontFamily = Poppins,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
+            ),
+            color = CloverDarker
+        )
+        Icon(
+            painter = painterResource(id = R.drawable.ic_arrow_right), 
+            contentDescription = null, 
+            tint = CloverDarker,
+            modifier = Modifier.size(16.dp)
+        )
     }
 }

@@ -18,6 +18,8 @@ import com.example.cauds.screens.CreateEntryScreen
 import com.example.cauds.screens.JournalScreen
 import com.example.cauds.ui.account.AccountTestScreen
 import com.example.cauds.ui.account.AccountScreen
+import com.example.cauds.ui.account.ChangePasswordScreen
+import com.example.cauds.ui.account.ChangePasswordViewModel
 import com.example.cauds.ui.calendar.CalendarScreen
 import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
@@ -70,7 +72,18 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.OnboardingName.route) { OnboardingNameScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingSex.route) { OnboardingSexScreen(navController, onboardingViewModel) }
         composable(Screen.OnboardingPurpose.route) { OnboardingPurposeScreen(navController, onboardingViewModel) }
-        composable(Screen.NotificationPreferences.route) { NotificationPreferencesScreen(navController, onboardingViewModel)}
+        composable(
+            route = Screen.NotificationPreferences.route,
+            arguments = listOf(
+                androidx.navigation.navArgument("fromAccount") {
+                    type = androidx.navigation.NavType.BoolType
+                    defaultValue = false
+                }
+            )
+        ) { backStackEntry ->
+            val fromAccount = backStackEntry.arguments?.getBoolean("fromAccount") ?: false
+            NotificationPreferencesScreen(navController, onboardingViewModel, fromAccount)
+        }
         composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home
@@ -105,6 +118,10 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         ) }
         composable(Screen.AccountTest.route) { AccountTestScreen(navController) }
         composable(Screen.Account.route) { AccountScreen(navController) }
+        composable(Screen.ChangePassword.route) {
+            val changePasswordViewModel: ChangePasswordViewModel = viewModel()
+            ChangePasswordScreen(navController, changePasswordViewModel)
+        }
 
         // Secondary Features
         composable(Screen.DaySummary.route) { backStackEntry ->
