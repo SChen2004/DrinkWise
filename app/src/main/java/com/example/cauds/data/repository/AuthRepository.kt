@@ -85,6 +85,44 @@ class AuthRepository {
             }
     }
 
+    /**
+     * updatePassword - Updates the authenticated user's password to a new value.
+     * Throws 'RecentLoginRequiredException' if the user hasn't authenticated recently.
+     */
+    fun updatePassword(newPass: String, onResult: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        if (user != null) {
+            user.updatePassword(newPass)
+                .addOnSuccessListener { onResult(true, null) }
+                .addOnFailureListener { e ->
+                    val errorMessage = when (e) {
+                         is com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException -> "Please log in again to change password"
+                         else -> e.message ?: "Unknown error"
+                    }
+                    onResult(false, errorMessage)
+                }
+        } else {
+            onResult(false, "User not logged in")
+        }
+    }
+
+    /**
+     * reauthenticate - Confirms the user's identity before performing account changes.
+     * Uses the current email and provided password to refresh the authentication state.
+     */
+    fun reauthenticate(currentPass: String, onResult: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        val email = user?.email
+        if (user != null && email != null) {
+            val credential = com.google.firebase.auth.EmailAuthProvider.getCredential(email, currentPass)
+            user.reauthenticate(credential)
+                .addOnSuccessListener { onResult(true, null) }
+                .addOnFailureListener { onResult(false, it.message) }
+        } else {
+            onResult(false, "User not found")
+        }
+    }
+
     // Log out
     fun logout() = auth.signOut()
 }

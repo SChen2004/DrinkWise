@@ -18,6 +18,8 @@ import com.example.cauds.screens.CreateEntryScreen
 import com.example.cauds.screens.JournalScreen
 import com.example.cauds.ui.account.AccountTestScreen
 import com.example.cauds.ui.account.AccountScreen
+import com.example.cauds.ui.account.ChangePasswordScreen
+import com.example.cauds.ui.account.ChangePasswordViewModel
 import com.example.cauds.ui.calendar.CalendarScreen
 import com.example.cauds.ui.calendar.CalendarViewModel
 import com.example.cauds.ui.calendar.DaySummaryScreen
@@ -113,6 +115,10 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         ) }
         composable(Screen.AccountTest.route) { AccountTestScreen(navController) }
         composable(Screen.Account.route) { AccountScreen(navController) }
+        composable(Screen.ChangePassword.route) {
+            val changePasswordViewModel: ChangePasswordViewModel = viewModel()
+            ChangePasswordScreen(navController, changePasswordViewModel)
+        }
 
         // Secondary Features
         composable(Screen.DaySummary.route) { backStackEntry ->
