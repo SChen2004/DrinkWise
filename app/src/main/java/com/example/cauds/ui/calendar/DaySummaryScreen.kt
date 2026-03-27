@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cauds.components.JournalEntry
-import com.example.cauds.components.JournalEntryCard
 import com.example.cauds.data.model.LogItem
 import com.example.cauds.ui.navigation.Screen
 import com.example.cauds.ui.theme.BigShouldersDisplay
@@ -98,6 +97,8 @@ fun DaySummaryScreen(
     LaunchedEffect(dateString) {
         journalViewModel.loadEntries()
     }
+
+    var didntDrink by remember(dateString) { mutableStateOf(false) }
 
     val logsForDay = remember(calendarViewModel.monthLogs, dateString) {
         calendarViewModel.monthLogs.filter { it.data.date == dateString }
@@ -189,11 +190,53 @@ fun DaySummaryScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                DaySummaryDrinkList(
-                    logs = logsForDay,
-                    onRemoveItem = { logId -> calendarViewModel.deleteLog(logId) },
-                    onRemoveBatch = { logIds -> logIds.forEach { calendarViewModel.deleteLog(it) } }
-                )
+// ── Drink content: list / "I didn't drink" / "No drinks" card
+                if (totalDrinks > 0) {
+                    // Normal drink list — user has logged drinks
+                    DaySummaryDrinkList(
+                        logs = logsForDay,
+                        onRemoveItem = { logId -> calendarViewModel.deleteLog(logId) },
+                        onRemoveBatch = { logIds -> logIds.forEach { calendarViewModel.deleteLog(it) } }
+                    )
+                } else if (didntDrink) {
+                    // User explicitly marked "I didn't drink" — show the confirmation card
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .background(Color(0x80EDF5EF))
+                            .border(0.5.dp, Color(0x80000000))
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                    ) {
+                        Text(
+                            text = "No drinks",
+                            fontFamily = Poppins,
+                            fontSize = 14.sp,
+                            color = Color(0xFF2E4A2E)
+                        )
+                    }
+                } else {
+                    // No drinks logged and no "didn't drink" flag — show the pill button
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(Color(0x80EDF5EF), shape = CircleShape)
+                                .border(0.5.dp, Color(0x80000000), shape = CircleShape)
+                                .clickable { didntDrink = true }
+                                .padding(horizontal = 24.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = "I didn't drink",
+                                fontFamily = Poppins,
+                                fontSize = 14.sp,
+                                color = DarkNavy
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

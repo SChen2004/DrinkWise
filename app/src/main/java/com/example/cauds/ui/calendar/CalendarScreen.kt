@@ -3,9 +3,6 @@ package com.example.cauds.ui.calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -41,7 +38,6 @@ private val CalendarBlue = Color(0xFFAFC9DC)
 private val CreamBackground = Color(0xFFFEF5DC)
 private val DarkNavy = Color(0xFF121E30)
 private val WeekendColor = Color(0x9933578A)
-private val LoggedDayCircle = Color(0xFFB0BEC5)
 private val RowDivider = Color(0x4D000000)
 private val JournalCircle = Color(0xFF9EB5C6)
 
@@ -59,6 +55,7 @@ fun CalendarScreen(
     val daycellPadding = if (screenHeight > 700) 58.dp else 54.dp
 
     val currentMonth = viewModel.currentMonth
+    val isCurrentMonth = currentMonth == YearMonth.now()
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -133,12 +130,13 @@ fun CalendarScreen(
 
                 IconButton(
                     onClick = { viewModel.goNextMonth() },
+                    enabled = !isCurrentMonth,
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "Next month",
-                        tint = DarkNavy
+                        tint = if (isCurrentMonth) DarkNavy.copy(alpha = 0.2f) else DarkNavy
                     )
                 }
             }
