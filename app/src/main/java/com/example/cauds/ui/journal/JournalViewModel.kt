@@ -44,6 +44,14 @@ class JournalViewModel(
     var selectedDate by mutableStateOf<LocalDate?>(null)
         private set
 
+    // The document ID of the entry being edited, or null for a new entry
+    var editingEntryId by mutableStateOf<String?>(null)
+        private set
+
+    // The pre-loaded text for editing
+    var editingEntryText by mutableStateOf<String?>(null)
+        private set
+
     fun setEntryDate(date: LocalDate) {
         selectedDate = date
     }
@@ -126,4 +134,25 @@ class JournalViewModel(
     fun clearDeleteError() {
         deleteError = null
     }
+
+    fun setEditingEntry(docId: String) {
+        editingEntryId = docId
+        // Find the entry in the already-loaded list and grab its text
+        val entry = entries.firstOrNull { it.first == docId }
+        editingEntryText = entry?.second?.entry
+
+        // Also set the date so the header shows correctly
+        val entryDate = entry?.second?.createdAt?.toDate()?.toInstant()
+            ?.atZone(java.time.ZoneId.systemDefault())
+            ?.toLocalDate()
+        if (entryDate != null) {
+            setEntryDate(entryDate)
+        }
+    }
+
+    fun clearEditingEntry() {
+        editingEntryId = null
+        editingEntryText = null
+    }
+
 }

@@ -418,7 +418,7 @@ fun OnboardingPurposeScreen(
                 shape = RectangleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF121E30),
-                    disabledContainerColor = Color(0x80121E30),
+                    disabledContainerColor = Color(0xFF8397A5),
                     contentColor = Color.White,
                     disabledContentColor = Color.White
                 ),
