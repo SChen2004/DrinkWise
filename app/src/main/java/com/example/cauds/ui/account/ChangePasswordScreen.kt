@@ -20,6 +20,7 @@ import com.example.cauds.R
 import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.CloverDarker
+import com.example.cauds.ui.theme.CobaltDarker
 import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
