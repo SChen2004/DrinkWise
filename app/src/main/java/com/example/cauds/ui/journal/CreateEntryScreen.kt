@@ -35,9 +35,17 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
     var entryText by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
 
+    LaunchedEffect(viewModel.editingEntryText) {
+        if (viewModel.editingEntryText != null) {
+            entryText = viewModel.editingEntryText!!
+        }
+    }
+
+    // Save success handler
     LaunchedEffect(viewModel.saveSuccess) {
         if (viewModel.saveSuccess) {
             viewModel.onSaveHandled()
+            viewModel.clearEditingEntry()
             viewModel.loadEntries()
             navController.popBackStack()
         }
@@ -68,7 +76,10 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = {
+                    viewModel.clearEditingEntry()
+                    navController.popBackStack()
+                }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = "Back",
@@ -76,7 +87,14 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
                     )
                 }
 
-                IconButton(onClick = { /* TODO: delete entry */ }) {
+                IconButton(onClick = {
+                    val editId = viewModel.editingEntryId
+                    if (editId != null) {
+                        viewModel.deleteEntry(editId)
+                        viewModel.clearEditingEntry()
+                        navController.popBackStack()
+                    }
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_trash),
                         contentDescription = "Delete",
@@ -171,7 +189,13 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.saveEntry(entryText) },
+            onClick = {
+                // If editing, delete the old entry first
+                val editId = viewModel.editingEntryId
+                if (editId != null) {
+                    viewModel.deleteEntry(editId)
+                }
+                viewModel.saveEntry(entryText) },
             enabled = entryText.isNotBlank() && !viewModel.isSaving,
             shape = RectangleShape,
             colors = ButtonDefaults.buttonColors(

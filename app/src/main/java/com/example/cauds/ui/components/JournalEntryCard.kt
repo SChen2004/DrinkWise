@@ -91,7 +91,7 @@ fun JournalEntryCard(
                 fontFamily = Poppins,
                 fontSize = 14.sp,
                 color = Color(0xFF121E30),
-                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -162,18 +162,13 @@ fun EmptyTodayCard(
 @Composable
 fun JournalEntryPager(
     entries: List<JournalEntry>,
-    onDelete: (String) -> Unit,
+    onEntryClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color(0x80EDF5EF)
 ) {
     if (entries.isEmpty()) return
 
     val pagerState = rememberPagerState(pageCount = { entries.size })
-    var expandedPageIndex by remember { mutableIntStateOf(-1) }
-
-    LaunchedEffect(pagerState.currentPage) {
-        expandedPageIndex = -1
-    }
 
     Box(
         modifier = modifier
@@ -187,14 +182,11 @@ fun JournalEntryPager(
                 modifier = Modifier.fillMaxWidth()
             ) { page ->
                 val entry = entries[page]
-                val isExpanded = expandedPageIndex == pagerState.currentPage
-
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        expandedPageIndex = if (isExpanded) -1 else pagerState.currentPage
-                    }
-                    .padding(16.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onEntryClick(entry.documentId) }
+                        .padding(16.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -203,27 +195,16 @@ fun JournalEntryPager(
                         Text(
                             text = entry.date,
                             fontFamily = BigShouldersDisplay,
-                            fontWeight = FontWeight.Normal,
+                            fontWeight = FontWeight.SemiBold,
                             fontSize = 24.sp,
                             color = Color(0xFF121E30)
                         )
-
-                        if (isExpanded) {
-                            OutlinedButton(
-                                onClick = { onDelete(entry.documentId) },
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                                border = BorderStroke(1.dp, Color.Red)
-                            ) {
-                                Text("Delete", fontFamily = Poppins)
-                            }
-                        } else {
-                            Text(
-                                text = entry.dayOfWeek,
-                                fontFamily = BigShouldersDisplay,
-                                fontSize = 20.sp,
-                                color = Color(0xFF121E30)
-                            )
-                        }
+                        Text(
+                            text = entry.dayOfWeek,
+                            fontFamily = BigShouldersDisplay,
+                            fontSize = 20.sp,
+                            color = Color(0xFF121E30)
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -233,13 +214,12 @@ fun JournalEntryPager(
                         fontFamily = Poppins,
                         fontSize = 14.sp,
                         color = Color(0xFF121E30),
-                        maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
             }
 
-            // Dots + counter row (only if multiple entries)
             if (entries.size > 1) {
                 Row(
                     modifier = Modifier
@@ -269,7 +249,7 @@ fun JournalEntryPager(
                         text = "${pagerState.currentPage + 1}/${entries.size}",
                         fontFamily = Poppins,
                         fontSize = 12.sp,
-                        color = Color(0x801A3720)
+                        color = Color(0xFF1A3720)
                     )
                 }
             }

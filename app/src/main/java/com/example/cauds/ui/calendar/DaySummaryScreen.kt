@@ -301,7 +301,10 @@ fun DaySummaryScreen(
                                 body = data.entry
                             )
                         },
-                        onDelete = { docId -> journalViewModel.deleteEntry(docId) },
+                        onEntryClick = { docId ->
+                            journalViewModel.setEditingEntry(docId)
+                            navController.navigate(Screen.CreateEntry.route)
+                        },
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }

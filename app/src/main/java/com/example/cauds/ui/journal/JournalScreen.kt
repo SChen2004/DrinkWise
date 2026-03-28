@@ -41,18 +41,13 @@ fun JournalScreen(
     navController: NavController,
     viewModel: JournalViewModel
 ) {
-
-    var expandedEntryId by remember { mutableStateOf<String?>(null) }
-
     val todayDate = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date())
     val todayDayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
 
-    // Kick off the data load once when the screen first appears
     LaunchedEffect(Unit) {
         viewModel.loadEntries()
     }
 
-    // Show a snackbar if a delete fails, then clear the error so it doesn't re-trigger
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(viewModel.deleteError) {
         if (viewModel.deleteError != null) {
@@ -70,7 +65,6 @@ fun JournalScreen(
                 .background(Color(0xFFFEF5DC))
                 .padding(paddingValues)
         ) {
-            // ── Header: pencil icon + "Write an entry" ────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,7 +91,6 @@ fun JournalScreen(
                 )
             }
 
-            // Loading spinner
             if (viewModel.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -105,7 +98,6 @@ fun JournalScreen(
                 return@Scaffold
             }
 
-            // Error state
             if (viewModel.errorMessage != null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(text = viewModel.errorMessage!!, color = Color.Red)
@@ -113,8 +105,6 @@ fun JournalScreen(
                 return@Scaffold
             }
 
-            // Convert raw Firestore pairs into JournalEntry objects the card can display.
-            // mapNotNull safely skips any entry where createdAt is somehow null.
             val entries = viewModel.entries.mapNotNull { (docId, data) ->
                 val millis = data.createdAt?.toDate()?.time ?: return@mapNotNull null
                 JournalEntry(
@@ -125,6 +115,8 @@ fun JournalScreen(
             }
 
             val hasTodayEntry = entries.any { it.date == todayDate }
+            val groupedByDate = entries.groupBy { it.date }
+            val groupedList = groupedByDate.entries.toList()
 
             LazyColumn(
                 modifier = Modifier
@@ -133,8 +125,6 @@ fun JournalScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-
-                // Show empty today card if there's no entry for today yet
                 if (!hasTodayEntry) {
                     item {
                         EmptyTodayCard(
@@ -145,32 +135,27 @@ fun JournalScreen(
                     }
                 }
 
-                // Group entries by date so same-day entries get condensed into one pager card.
-                // groupBy preserves insertion order, so entries stay sorted by date.
-                val groupedByDate = entries.groupBy { it.date }
-                val groupedList = groupedByDate.entries.toList()
-
-                itemsIndexed(groupedList, key = { _, entry -> entry.key }) { index, (date, dayEntries) ->
+                itemsIndexed(groupedList, key = { _, entry -> entry.key }) { index, (_, dayEntries) ->
                     val cardColor = JournalCardColors[index % JournalCardColors.size]
 
                     if (dayEntries.size == 1) {
                         val entry = dayEntries.first()
                         JournalEntryCard(
                             entry = entry,
-                            isExpanded = expandedEntryId == entry.documentId,
+                            isExpanded = false,
                             onClick = {
-                                expandedEntryId = if (expandedEntryId == entry.documentId) null else entry.documentId
-                            },
-                            onDelete = {
-                                viewModel.deleteEntry(entry.documentId)
-                                expandedEntryId = null
+                                viewModel.setEditingEntry(entry.documentId)
+                                navController.navigate(Screen.CreateEntry.route)
                             },
                             backgroundColor = cardColor
                         )
                     } else {
                         JournalEntryPager(
                             entries = dayEntries,
-                            onDelete = { docId -> viewModel.deleteEntry(docId) },
+                            onEntryClick = { docId ->
+                                viewModel.setEditingEntry(docId)
+                                navController.navigate(Screen.CreateEntry.route)
+                            },
                             backgroundColor = cardColor
                         )
                     }
