@@ -97,40 +97,40 @@ fun AccountScreen(
             }
         }
         
-        Spacer(modifier = Modifier.height(26.dp))
 
-        // Top Bar
-        Row(
+        // Top Bar (Responsive Sync)
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(top = 26.rdp(), start = 16.rdp())
         ) {
             IconButton(
                 onClick = { navController.popBackStack() },
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(20.rdp())
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left),
                     contentDescription = "Back",
-                    tint = CloverDarker
+                    tint = CloverDarker,
+                    modifier = Modifier.size(20.rdp())
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.rdp()))
         
         Text(
             text = "You",
             style = TextStyle(
                 fontFamily = BigShouldersDisplay,
-                fontSize = 32.sp,
+                fontSize = 32.rsp(),
                 fontWeight = FontWeight.Normal
             ),
             color = CloverDarker,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 48.dp)
+                .padding(bottom = 48.rdp())
         )
 
         // Sections

@@ -20,6 +20,7 @@ class ChangePasswordViewModel : ViewModel() {
     var isSuccess by mutableStateOf(false)
 
     // Visibility states
+    var isCurrentPasswordVisible by mutableStateOf(false)
     var isNewPasswordVisible by mutableStateOf(false)
     var isConfirmPasswordVisible by mutableStateOf(false)
 
@@ -73,8 +74,8 @@ class ChangePasswordViewModel : ViewModel() {
                 authRepo.updatePassword(newPassword) { updateSuccess, updateError ->
                     isLoading = false
                     if (updateSuccess) {
+                        statusMessage = null
                         isSuccess = true
-                        statusMessage = "Password updated successfully"
                         onSuccess()
                     } else {
                         statusMessage = updateError ?: "Failed to update password"

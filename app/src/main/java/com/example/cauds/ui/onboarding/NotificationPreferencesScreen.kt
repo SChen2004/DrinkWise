@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -257,22 +258,6 @@ fun AccountNotificationLayout(
 ) {
     Scaffold(
         containerColor = BackgroundSand,
-        topBar = {
-            @OptIn(ExperimentalMaterial3Api::class)
-            TopAppBar(
-                title = { },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = CloverDarker
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        },
         bottomBar = {
             // The bottom of the screen Save button
             Column(
@@ -318,19 +303,39 @@ fun AccountNotificationLayout(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(bottom = innerPadding.calculateBottomPadding())
+                .padding(horizontal = 16.rdp()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.rdp()))
+            // 1. Standardized Back Button
+            Box(modifier = Modifier.fillMaxWidth()) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .padding(top = 26.rdp())
+                        .size(20.rdp())
+                ) {
+                    Icon(
+                        painter = painterResource(id = com.example.cauds.R.drawable.ic_arrow_left),
+                        contentDescription = "Back",
+                        tint = CloverDarker,
+                        modifier = Modifier.size(20.rdp())
+                    )
+                }
+            }
 
+            // 2. Standardized Title (Synced with Account/ChangePassword)
             Text(
                 text = "Notifications",
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 32.rsp(),
                 fontFamily = BigShouldersDisplay,
                 color = CloverDarker,
-                modifier = Modifier.padding(bottom = 32.rdp())
+                modifier = Modifier.fillMaxWidth().padding(top = 10.rdp()),
+                textAlign = TextAlign.Center
             )
+
+            Spacer(modifier = Modifier.height(32.rdp()))
 
             HorizontalDivider(thickness = 0.5.rdp(), color = CloverDarker.copy(alpha = 0.4f))
 
