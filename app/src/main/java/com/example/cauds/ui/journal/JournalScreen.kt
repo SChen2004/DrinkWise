@@ -37,7 +37,10 @@ private val JournalCardColors = listOf(
 )
 
 @Composable
-fun JournalScreen(navController: NavController, viewModel: JournalViewModel) {
+fun JournalScreen(
+    navController: NavController,
+    viewModel: JournalViewModel
+) {
 
     var expandedEntryId by remember { mutableStateOf<String?>(null) }
 
