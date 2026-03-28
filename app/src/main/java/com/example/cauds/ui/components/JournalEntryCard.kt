@@ -3,7 +3,6 @@ package com.example.cauds.components
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +21,13 @@ import com.example.cauds.ui.theme.BigShouldersDisplay
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ButtonDefaults
 
 
 // Updated to use a String documentId (Firestore's ID) instead of an Int,
@@ -47,13 +53,14 @@ fun JournalEntryCard(
     isExpanded: Boolean,
     onClick: () -> Unit,
     onDelete: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color(0x80EDF5EF)
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(0x80EDF5EF))
-            .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f))
+            .background(backgroundColor)
+            .border(0.5.dp, Color(0x801A3720))
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -65,7 +72,7 @@ fun JournalEntryCard(
                 Text(
                     text = entry.date,
                     fontFamily = BigShouldersDisplay,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 24.sp,
                     color = Color(0xFF121E30)
                 )
@@ -115,7 +122,7 @@ fun EmptyTodayCard(
         modifier = modifier
             .fillMaxWidth()
             .background(Color(0x80EDF5EF))
-            .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f))
+            .border(0.5.dp, Color(0x801A3720))
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -126,7 +133,7 @@ fun EmptyTodayCard(
                 Text(
                     text = date,
                     fontFamily = BigShouldersDisplay,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 24.sp,
                     color = Color(0xFF121E30)
                 )
@@ -156,17 +163,23 @@ fun EmptyTodayCard(
 fun JournalEntryPager(
     entries: List<JournalEntry>,
     onDelete: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color(0x80EDF5EF)
 ) {
     if (entries.isEmpty()) return
 
     val pagerState = rememberPagerState(pageCount = { entries.size })
+    var expandedPageIndex by remember { mutableIntStateOf(-1) }
+
+    LaunchedEffect(pagerState.currentPage) {
+        expandedPageIndex = -1
+    }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(0x80EDF5EF))
-            .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f))
+            .background(backgroundColor)
+            .border(0.5.dp, Color(0x801A3720))
     ) {
         Column {
             HorizontalPager(
@@ -174,7 +187,15 @@ fun JournalEntryPager(
                 modifier = Modifier.fillMaxWidth()
             ) { page ->
                 val entry = entries[page]
-                Column(modifier = Modifier.padding(16.dp)) {
+                val isExpanded = expandedPageIndex == pagerState.currentPage
+
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        expandedPageIndex = if (isExpanded) -1 else pagerState.currentPage
+                    }
+                    .padding(16.dp)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -182,16 +203,27 @@ fun JournalEntryPager(
                         Text(
                             text = entry.date,
                             fontFamily = BigShouldersDisplay,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Normal,
                             fontSize = 24.sp,
                             color = Color(0xFF121E30)
                         )
-                        Text(
-                            text = entry.dayOfWeek,
-                            fontFamily = BigShouldersDisplay,
-                            fontSize = 20.sp,
-                            color = Color(0xFF121E30)
-                        )
+
+                        if (isExpanded) {
+                            OutlinedButton(
+                                onClick = { onDelete(entry.documentId) },
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                                border = BorderStroke(1.dp, Color.Red)
+                            ) {
+                                Text("Delete", fontFamily = Poppins)
+                            }
+                        } else {
+                            Text(
+                                text = entry.dayOfWeek,
+                                fontFamily = BigShouldersDisplay,
+                                fontSize = 20.sp,
+                                color = Color(0xFF121E30)
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -201,7 +233,7 @@ fun JournalEntryPager(
                         fontFamily = Poppins,
                         fontSize = 14.sp,
                         color = Color(0xFF121E30),
-                        maxLines = 3,
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -222,9 +254,9 @@ fun JournalEntryPager(
                                     .size(6.dp)
                                     .background(
                                         color = if (index == pagerState.currentPage)
-                                            Color(0xFF999999)
+                                            Color(0xFF1A3720).copy(alpha = 0.3f)
                                         else
-                                            Color(0xFFCCCCCC),
+                                            Color(0xFF1A3720).copy(alpha = 0.2f),
                                         shape = CircleShape
                                     )
                             )
@@ -237,7 +269,7 @@ fun JournalEntryPager(
                         text = "${pagerState.currentPage + 1}/${entries.size}",
                         fontFamily = Poppins,
                         fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        color = Color(0x801A3720)
                     )
                 }
             }

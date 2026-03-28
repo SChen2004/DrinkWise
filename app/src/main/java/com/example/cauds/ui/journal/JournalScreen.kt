@@ -4,9 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,11 +17,24 @@ import androidx.navigation.NavController
 import com.example.cauds.components.EmptyTodayCard
 import com.example.cauds.components.JournalEntry
 import com.example.cauds.components.JournalEntryCard
+import com.example.cauds.components.JournalEntryPager
 import com.example.cauds.ui.navigation.Screen
 import com.example.cauds.viewmodel.JournalViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.res.painterResource
+import com.example.cauds.R
+import com.example.cauds.ui.theme.BigShouldersDisplay
+
+private val HeadingColor = Color(0xFF1A3720)
+
+private val JournalCardColors = listOf(
+    Color(0xFFC0CBDB),
+    Color(0x99499F5D),
+    Color(0x99FAAAA5),
+    Color(0x99FFCB46)
+)
 
 @Composable
 fun JournalScreen(navController: NavController, viewModel: JournalViewModel) {
@@ -53,17 +64,34 @@ fun JournalScreen(navController: NavController, viewModel: JournalViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(Color(0xFFFEF5DC))
                 .padding(paddingValues)
         ) {
-            // Header
-            Box(
+            // ── Header: pencil icon + "Write an entry" ────────────
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Black)
-                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .clickable { navController.navigate(Screen.CreateEntry.route) }
+                    .statusBarsPadding()
+                    .padding(top = 64.dp, bottom = 64.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Journal", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_pencil),
+                    contentDescription = "Write entry",
+                    tint = HeadingColor,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Write an entry",
+                    fontFamily = BigShouldersDisplay,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = HeadingColor
+                )
             }
 
             // Loading spinner
@@ -102,25 +130,6 @@ fun JournalScreen(navController: NavController, viewModel: JournalViewModel) {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                // "Write an entry" button
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { navController.navigate(Screen.CreateEntry.route) }
-                            .padding(vertical = 12.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = "Write entry",
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Write an entry", color = Color.Gray, fontSize = 15.sp)
-                    }
-                }
 
                 // Show empty today card if there's no entry for today yet
                 if (!hasTodayEntry) {
@@ -133,18 +142,35 @@ fun JournalScreen(navController: NavController, viewModel: JournalViewModel) {
                     }
                 }
 
-                items(entries, key = { it.documentId }) { entry ->
-                    JournalEntryCard(
-                        entry = entry,
-                        isExpanded = expandedEntryId == entry.documentId,
-                        onClick = {
-                            expandedEntryId = if (expandedEntryId == entry.documentId) null else entry.documentId
-                        },
-                        onDelete = {
-                            viewModel.deleteEntry(entry.documentId)
-                            expandedEntryId = null
-                        }
-                    )
+                // Group entries by date so same-day entries get condensed into one pager card.
+                // groupBy preserves insertion order, so entries stay sorted by date.
+                val groupedByDate = entries.groupBy { it.date }
+                val groupedList = groupedByDate.entries.toList()
+
+                itemsIndexed(groupedList, key = { _, entry -> entry.key }) { index, (date, dayEntries) ->
+                    val cardColor = JournalCardColors[index % JournalCardColors.size]
+
+                    if (dayEntries.size == 1) {
+                        val entry = dayEntries.first()
+                        JournalEntryCard(
+                            entry = entry,
+                            isExpanded = expandedEntryId == entry.documentId,
+                            onClick = {
+                                expandedEntryId = if (expandedEntryId == entry.documentId) null else entry.documentId
+                            },
+                            onDelete = {
+                                viewModel.deleteEntry(entry.documentId)
+                                expandedEntryId = null
+                            },
+                            backgroundColor = cardColor
+                        )
+                    } else {
+                        JournalEntryPager(
+                            entries = dayEntries,
+                            onDelete = { docId -> viewModel.deleteEntry(docId) },
+                            backgroundColor = cardColor
+                        )
+                    }
                 }
             }
         }
