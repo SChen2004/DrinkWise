@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -28,19 +29,19 @@ import com.example.cauds.data.model.Subject
 import com.example.cauds.ui.navigation.Screen
 
 // ── Reusable tile card ──────────────────────────────────────────
-// Takes raw fields instead of a specific model, so it works for
-// both Article and Subject (or anything else with a title/desc/image).
-// The caller decides what happens on click via the lambda.
+// Accepts raw fields so it works for both Article and Subject.
+// The caller controls what happens on click via the lambda.
+// modifier parameter lets the parent add padding, sizing, etc.
 @Composable
 fun LearningTileCard(
     title: String,
     description: String,
     imageRes: Int,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier       // new parameter, defaults to empty
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier              // apply it here first
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() }
     ) {
@@ -71,25 +72,24 @@ fun LearningTileCard(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Image at the bottom (Figma layout: text on top, image below)
+        // Image at the bottom — FillWidth preserves full aspect ratio, no cropping
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = title,
             contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
 // ── Learning landing page ───────────────────────────────────────
+// The Subject tile is hardcoded here because it's static layout,
+// not dynamic data — no need for a ViewModel.
 @Composable
 fun LearningPageScreen(
     navController: NavController,
     viewModel: LearningViewModel
 ) {
-    // Define subject tiles right here — they're part of this screen's layout,
-    // not dynamic data, so they don't need to live in the ViewModel.
     val understandingAud = Subject(
         title = "Understanding AUD",
         description = "Learn more about AUD, how it affects your health, where to get help, facts about alcohol, and how you can reduce your intake.",
@@ -110,7 +110,7 @@ fun LearningPageScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // The "Understanding AUD" folder tile — hardcoded into this screen's layout
+        // "Understanding AUD" folder tile
         item {
             LearningTileCard(
                 title = understandingAud.title,
@@ -120,7 +120,6 @@ fun LearningPageScreen(
             )
         }
 
-        // You'll add more items here as the design grows —
-        // more subjects, support links section, etc.
+        // More sections will go here — support links, etc.
     }
 }

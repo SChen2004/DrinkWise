@@ -20,41 +20,45 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cauds.R
 import com.example.cauds.data.model.Subject
+import com.example.cauds.ui.navigation.Screen
+
+// ── Article lists for each subject ──────────────────────────────
+// These map each subject to its articles. Defined here because
+// this screen owns the relationship between subjects and articles.
+// The actual Article lists are in SubjectArticlesData.kt.
+
+private val subjects = listOf(
+    Subject(
+        title = "Learning More About AUD",
+        description = "What is AUD, what are the symptoms and risks, how can you treat it, and what can you do to help your loved ones who have it?",
+        imageRes = R.drawable.learning_more_aud,
+        route = "learning_more_aud"
+    ),
+    Subject(
+        title = "Getting Help",
+        description = "Plan what to do in an emergency, guides for finding treatment, the do's and don'ts of talking about AUD, how to help others, and types of help!...",
+        imageRes = R.drawable.getting_help,
+        route = "getting_help"
+    ),
+    Subject(
+        title = "Health Information",
+        description = "Nutritional tips, information on medications, and facts about alcohol's effects on the body.",
+        imageRes = R.drawable.health_info,
+        route = "health_info"
+    ),
+    Subject(
+        title = "Facts About Alcohol",
+        description = "What is alcohol, and facts about what is considered a standard drink.",
+        imageRes = R.drawable.facts_alcohol,
+        route = "facts_alcohol"
+    )
+)
 
 @Composable
 fun UnderstandingAudScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: LearningViewModel
 ) {
-    // These 4 subjects are hardcoded layout — each one navigates
-    // to a sub-screen that will show a list of articles.
-    // You'll need to add these routes to your Screen sealed class.
-    val subjects = listOf(
-        Subject(
-            title = "Learning More About AUD",
-            description = "What is AUD, what are the symptoms and risks, how can you treat it, and what can you do to help your loved ones who have it?",
-            imageRes = R.drawable.learning_more_aud,
-            route = "learning_more_aud"
-        ),
-        Subject(
-            title = "Getting Help",
-            description = "Plan what to do in an emergency, guides for finding treatment, the do's and don'ts of talking about AUD, how to help others, and types of help!...",
-            imageRes = R.drawable.getting_help,
-            route = "getting_help"
-        ),
-        Subject(
-            title = "Health Information",
-            description = "Nutritional tips, information on medications, and facts about alcohol's effects on the body.",
-            imageRes = R.drawable.health_info,
-            route = "health_info"
-        ),
-        Subject(
-            title = "Facts About Alcohol",
-            description = "What is alcohol, and facts about what is considered a standard drink.",
-            imageRes = R.drawable.facts_alcohol,
-            route = "facts_alcohol"
-        )
-    )
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 32.dp)
@@ -85,20 +89,23 @@ fun UnderstandingAudScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        // Render each subject tile with a divider above it.
-        // The divider sits outside the padded content to span full width —
-        // remember, negative padding crashes Compose, so we handle
-        // the divider separately from the padded tile content.
+        // Each subject tile — tapping sets the subject data on the ViewModel
+        // and navigates to the single SubjectArticles screen
         items(subjects) { subject ->
             HorizontalDivider(thickness = 0.5.dp)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // The tile itself gets horizontal padding
             LearningTileCard(
                 title = subject.title,
                 description = subject.description,
                 imageRes = subject.imageRes,
-                onClick = { navController.navigate(subject.route) },
+                onClick = {
+                    // Look up the article list for this subject and set it
+                    // on the ViewModel before navigating — same pattern as selectArticle()
+                    val articles = subjectArticlesMap[subject.route] ?: emptyList()
+                    viewModel.selectSubject(subject.title, articles)
+                    navController.navigate(Screen.SubjectArticles.route)
+                },
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 

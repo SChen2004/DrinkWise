@@ -64,11 +64,6 @@ fun ArticleScreen(
                         text = a.title,
                         style = MaterialTheme.typography.headlineLarge
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = a.description,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }

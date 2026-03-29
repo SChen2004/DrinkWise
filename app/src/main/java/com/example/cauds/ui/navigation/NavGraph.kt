@@ -30,6 +30,7 @@ import com.example.cauds.ui.drinklog.DrinkLogViewModel
 import com.example.cauds.ui.learning.ArticleScreen
 import com.example.cauds.ui.learning.LearningPageScreen
 import com.example.cauds.ui.learning.LearningViewModel
+import com.example.cauds.ui.learning.SubjectArticlesScreen
 import com.example.cauds.ui.learning.UnderstandingAudScreen
 import com.example.cauds.ui.onboarding.AudQuizScreen
 import com.example.cauds.ui.onboarding.FavouriteDrinksScreen
@@ -110,11 +111,8 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
 
         // Learning
         composable(Screen.LearningPage.route) { LearningPageScreen(navController, learningViewModel) }
-        composable(Screen.UnderstandingAud.route) { UnderstandingAudScreen(navController = navController) }
-//        composable(Screen.LearningMoreAud.route) { LearningMoreAudScreen(navController, learningViewModel) }
-//        composable(Screen.GettingHelp.route) { GettingHelpScreen(navController, learningViewModel) }
-//        composable(Screen.HealthInfo.route) { HealthInfoScreen(navController, learningViewModel) }
-//        composable(Screen.FactsAlcohol.route) { FactsAlcoholScreen(navController, learningViewModel) }
+        composable(Screen.UnderstandingAud.route) { UnderstandingAudScreen(navController, learningViewModel) }
+        composable(Screen.SubjectArticles.route) { SubjectArticlesScreen(navController, learningViewModel) }
         composable(Screen.ArticlePage.route) { ArticleScreen(navController, learningViewModel) }
 
         // Calendar
