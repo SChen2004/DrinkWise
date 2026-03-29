@@ -19,7 +19,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -28,6 +27,7 @@ import com.example.cauds.R
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.BackgroundSand
+import com.example.cauds.ui.theme.CloverDarker
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.cauds.ui.theme.rdp
@@ -68,7 +68,12 @@ fun AddNewDrinkScreen(navController: NavController, viewModel: ManageDrinksViewM
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
+                            contentDescription = "Back",
+                            modifier = Modifier.size(20.rdp()),
+                            tint = CloverDarker
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = backgroundColor)

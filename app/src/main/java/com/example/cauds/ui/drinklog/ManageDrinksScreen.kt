@@ -12,9 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -25,13 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavController
@@ -39,6 +35,7 @@ import com.example.cauds.R
 import com.example.cauds.data.model.DrinkItem
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.Poppins
+import com.example.cauds.ui.theme.CloverDarker
 import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.navigation.Screen
 
@@ -68,7 +65,12 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
+                            contentDescription = "Back",
+                            modifier = Modifier.size(20.rdp()),
+                            tint = CloverDarker
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
