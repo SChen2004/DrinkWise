@@ -29,9 +29,12 @@ local.properties
 .externalNativeBuild
 .cxx/
 
-# Google Services file (Ignored as per user request)
+# Google Services file
 google-services.json
 
 # OS files
 .DS_Store
 captures/
+
+# Kotlin
+.kotlin/

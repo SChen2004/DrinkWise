@@ -21,14 +21,14 @@ import com.example.cauds.ui.auth.AuthViewModel
 import com.example.cauds.ui.navigation.AppBottomNavigation
 import com.example.cauds.ui.navigation.NavGraph
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.CAUDSTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MaterialTheme {
-
+            CAUDSTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -83,12 +83,12 @@ class MainActivity : ComponentActivity() {
                         }
 
                         NavGraph(
-    navController = navController,
-    startDestination = startDestination ?: "login"
-)
+                            navController = navController,
+                            startDestination = startDestination ?: "login"
+                        )
                     }
                 }
             }
         }
     }
-}
+}
