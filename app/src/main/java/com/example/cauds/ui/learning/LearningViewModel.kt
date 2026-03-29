@@ -4,20 +4,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.cauds.R
 import com.example.cauds.data.model.Article
 import com.example.cauds.data.model.ArticleBlock
+import com.example.cauds.data.model.Subject
 import com.example.cauds.data.repository.ArticleRepository
+import com.example.cauds.ui.navigation.Screen
 
 class LearningViewModel(
     private val articleRepo: ArticleRepository
 ) : ViewModel() {
-
-    var articles by mutableStateOf<List<Article>>(emptyList())
-        private set
-
-    init {
-        articles = articleRepo.articles
-    }
 
     var currentArticle by mutableStateOf<Article?>(null)
         private set
