@@ -49,6 +49,7 @@ fun DashboardScreen(
                 .fillMaxWidth()
                 .background(BackgroundSand)
                 .padding(horizontal = 16.rdp())
+                .padding(top = 32.rdp())
         ) {
             DrinkLogSection(
                 streakCount = dashboardViewModel.streakCount,
@@ -62,7 +63,6 @@ fun DashboardScreen(
                     dashboardViewModel.toggleDidntDrink()
                 }
             )
-            Spacer(modifier = Modifier.height(16.rdp()))
         }
 
         Column(

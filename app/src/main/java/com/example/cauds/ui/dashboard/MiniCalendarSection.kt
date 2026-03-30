@@ -27,6 +27,8 @@ import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.BowlbyOne
+import com.example.cauds.ui.theme.CobaltDarker
+import com.example.cauds.ui.theme.SkyNormal
 
 /**
  * MiniCalendarSection — a compact month view for the dashboard's bottom-left slot.
@@ -38,11 +40,7 @@ import com.example.cauds.ui.theme.BowlbyOne
  *
  * DRINK INTENSITY:
  * The `drinkCountByDay` map tells us how many drinks were logged on each day.
- * We pick a base highlight color and vary its alpha (opacity) based on count:
- *   - 0 drinks → no highlight
- *   - 1 drink  → light (alpha 0.3)
- *   - 2 drinks → medium (alpha 0.5)
- *   - 3+ drinks → full (alpha 0.8)
+
  * This gives a "heat map" effect — heavier drinking days are darker.
  *
  * TODAY'S DATE gets a special circle highlight so the user can spot it quickly.
@@ -64,19 +62,17 @@ fun MiniCalendarSection(
 
     Column(
         modifier = modifier
-            .background(Color(0xFFAFC9DC))
-            .border(0.5.rdp(), Color.Black.copy(alpha = 0.5f))
+            .background(SkyNormal)
             .clickable { onClick() }
             .padding(12.rdp())
     ) {
-        // Month + year header (e.g., "March 2026")
+        // Month + year header
         Text(
             text = monthTitle,
             fontSize = 12.rsp(),
             fontFamily = BowlbyOne,
             fontWeight = FontWeight.Normal,
-            color = Color(0xFF1A3720),
-            modifier = Modifier.padding(bottom = 8.rdp())
+            color = CobaltDarker,
         )
 
         // Weekday header row: S M T W T F S
@@ -102,7 +98,7 @@ fun MiniCalendarSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(6.rdp()))
+        Spacer(modifier = Modifier.height(10.rdp()))
 
         // Build the grid cells for this month.
         // "cells" is a list of nullable LocalDates — null means a blank filler cell.
@@ -129,49 +125,48 @@ fun MiniCalendarSection(
                                     date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY
                                 // Background highlight — color intensity scales with drink count
                                 val bgColor = when {
-                                    drinkCount >= 5 -> Color(0xFF5900FF).copy(alpha = 0.32f)
-                                    drinkCount >= 3 -> Color(0xFF6074FF).copy(alpha = 0.7f)
-                                    drinkCount >= 2 -> Color(0xFF6EA8FE).copy(alpha = 0.4f)
-                                    drinkCount >= 1 -> Color(0xFFFFFFFF).copy(alpha = 0.2f)
+                                    drinkCount >= 5 -> Color(0x525900FF) // Marker_Red (Purple 32%)
+                                    drinkCount >= 3 -> Color(0xB36074FF) // Marker_Blue (Blue 70%)
+                                    drinkCount >= 2 -> Color(0x666EA8FE) // Marker_Yellow (SkyBlue 40%)
+                                    drinkCount >= 1 -> Color(0x33FFFFFF) // Marker_Grey (White 20%)
                                     else -> Color.Transparent
                                 }
 
                                 // Text color — white on dark backgrounds, black otherwise
                                 val textColor = when {
                                     isToday -> Color.White
-                                    isFuture -> Color(0xFF000000).copy(alpha = 0.2f)
-                                    isWeekendDay -> Color(0xFF000000).copy(alpha = 0.4f)
-                                    else -> Color(0xFF000000)
+                                    isFuture -> Color(0xFF121E30).copy(alpha = 0.2f)
+                                    isWeekendDay -> Color(0xFF121E30).copy(alpha = 0.4f)
+                                    else -> Color(0xFF121E30)
                                 }
 
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(if (!isToday && drinkCount > 0) bgColor else Color.Transparent),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    if (isToday) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(24.rdp())
-                                                .clip(CircleShape)
-                                                .background(Color(0xFF000000)),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                text = date.dayOfMonth.toString(),
-                                                fontSize = 11.rsp(),
-                                                fontFamily = Poppins,
-                                                fontWeight = FontWeight.Bold,
-                                                color = textColor
-                                            )
-                                        }
-                                    } else {
+                                if (isToday) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(22.rdp())
+                                            .background(Color.Black, CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
                                         Text(
                                             text = date.dayOfMonth.toString(),
-                                            fontSize = 11.rsp(),
+                                            fontSize = 12.rsp(),
                                             fontFamily = Poppins,
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color.White
+                                        )
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize(0.85f)
+                                            .background(bgColor),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = date.dayOfMonth.toString(),
+                                            fontSize = 12.rsp(),
+                                            fontFamily = Poppins,
+                                            fontWeight = FontWeight.SemiBold,
                                             color = textColor
                                         )
                                     }
@@ -185,6 +180,7 @@ fun MiniCalendarSection(
         }
     }
 }
+
 
 /**
  * Builds a flat list of nullable LocalDates representing the calendar grid.

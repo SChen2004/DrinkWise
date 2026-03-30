@@ -13,6 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CAUDS"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="412"/>
+        <meta-data
+            android:name="design_height_in_dp"
+            android:value="1210"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

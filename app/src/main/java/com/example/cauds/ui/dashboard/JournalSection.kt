@@ -24,6 +24,8 @@ import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
+import com.example.cauds.ui.theme.CloverDarker
+import com.example.cauds.ui.theme.Tertiary
 
 /**
  * JournalSection — the mini journal card on the dashboard.
@@ -45,10 +47,9 @@ fun JournalSection(
     onNewEntryClick: () -> Unit,
     onViewJournalClick: () -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
     val todayDate = SimpleDateFormat("MMM d", Locale.getDefault()).format(Date())
     val todayDayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(Date())
+    
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,68 +62,63 @@ fun JournalSection(
     ) {
         // The "text field" area — just a box with placeholder text, not an actual input
         Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = if (screenHeight < 700.dp) {
-                    80.rdp()
-                } else if (screenHeight < 850.dp) {
-                    110.rdp()
-                } else {
-                    140.rdp()
-                })
-                .background(Color(0xFFEDF5EF).copy(alpha = 0.5f))
-                .border(0.5.rdp(), Color.Black.copy(alpha = 0.5f))
+                .background(Tertiary)
                 .padding(16.rdp())
         ) {
             // Date headers
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = todayDate,
-                    fontSize = if (screenHeight < 700.dp) {
-                        20.rsp()
-                    } else if (screenHeight < 850.dp) {
-                        24.rsp()
-                    } else {
-                        28.rsp()
-                    },
+                    fontSize = 24.rsp(),
                     fontFamily = BigShouldersDisplay,
-                    color = Color(0xFF1A3720)
+                    color = CloverDarker,
+                    style = androidx.compose.ui.text.TextStyle(
+                        platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                            includeFontPadding = false
+                        ),
+                        lineHeightStyle = androidx.compose.ui.text.style.LineHeightStyle(
+                            alignment = androidx.compose.ui.text.style.LineHeightStyle.Alignment.Center,
+                            trim = androidx.compose.ui.text.style.LineHeightStyle.Trim.None
+                        )
+                    )
                 )
                 Text(
                     text = todayDayOfWeek,
-                    fontSize = if (screenHeight < 700.dp) {
-                        12.rsp()
-                    } else if (screenHeight < 850.dp) {
-                        16.rsp()
-                    } else {
-                        20.rsp()
-                    },
+                    fontSize = 20.rsp(),
                     fontFamily = BigShouldersDisplay,
-                    color = Color(0xFF1A3720)
+                    color = CloverDarker,
+                    style = androidx.compose.ui.text.TextStyle(
+                        platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                            includeFontPadding = false
+                        )
+                    )
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.rdp()))
 
             // Journal preview or empty place holder
             Text(
                 text = todayEntryPreview ?: "Type something...",
-                fontSize = 14.rsp(),
+                fontSize = if (todayEntryPreview != null) 12.rsp() else 14.rsp(),
                 fontFamily = Poppins,
-                lineHeight = 22.rsp(),
-                color = if (todayEntryPreview != null) Color(0xFF1A3720) else Color(0xFFA0A5A0),
-                maxLines = if (screenHeight < 700.dp) {
-                    1
-                } else if (screenHeight < 850.dp) {
-                    2
-                } else {
-                    3
-                },
-                overflow = TextOverflow.Ellipsis
+                color = if (todayEntryPreview != null) CloverDarker else CloverDarker.copy(alpha = 0.4f),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis, 
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.rdp(), end = 8.rdp())
+                    .heightIn(min = 60.rdp()),
+                style = androidx.compose.ui.text.TextStyle(
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
             )
         }
     }

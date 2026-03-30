@@ -175,9 +175,7 @@ class DashboardViewModel(
                     entryDate == todayFormatted
                 }
 
-                todayEntryPreview = todayEntry?.second?.entry?.let { text ->
-                    if (text.length > 100) text.take(100) + "…" else text
-                }
+                todayEntryPreview = todayEntry?.second?.entry
             }
         }
     }
