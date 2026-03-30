@@ -1,22 +1,18 @@
 package com.example.cauds.ui.dashboard
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.cauds.ui.theme.Poppins
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -25,7 +21,6 @@ import java.time.format.TextStyle
 import java.util.Locale
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
-import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.CobaltDarker
 import com.example.cauds.ui.theme.SkyNormal
@@ -66,16 +61,23 @@ fun MiniCalendarSection(
             .clickable { onClick() }
             .padding(12.rdp())
     ) {
-        // Month + year header
+        // 1. Month + year header
         Text(
             text = monthTitle,
             fontSize = 12.rsp(),
             fontFamily = BowlbyOne,
             fontWeight = FontWeight.Normal,
             color = CobaltDarker,
+            style = androidx.compose.ui.text.TextStyle(
+                platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                    includeFontPadding = false
+                )
+            )
         )
 
-        // Weekday header row: S M T W T F S
+        Spacer(modifier = Modifier.height(10.rdp())) // Space from Title to Weekdays
+
+        // 2. Weekday header row: S M T W T F S
         val weekdays = listOf(
             DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
             DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY,
@@ -90,22 +92,28 @@ fun MiniCalendarSection(
                     text = dow.getDisplayName(TextStyle.NARROW, Locale.getDefault()),
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    fontFamily = Poppins,
                     fontSize = 10.rsp(),
                     fontWeight = FontWeight.SemiBold,
-                    color = if (isWeekend) Color(0xFF000000).copy(alpha = 0.4f) else Color(0xFF1A3720)
+                    color = if (isWeekend) Color(0xFF000000).copy(alpha = 0.4f) else Color(0xFF1A3720),
+                    fontFamily = Poppins,
+                    style = androidx.compose.ui.text.TextStyle(
+                        platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                            includeFontPadding = false
+                        )
+                    )
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(10.rdp()))
+        // Distance from weekday letters to the top of heatmap blocks
+        Spacer(modifier = Modifier.height(8.rdp()))
 
-        // Build the grid cells for this month.
+        // 3. Build the grid cells for this month.
         // "cells" is a list of nullable LocalDates — null means a blank filler cell.
         val cells = remember(currentMonth) { buildMiniCalendarCells(currentMonth) }
         Column(
             modifier = Modifier.weight(1f), // let the date grid fill the space
-            verticalArrangement = Arrangement.spacedBy(4.rdp()) // space between each row of week
+            verticalArrangement = Arrangement.spacedBy(8.rdp()) // space between each row of week
         ) {
             // Chunk into rows of 7 (one per week) and render each row
             cells.chunked(7).forEach { week ->
@@ -140,34 +148,44 @@ fun MiniCalendarSection(
                                     else -> Color(0xFF121E30)
                                 }
 
-                                if (isToday) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(22.rdp())
-                                            .background(Color.Black, CircleShape),
-                                        contentAlignment = Alignment.Center
-                                    ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize().background(bgColor),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (isToday) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(22.rdp())
+                                                .background(Color.Black, CircleShape),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = date.dayOfMonth.toString(),
+                                                fontSize = 12.rsp(),
+                                                fontFamily = Poppins,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = Color.White,
+                                                textAlign = TextAlign.Center,
+                                                style = androidx.compose.ui.text.TextStyle(
+                                                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                                                        includeFontPadding = false
+                                                    )
+                                                )
+                                            )
+                                        }
+                                    } else {
                                         Text(
                                             text = date.dayOfMonth.toString(),
                                             fontSize = 12.rsp(),
                                             fontFamily = Poppins,
                                             fontWeight = FontWeight.SemiBold,
-                                            color = Color.White
-                                        )
-                                    }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize(0.85f)
-                                            .background(bgColor),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = date.dayOfMonth.toString(),
-                                            fontSize = 12.rsp(),
-                                            fontFamily = Poppins,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = textColor
+                                            color = textColor,
+                                            textAlign = TextAlign.Center,
+                                            style = androidx.compose.ui.text.TextStyle(
+                                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                                                    includeFontPadding = false
+                                                )
+                                            )
                                         )
                                     }
                                 }

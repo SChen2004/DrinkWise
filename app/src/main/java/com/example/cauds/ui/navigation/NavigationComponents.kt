@@ -2,15 +2,20 @@ package com.example.cauds.ui.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.cauds.R
 import com.example.cauds.ui.theme.BackgroundSand
@@ -32,8 +37,8 @@ fun AppBottomNavigation(navController: NavController) {
         BottomNavItem.Account
     )
 
-    val navBackStackEntry = navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry.value?.destination?.route
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
     Surface(
         color = BackgroundSand,
@@ -59,20 +64,37 @@ fun AppBottomNavigation(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 items.forEach { item ->
-                    val selected = currentRoute == item.route
+                    // Dashboard is logically the parent of Calendar and tracking sub-screens
+                    val isDashboardSubScreen = currentDestination?.route == Screen.Calendar.route || 
+                                             currentDestination?.route == Screen.Tracking.route ||
+                                             currentDestination?.route == Screen.ManageDrinks.route ||
+                                             currentDestination?.route == Screen.DaySummary.route ||
+                                             currentDestination?.route?.startsWith("day_summary") == true
+
+                    val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true || 
+                                 (item == BottomNavItem.Dashboard && isDashboardSubScreen)
+
                     Icon(
                         painter = painterResource(id = if (selected) item.selectedIconRes else item.iconRes),
                         contentDescription = null,
                         tint = Color.Unspecified,
                         modifier = Modifier
                             .size(24.rdp())
-                            .clickable {
-                                if (currentRoute != item.route) {
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                if (item.route == Screen.Dashboard.route) {
+                                    // SPECIAL CASE: For the Dashboard (Home) button, 
+                                    // we want to ensure we pop back to the root if we're on a sub-page.
+                                    if (currentDestination?.route != Screen.Dashboard.route) {
+                                        navController.popBackStack(Screen.Dashboard.route, inclusive = false)
+                                    }
+                                } else if (currentDestination?.route != item.route) {
+                                    // Standard tab switching logic for other items
                                     navController.navigate(item.route) {
-                                        navController.graph.startDestinationRoute?.let { route ->
-                                            popUpTo(route) {
-                                                saveState = true
-                                            }
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
                                         }
                                         launchSingleTop = true
                                         restoreState = true

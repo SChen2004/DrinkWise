@@ -22,7 +22,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    dashboardViewModel: DashboardViewModel
+    dashboardViewModel: DashboardViewModel,
+    drinkLogViewModel: com.example.cauds.ui.drinklog.DrinkLogViewModel
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -57,6 +58,7 @@ fun DashboardScreen(
                 todayTotalSpent = dashboardViewModel.todayTotalSpent,
                 didntDrinkToggled = dashboardViewModel.didntDrinkToggled,
                 onLogClick = {
+                    drinkLogViewModel.resetToToday()
                     navController.navigate(Screen.Tracking.route)
                 },
                 onDidntDrinkToggle = {
