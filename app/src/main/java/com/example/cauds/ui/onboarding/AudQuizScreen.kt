@@ -71,8 +71,9 @@ fun QuizIntroScreen(navController: NavController) {
                 .padding(top = 32.dp, start = 8.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                painter = painterResource(id = R.drawable.ic_arrow_left),
                 contentDescription = "Back",
+                modifier = Modifier.size(20.dp),
                 tint = Color.Black
             )
         }
@@ -275,7 +276,7 @@ fun AudQuizScreen(navController: NavController, viewModel: OnboardingViewModel =
                         else navController.popBackStack()
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
                             contentDescription = "Back",
                             modifier = Modifier.size(24.dp),
                             tint = Color.White.copy(alpha = 0.6f)

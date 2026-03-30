@@ -10,6 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.R
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -196,9 +198,9 @@ fun OnboardingSexScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
                             contentDescription = "Back",
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = Color.Gray
                         )
                     }
@@ -313,7 +315,7 @@ fun OnboardingPurposeScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
                             contentDescription = "Back",
                             modifier = Modifier.size(24.dp),
                             tint = Color.Gray
