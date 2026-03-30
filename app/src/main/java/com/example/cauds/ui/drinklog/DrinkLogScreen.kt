@@ -61,6 +61,7 @@ import com.example.cauds.ui.theme.rsp
 import com.example.cauds.ui.navigation.Screen
 import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.CobaltDarker
+import com.example.cauds.ui.theme.ErrorLight
 import com.example.cauds.ui.theme.SkyDark
 import com.example.cauds.ui.theme.SkyNormal
 import kotlinx.coroutines.launch
@@ -97,6 +98,9 @@ fun DrinkLogScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
+    // Track which item is currently swiped open to ensure only one is open at a time
+    var currentSwipedId by remember { mutableStateOf<String?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -503,8 +507,8 @@ fun DrinkLogScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 32.rdp())
                         .background(BackgroundSand)
-                        .background(Color(0xFFEDF5EF).copy(alpha = 0.5f))
-                        .border(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f)) // Bounding box stroke around the list
+                        .background(Tertiary)
+                        .border(0.5.rdp(), CloverDarker.copy(alpha = 0.5f)) // Bounding box stroke around the list
                 ) {
                     groupedLogs.values.forEach { logs ->
                         val firstLog = logs.first()
@@ -518,9 +522,12 @@ fun DrinkLogScreen(
                             viewModel = viewModel,
                             onClick = { if (logs.size == 1) viewModel.enterEditMode(firstLog.id) },
                             onRemove = { viewModel.removeBatch(firstLog.type, firstLog.drinkSize) },
-                            onDuplicate = { viewModel.duplicateDrink(firstLog.id) }
+                            onDuplicate = { viewModel.duplicateDrink(firstLog.id) },
+                            swipedItemId = "${firstLog.type}_${firstLog.drinkSize}",
+                            currentSwipedId = currentSwipedId,
+                            onSwipeItem = { id -> currentSwipedId = id }
                         )
-                        HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
+                        HorizontalDivider(color = CloverDarker.copy(alpha = 0.5f), thickness = 0.5.dp)
 
                         if (logs.size > 1) {
                             logs.forEach { log ->
@@ -528,9 +535,12 @@ fun DrinkLogScreen(
                                     log = log,
                                     onClick = { viewModel.enterEditMode(log.id) },
                                     onRemove = { viewModel.removeDrink(log.id) },
-                                    onDuplicate = { viewModel.duplicateDrink(log.id) }
+                                    onDuplicate = { viewModel.duplicateDrink(log.id) },
+                                    swipedItemId = log.id,
+                                    currentSwipedId = currentSwipedId,
+                                    onSwipeItem = { id -> currentSwipedId = id }
                                 )
-                                HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
+                                HorizontalDivider(color = CloverDarker.copy(alpha = 0.5f), thickness = 0.5.dp)
                             }
                         }
                     }
@@ -759,7 +769,10 @@ fun BatchHeaderRow(
     viewModel: DrinkLogViewModel,
     onClick: () -> Unit = {},
     onRemove: () -> Unit,
-    onDuplicate: () -> Unit = {}
+    onDuplicate: () -> Unit = {},
+    swipedItemId: String,
+    currentSwipedId: String?,
+    onSwipeItem: (String?) -> Unit
 ) {
     // 1. Dynamic category lookup based on drink name
     val uiState by viewModel.uiState.collectAsState()
@@ -774,7 +787,7 @@ fun BatchHeaderRow(
         "Cocktail/Mixed" -> R.drawable.ic_cocktail_mixed_o
         else -> R.drawable.ic_beer_o
     }
-    var showDelete by remember { mutableStateOf(false) }
+    val showDelete = currentSwipedId == swipedItemId
     var showMenu by remember { mutableStateOf(false) }
 
     val batchBgColor = Color(0xFFF5F5E5)
@@ -790,13 +803,13 @@ fun BatchHeaderRow(
                             .pointerInput(Unit) {
                                 detectHorizontalDragGestures { _, dragAmount ->
                                 // Swipe left to reveal, swipe right to hide
-                                    if (dragAmount < -15) showDelete = true
-                                    else if (dragAmount > 15) showDelete = false
+                                    if (dragAmount < -15) onSwipeItem(swipedItemId)
+                                    else if (dragAmount > 15) onSwipeItem(null)
                                 }
                             }
                             .combinedClickable(
                                 onClick = {
-                                    if (showDelete) showDelete = false
+                                    if (showDelete) onSwipeItem(null)
                                     else onClick()
                                 },
                                 onLongClick = { showMenu = true }
@@ -824,7 +837,7 @@ fun BatchHeaderRow(
                     text = type,
                     fontSize = 14.rsp(),
                     fontWeight = FontWeight.Normal,
-                    color = Color(0xFF1A3720),
+                    color = CloverDarker,
                     fontFamily = Poppins,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -833,7 +846,7 @@ fun BatchHeaderRow(
                 Spacer(modifier = Modifier.width(8.rdp()))
                 Text(
                     text = drinkSize.uppercase(),
-                    color = Color.Black.copy(alpha = 0.3f),
+                    color = SkyDark,
                     fontSize = 10.rsp(),
                     fontWeight = FontWeight.Normal,
                     fontFamily = Poppins,
@@ -844,9 +857,9 @@ fun BatchHeaderRow(
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
                 Text(
                     text = String.format("$%.2f", totalCost),
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 14.rsp(),
-                    color = Color.Black,
+                    color = CloverDarker,
                     fontFamily = Poppins,
                     modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.rdp())
                 )
@@ -857,14 +870,14 @@ fun BatchHeaderRow(
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(50.rdp())
-                            .background(Color(0xFFFF5252))
+                            .background(ErrorLight)
                             .clickable {
-                                showDelete = false
+                                onSwipeItem(null)
                                 onRemove()
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Close, "Remove", tint = Color.White, modifier = Modifier.size(20.rdp()))
+                        Icon(painterResource(id = R.drawable.ic_cross), "Remove", tint = Color.White, modifier = Modifier.size(24.rdp()))
                     }
                 }
             }
@@ -880,23 +893,47 @@ fun BatchHeaderRow(
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.background(Color(0xFFF5F5E5)),
-                    offset = DpOffset(x = (-130).rdp(), y = 0.rdp())
+                    offset = DpOffset(x = (-130).rdp(), y = 3.rdp()),
+                    modifier = Modifier
+                        .background(Tertiary)
+                        .border(0.5.dp, CloverDarker.copy(alpha = 0.5f)),
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Delete", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        text = { 
+                            Text(
+                                "Delete", 
+                                fontFamily = Poppins, 
+                                fontSize = 14.rsp(),
+                                color = CloverDarker
+                            ) 
+                        },
                         onClick = {
                             showMenu = false
                             onRemove()
-                        }
+                        },
+                        modifier = Modifier.height(34.rdp()),
+                        contentPadding = PaddingValues(horizontal = 10.rdp(), vertical = 2.rdp())
                     )
-                    HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.rdp())
+                    HorizontalDivider(
+                        color = CloverDarker.copy(alpha = 0.3f), 
+                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(horizontal = 10.rdp())
+                    )
                     DropdownMenuItem(
-                        text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        text = { 
+                            Text(
+                                "Duplicate", 
+                                fontFamily = Poppins, 
+                                fontSize = 14.rsp(),
+                                color = CloverDarker
+                            ) 
+                        },
                         onClick = {
                             showMenu = false
                             onDuplicate()
-                        }
+                        },
+                        modifier = Modifier.height(34.rdp()),
+                        contentPadding = PaddingValues(horizontal = 10.rdp(), vertical = 2.rdp())
                     )
                 }
             }
@@ -910,12 +947,15 @@ fun LogItemRow(
     log: LogDataWrapper,
     onClick: () -> Unit,
     onRemove: () -> Unit,
-    onDuplicate: () -> Unit = {}
+    onDuplicate: () -> Unit = {},
+    swipedItemId: String,
+    currentSwipedId: String?,
+    onSwipeItem: (String?) -> Unit
 ) {
-    var showDelete by remember { mutableStateOf(false) }
+    val showDelete = currentSwipedId == swipedItemId
     var showMenu by remember { mutableStateOf(false) }
 
-    val logBgColor = Color(0xFFF5F5E5)
+    val logBgColor = Tertiary
 
     Box(modifier = Modifier.fillMaxWidth().background(logBgColor)) {
         Row(
@@ -924,13 +964,13 @@ fun LogItemRow(
                 .height(34.rdp())
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { _, dragAmount ->
-                        if (dragAmount < -15) showDelete = true
-                        else if (dragAmount > 15) showDelete = false
+                        if (dragAmount < -15) onSwipeItem(swipedItemId)
+                        else if (dragAmount > 15) onSwipeItem(null)
                     }
                 }
                 .combinedClickable(
                     onClick = {
-                        if (showDelete) showDelete = false
+                        if (showDelete) onSwipeItem(null)
                         else onClick()
                     },
                     onLongClick = { showMenu = true }
@@ -947,8 +987,9 @@ fun LogItemRow(
                 Spacer(modifier = Modifier.width(48.rdp()))
                 Text(
                     text = log.type,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 12.rsp(),
-                    color = Color.Black,
+                    color = CloverDarker,
                     fontFamily = Poppins,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -962,7 +1003,7 @@ fun LogItemRow(
                     text = costStr,
                     fontWeight = FontWeight.Normal,
                     fontSize = 12.rsp(),
-                    color = Color.Black,
+                    color = CloverDarker,
                     fontFamily = Poppins,
                     modifier = Modifier.padding(end = if (showDelete) 0.dp else 16.rdp())
                 )
@@ -973,14 +1014,14 @@ fun LogItemRow(
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(34.rdp())
-                            .background(Color(0xFFFF5252))
+                            .background(ErrorLight)
                             .clickable {
-                                showDelete = false
+                                onSwipeItem(null)
                                 onRemove()
                             },
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Close, "Remove", tint = Color.White, modifier = Modifier.size(20.rdp()))
+                        Icon(painterResource(id = R.drawable.ic_cross), "Remove", tint = Color.White, modifier = Modifier.size(20.rdp()))
                     }
                 }
             }
@@ -996,23 +1037,47 @@ fun LogItemRow(
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.background(Color(0xFFF5F5E5)),
-                    offset = DpOffset(x = (-130).rdp(), y = 0.rdp())
+                    offset = DpOffset(x = (-130).rdp(), y = 3.rdp()),
+                    modifier = Modifier
+                        .background(Tertiary)
+                        .border(0.5.dp, CloverDarker.copy(alpha = 0.5f)),
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Delete", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        text = { 
+                            Text(
+                                "Delete", 
+                                fontFamily = Poppins, 
+                                fontSize = 14.rsp(),
+                                color = CloverDarker
+                            ) 
+                        },
                         onClick = {
                             showMenu = false
                             onRemove()
-                        }
+                        },
+                        modifier = Modifier.height(34.rdp()),
+                        contentPadding = PaddingValues(horizontal = 10.rdp(), vertical = 2.rdp())
                     )
-                    HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.rdp())
+                    HorizontalDivider(
+                        color = CloverDarker.copy(alpha = 0.3f), 
+                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(horizontal = 10.rdp())
+                    )
                     DropdownMenuItem(
-                        text = { Text("Duplicate", fontFamily = Poppins, fontSize = 14.rsp()) },
+                        text = { 
+                            Text(
+                                "Duplicate", 
+                                fontFamily = Poppins, 
+                                fontSize = 14.rsp(),
+                                color = CloverDarker
+                            ) 
+                        },
                         onClick = {
                             showMenu = false
                             onDuplicate()
-                        }
+                        },
+                        modifier = Modifier.height(34.rdp()),
+                        contentPadding = PaddingValues(horizontal = 10.rdp(), vertical = 2.rdp())
                     )
                 }
             }
