@@ -1,0 +1,39 @@
+[
+  {"type": "text", "content": "In AUD, severity is based on the number of criteria a person meets based on their symptoms. These criteria range between mild, moderate, or severe. "},
+  {"type": "text", "content": "Healthcare professionals use criteria from the Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition (DSM-5), to assess whether a person has AUD and to determine the severity if the disorder is present."},
+  {"type": "expandable", "name": "Behavioural Symptoms", "blocks": [
+    {"type": "tinyHeading", "content": "Increased Drinking Frequency/Quantity"},
+    {"type": "text", "content": "Drinking more than intended, for longer periods, or needing more alcohol to achieve the desired effect."},
+    {"type": "tinyHeading", "content": "Cravings & Attempts to Cut Down"},
+    {"type": "text", "content": "Strong urges to drink, repeated attempts to reduce or stop drinking, and unsuccessful efforts."},
+    {"type": "tinyHeading", "content": "Time Spent Drinking"},
+    {"type": "text", "content": "Spending a significant amount of time drinking."},
+    {"type": "image", "name": "man_watch"},
+    { "type": "tinyHeading", "content": "Giving Up Activities" },
+    { "type": "text", "content": "Sacrificing hobbies, interests, and social activities for the sake of drinking." },
+    { "type": "tinyHeading", "content": "Risky Behavior" },
+    { "type": "text", "content": "Engaging in dangerous situations while or after drinking (driving, unsafe activities, unprotected sex)." },
+    { "type": "tinyHeading", "content": "Continuing Despite Problems:" },
+    { "type": "text", "content": "Continuing to drink despite negative consequences like family/friend issues, job/school problems, or health concerns." }
+
+  ]},
+  { "type": "expandable", "name": "Physical Symptoms", "blocks": [
+    { "type": "tinyHeading", "content": "Withdrawal Symptoms" },
+    { "type": "text", "content": "Experiencing withdrawal symptoms like insomnia, shakiness, restlessness, nausea, sweating, a racing heart, or seizures." },
+    { "type": "tinyHeading", "content": "Sensory Disturbances" },
+    { "type": "text", "content": "Experiencing hallucinations or sensing things that aren't there." },
+    { "type": "image", "content": "shaking_hand" },
+    { "type": "tinyHeading", "content": "Post-Drinking Illness" },
+    { "type": "text", "content": "Experiencing sickness or aftereffects related to alcohol consumption." },
+    { "type": "tinyHeading", "content": "Intense Cravings" },
+    { "type": "text", "content": "Wanting a drink so strongly that it dominates thoughts." }
+  ]},
+  { "type": "expandable", "name": "Psychological Symptoms", "blocks": [
+    { "type": "tinyHeading", "content": "Depression & Anxiety" },
+    { "type": "text", "content": "Drinking to cope with or exacerbate feelings of depression, anxiety, or other health problems." },
+    { "type": "image", "content": "compass_woman" },
+    { "type": "tinyHeading", "content": "Memory Blackouts" },
+    { "type": "text", "content": "Experiencing memory blackouts related to alcohol use." }
+  ]},
+  { "type": "note", "content": "Any of these symptoms may be cause for concern. The more symptoms, the more urgent the need for change." }
+]

@@ -12,12 +12,23 @@ class LearningViewModel(
     private val articleRepo: ArticleRepository
 ) : ViewModel() {
 
-    var articles by mutableStateOf<List<Article>>(emptyList())
+    // ── Subject selection ───────────────────────────────────────
+    // Set before navigating to SubjectArticlesScreen.
+    // Same pattern as selectArticle — caller sets the data,
+    // then the destination screen reads it.
+
+    var currentSubjectTitle by mutableStateOf("")
         private set
 
-    init {
-        articles = articleRepo.articles
+    var currentSubjectArticles by mutableStateOf<List<Article>>(emptyList())
+        private set
+
+    fun selectSubject(title: String, articles: List<Article>) {
+        currentSubjectTitle = title
+        currentSubjectArticles = articles
     }
+
+    // ── Article selection (unchanged) ───────────────────────────
 
     var currentArticle by mutableStateOf<Article?>(null)
         private set
