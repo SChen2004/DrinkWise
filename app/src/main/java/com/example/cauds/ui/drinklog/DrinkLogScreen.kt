@@ -63,6 +63,7 @@ import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.CloverDarker
 import kotlinx.coroutines.launch
 
 /**
@@ -98,7 +99,15 @@ fun DrinkLogScreen(
         }
     }
     
+    val toastMessage = when {
+        uiState.showLoggedToast -> if (uiState.lastToastQuantity > 1) "Drinks logged." else "Drink logged."
+        uiState.showDeletedToast -> if (uiState.lastToastQuantity > 1) "Drinks deleted." else "Drink deleted."
+        uiState.showSavedToast -> if (uiState.lastToastQuantity > 1) "Drinks saved." else "Drink saved."
+        else -> null
+    }
+
     // Scaffold provides the standard Material structural layout (topBar, bottomBar, content)
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         containerColor = BackgroundSand, // Main sand background for the entire screen
         topBar = {
@@ -181,7 +190,6 @@ fun DrinkLogScreen(
         // The Box allows the Toast notification to overlay the scrollable content.
         Box(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -194,6 +202,7 @@ fun DrinkLogScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(innerPadding)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -581,39 +590,33 @@ fun DrinkLogScreen(
             Spacer(modifier = Modifier.height(24.rdp()))
         }
 
-            // Toast overlay
-            val toastMessage = when {
-                uiState.showLoggedToast -> if (uiState.lastToastQuantity > 1) "Drinks logged." else "Drink logged."
-                uiState.showDeletedToast -> if (uiState.lastToastQuantity > 1) "Drinks deleted." else "Drink deleted."
-                uiState.showSavedToast -> if (uiState.lastToastQuantity > 1) "Drinks saved." else "Drink saved."
-                else -> null
-            }
-            
-            if (toastMessage != null) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.rdp(), vertical = 24.rdp())
-                        .background(BackgroundSand)
-                        .border(0.5.dp, Color(0xFF000000), RoundedCornerShape(2.dp))
-                        .padding(horizontal = 16.rdp(), vertical = 12.rdp())
-                        .align(Alignment.TopCenter),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(toastMessage, color = Color.Black, fontFamily = Poppins, fontSize = 14.rsp())
-                    Icon(
-                        Icons.Default.Close, 
-                        contentDescription = "Close", 
-                        modifier = Modifier
-                            .size(16.rdp())
-                            .clickable { viewModel.hideToast() }, 
-                        tint = Color.Black
-                    )
-                }
-            }
         }
     }
+
+    if (toastMessage != null) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 20.rdp(), start = 16.rdp(), end = 16.rdp())
+                .fillMaxWidth()
+                .background(BackgroundSand)
+                .border(width = 0.5.dp, color = Color(0x991A3720))
+                .padding(horizontal = 16.rdp(), vertical = 12.rdp()),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(toastMessage, color = CloverDarker, fontFamily = Poppins, fontSize = 14.rsp())
+            Icon(
+                painter = painterResource(id = R.drawable.ic_cross),
+                contentDescription = "Close", 
+                modifier = Modifier
+                    .size(20.rdp())
+                    .clickable { viewModel.hideToast() }, 
+                tint = Color.Black
+            )
+        }
+    }
+}
 }
 
 /**
