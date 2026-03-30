@@ -715,7 +715,7 @@ fun DrinkTypeWheel(selectedType: String, availableDrinkTypes: List<DrinkType>, o
         VerticalPager(
             state = pagerState,
             modifier = Modifier
-                .fillMaxWidth()
+                .width(300.rdp())
                 .height(containerHeight),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(vertical = verticalPadding),
