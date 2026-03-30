@@ -6,8 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,17 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.rdp
+import com.example.cauds.R
 import com.example.cauds.ui.theme.rsp
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
+import com.example.cauds.ui.theme.CloverDarker
+import com.example.cauds.ui.theme.CloverNormal
+import com.example.cauds.ui.theme.Tertiary
 
 /**
  * DrinkLogSection — the "Log your intake" card shown on the dashboard.
@@ -53,12 +52,10 @@ fun DrinkLogSection(
     onLogClick: () -> Unit,
     onDidntDrinkToggle: () -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 48.rdp(), bottom = 16.rdp()),
+            .padding(top = 24.rdp(), bottom = 24.rdp()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // "+" icon and "Log your intake" — these navigate to the drink log screen.
@@ -69,41 +66,40 @@ fun DrinkLogSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
+                painter = painterResource(id = R.drawable.ic_plus),
                 contentDescription = "Log Intake",
                 tint = Color(0xFF1A3720),
-                modifier = Modifier.size(28.rdp())
+                modifier = Modifier.size(32.rdp())
             )
 
-            Spacer(modifier = Modifier.height(12.rdp()))
+            Spacer(modifier = Modifier.height(16.rdp()))
 
             Text(
                 text = "Log your intake",
-                fontSize = if (screenHeight < 700.dp) {
-                    24.rsp()
-                } else if (screenHeight < 850.dp) {
-                    28.rsp()
-                } else {
-                    32.rsp()
-                },
+                fontSize = 32.rsp(),
                 fontFamily = BigShouldersDisplay,
                 color = Color(0xFF1A3720),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                style = androidx.compose.ui.text.TextStyle(
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
             )
         }
 
         Spacer(modifier = Modifier.height(16.rdp()))
 
         if (todayDrinkCount > 0) {
-            // Drinks logged → show count + spend chips (always have green dots)
+            // Drinks logged → show count + spend chips
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val drinkLabel = if (todayDrinkCount == 1) "1 Drink" else "$todayDrinkCount Drinks"
-                DashboardChip(text = drinkLabel, showDot = true, dotColor = Color(0xFF859BAF))
-                Spacer(modifier = Modifier.width(8.rdp()))
-                DashboardChip(text = String.format("$%.0f Spent", todayTotalSpent), showDot = true, dotColor = Color(0xFF859BAF))
+                DashboardChip(text = drinkLabel, showDot = true, dotColor = Color(0xFF6EA8FE))
+                Spacer(modifier = Modifier.width(4.rdp()))
+                DashboardChip(text = String.format("$%.0f Spent", todayTotalSpent), showDot = true, dotColor = Color(0xFF6EA8FE))
             }
         } else {
             // No drinks logged — show "I didn't drink" chip.
@@ -111,13 +107,13 @@ fun DrinkLogSection(
             DashboardChip(
                 text = "I didn't drink",
                 showDot = didntDrinkToggled,
-                dotColor = Color(0xFF519D5C),
+                dotColor = CloverNormal,
                 onClick = onDidntDrinkToggle
             )
         }
-        
+
         if (streakCount > 1) {
-            Spacer(modifier = Modifier.height(24.rdp()))
+            Spacer(modifier = Modifier.height(18.rdp()))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -125,21 +121,22 @@ fun DrinkLogSection(
                 Text(
                     text = "$streakCount days streak",
                     fontSize = 12.rsp(),
-                    color = Color(0xFF1A3720),
+                    color = CloverDarker,
                     fontFamily = Poppins,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Normal
                 )
-                Spacer(modifier = Modifier.width(6.rdp()))
+                Spacer(modifier = Modifier.width(12.rdp()))
                 Icon(
-                    imageVector = Icons.Default.TrendingUp,
+                    painter = painterResource(id = R.drawable.ic_streak),
                     contentDescription = "Streak",
-                    tint = Color(0xFF1A3720),
+                    tint = CloverDarker,
                     modifier = Modifier.size(16.rdp())
                 )
             }
         }
     }
 }
+
 
 /**
  * DashboardChip — a small pill-shaped chip with optional green dot and optional click.
@@ -158,15 +155,10 @@ fun DashboardChip(
     dotColor: Color = Color(0xFF4A9D5B),
     onClick: (() -> Unit)? = null
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
     Surface(
-        shape = RoundedCornerShape(50),
-        border = BorderStroke(0.5.rdp(), Color.Black.copy(alpha = 0.5f)),
-        color = Color(0xFFEDF5EF).copy(alpha = 0.5f),
-        // Only attach a click modifier if onClick is provided.
-        // Modifier.then() lets us conditionally chain modifiers —
-        // if onClick is null, we add nothing extra.
+        shape = RoundedCornerShape(100.dp),
+        border = BorderStroke(0.5.rdp(), CloverDarker.copy(alpha = 0.6f)),
+        color = Tertiary,
         modifier = if (onClick != null) Modifier.clickable { onClick() } else Modifier
     ) {
         Row(
@@ -180,20 +172,19 @@ fun DashboardChip(
                         .size(6.rdp())
                         .background(dotColor, CircleShape)
                 )
-                Spacer(modifier = Modifier.width(8.rdp()))
+                Spacer(modifier = Modifier.width(6.rdp()))
             }
             Text(
                 text = text,
-                fontSize = if (screenHeight < 700.dp) {
-                    9.rsp()
-                } else if (screenHeight < 850.dp) {
-                    11.rsp()
-                } else {
-                    12.rsp()
-                },
+                fontSize = 14.rsp(),
                 fontFamily = Poppins,
                 color = Color(0xFF1A3720),
-                fontWeight = FontWeight.Normal
+                fontWeight = FontWeight.Normal,
+                style = androidx.compose.ui.text.TextStyle(
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
             )
         }
     }

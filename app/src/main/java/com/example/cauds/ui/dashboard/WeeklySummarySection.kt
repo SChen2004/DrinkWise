@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.example.cauds.ui.theme.BowlbyOne
+import com.example.cauds.ui.theme.CloverNormal
 import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
@@ -39,22 +40,13 @@ fun WeekSummarySection(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-    val drinkCountFontSize = if (screenHeight < 700.dp) {
-        64.rsp()
-    } else if (screenHeight < 800.dp) {
-        72.rsp()
-    } else {
-        96.rsp()
-    }
     Column(
         modifier = modifier
-            .background(Color(0xFF4A9D5B))
-            .border(0.5.rdp(), Color.Black.copy(alpha = 0.5f))
+            .background(CloverNormal)
             .clickable { onClick() }
             .padding(12.rdp()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         // "This week" header
         Text(
@@ -64,67 +56,70 @@ fun WeekSummarySection(
             fontWeight = FontWeight.Normal,
             color = Color(0xFF121E30),
             textAlign = TextAlign.Left,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(0.rdp()))
-
-        Box(
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // Big drink count — the main visual element.
-                // Using a large font size so it dominates the card, matching the mockup.
-                Text(
-                    text = weekDrinkCount.toString(),
-                    fontSize = drinkCountFontSize,
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = Poppins,
-                    color = Color(0xFF121E30),
-                    textAlign = TextAlign.Center,
-                    lineHeight = 75.rsp()
-                )
-
-                // "DRINKS" label beneath the number
-                Text(
-                    text = "DRINKS",
-                    fontSize = 12.rsp(),
-                    fontWeight = FontWeight.Medium,
-                    fontFamily = Poppins,
-                    color = Color(0xFF121E30),
-                    letterSpacing = 0.rsp(),
-                    modifier = Modifier.offset(y =
-                        if (screenHeight < 700.dp) {
-                            -8.rdp()
-                        } else if (screenHeight < 800.dp) {
-                            (-16).rdp()
-                        } else {
-                            (-28).rdp()
-                        }
+            // Big drink count
+            Text(
+                text = weekDrinkCount.toString(),
+                fontSize = 96.rsp(),
+                fontWeight = FontWeight.Medium,
+                fontFamily = Poppins,
+                color = Color(0xFF121E30),
+                textAlign = TextAlign.Center,
+                lineHeight = 75.rsp(),
+                style = androidx.compose.ui.text.TextStyle(
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                        includeFontPadding = false
+                    ),
+                    lineHeightStyle = androidx.compose.ui.text.style.LineHeightStyle(
+                        alignment = androidx.compose.ui.text.style.LineHeightStyle.Alignment.Center,
+                        trim = androidx.compose.ui.text.style.LineHeightStyle.Trim.None
                     )
                 )
-                
-            }
-        }
-        Spacer(modifier = Modifier.height(0.rdp()))
+            )
 
-        // "$X Spent" chip at the bottom — pill shape with a subtle border
+            // "DRINKS" label
+            // Reduced leading/internal padding and added negative offset to hug the number
+            Text(
+                text = "DRINKS",
+                fontSize = 12.rsp(),
+                fontWeight = FontWeight.Medium,
+                fontFamily = Poppins,
+                color = Color(0xFF121E30),
+                letterSpacing = 0.rsp(),
+                modifier = Modifier.offset(y = (-24).rdp()),
+                style = androidx.compose.ui.text.TextStyle(
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
+            )
+        }
+
+        // "$X Spent" chip at the bottom
         Surface(
-            shape = RoundedCornerShape(100),
-            border = BorderStroke(0.5.rdp(), Color(0xFF1B3720).copy(alpha = 0.5f)),
+            shape = RoundedCornerShape(100.dp),
+            border = BorderStroke(0.5.rdp(), Color(0xFF1A3720).copy(alpha = 0.6f)),
             color = Color.Transparent
         ) {
             Text(
                 text = String.format("$%.0f Spent", weekTotalSpent),
                 fontSize = 12.rsp(),
                 fontFamily = Poppins,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Normal,
                 color = Color(0xFF121E30),
-                modifier = Modifier.padding(horizontal = 12.rdp(), vertical = 4.rdp())
+                modifier = Modifier.padding(horizontal = 12.rdp(), vertical = 4.rdp()),
+                style = androidx.compose.ui.text.TextStyle(
+                    platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                        includeFontPadding = false
+                    )
+                )
             )
         }
     }
