@@ -27,8 +27,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,7 +42,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.DpOffset
@@ -55,14 +52,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cauds.R
 import com.example.cauds.ui.theme.Poppins
-import com.example.cauds.ui.theme.Roboto
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.BackgroundSand
-import com.example.cauds.ui.theme.BowlbyOne
-import com.example.cauds.ui.theme.BowlbyOne
+import com.example.cauds.ui.theme.CloverDarker
+import com.example.cauds.ui.theme.Tertiary
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.BowlbyOne
 import kotlinx.coroutines.launch
 
 /**
@@ -102,35 +99,20 @@ fun DrinkLogScreen(
     Scaffold(
         containerColor = BackgroundSand, // Main sand background for the entire screen
         topBar = {
-            // The Top navigation bar containing the Back button and Blue Dot Chips
+            // THE TOP NAVIGATION BAR (Fixed)
+            // Navigation arrow is fixed, while the rest scrolls
             TopAppBar(
-                title = {
-                    if (uiState.editModeId == null && hasLogs) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().padding(end = 16.rdp()),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            val totalSpend = uiState.addedDrinks.sumOf { it.cost }
-                            CustomBlueDotChip("${uiState.addedDrinks.size} Drinks")
-                            Spacer(Modifier.width(12.rdp()))
-                            CustomBlueDotChip(String.format("$%.2f Spent", totalSpend))
-                        }
-                    }
-                },
+                title = { /* Centered chips elsewhere */ },
                 navigationIcon = {
                     IconButton(onClick = { 
-                        if (uiState.editModeId != null) {
-                            viewModel.cancelEdit()
-                        } else {
-                            navController.popBackStack() 
-                        }
+                        if (uiState.editModeId != null) viewModel.cancelEdit()
+                        else navController.popBackStack() 
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
                             contentDescription = "Back",
-                            modifier = Modifier.size(24.rdp()),
-                            tint = Color.Black
+                            modifier = Modifier.size(20.rdp()),
+                            tint = CloverDarker
                         )
                     }
                 },
@@ -181,7 +163,7 @@ fun DrinkLogScreen(
         // The Box allows the Toast notification to overlay the scrollable content.
         Box(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(bottom = innerPadding.calculateBottomPadding()) // Allow top overlap
                 .fillMaxSize()
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
@@ -197,6 +179,25 @@ fun DrinkLogScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Scrollable Header (Centered Summary Chips)
+                // Offset vertically to overlap with the TopAppBar line visually
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(innerPadding.calculateTopPadding()) // Match TopAppBar height
+                        .padding(horizontal = 8.rdp()),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (uiState.editModeId == null && hasLogs) {
+                        val totalSpend = uiState.addedDrinks.sumOf { it.cost }
+                        CustomBlueDotChip("${uiState.addedDrinks.size} Drinks")
+                        Spacer(modifier = Modifier.width(12.rdp()))
+                        CustomBlueDotChip(String.format("$%.2f Spent", totalSpend))
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(8.rdp()))
             
             // 1. Date Selector (< MTH dd >) or Edit Title
             if (uiState.editModeId != null) {
@@ -223,7 +224,7 @@ fun DrinkLogScreen(
                         painter = painterResource(id = R.drawable.ic_chevron_left),
                         contentDescription = "Prev", 
                         modifier = Modifier.size(24.rdp()).clickable { viewModel.previousDay() },
-                        tint = Color(0xFF1A3720)
+                        tint = CloverDarker
                     )
                     Spacer(modifier = Modifier.width(32.rdp()))
                     Text(
@@ -231,7 +232,8 @@ fun DrinkLogScreen(
                         fontWeight = FontWeight.Medium,
                         fontSize = 32.rsp(),
                         fontFamily = BigShouldersDisplay,
-                        color = Color(0xFF1A3720)
+                        color = CloverDarker,
+                        modifier = Modifier.clickable { navController.navigate(Screen.Calendar.route) }
                     )
                     Spacer(modifier = Modifier.width(32.rdp()))
                     Icon(
@@ -243,7 +245,7 @@ fun DrinkLogScreen(
                             .clickable(enabled = uiState.selectedDateObj < java.time.LocalDate.now()) { 
                                 viewModel.nextDay() 
                             },
-                        tint = Color(0xFF1A3720)
+                        tint = CloverDarker
                     )
                 }
             }
@@ -623,12 +625,12 @@ fun DrinkLogScreen(
 @Composable
 fun CustomBlueDotChip(text: String) {
     Surface(
-        shape = RoundedCornerShape(50),
-        border = BorderStroke(0.5.dp, Color(0xFF000000).copy(alpha = 0.5f)),
-        color = Color(0xFFEDF5EF).copy(alpha = 0.5f)
+        shape = RoundedCornerShape(100),
+        border = BorderStroke(0.5.dp, CloverDarker.copy(alpha = 0.6f)),
+        color = Tertiary
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.rdp(), vertical = 4.rdp()),
+            modifier = Modifier.padding(horizontal = 12.rdp(), vertical = 4.rdp()),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -636,8 +638,14 @@ fun CustomBlueDotChip(text: String) {
                     .size(6.rdp())
                     .background(Color(0xFF5900FF), CircleShape)
             )
-            Spacer(modifier = Modifier.width(8.rdp()))
-            Text(text, fontSize = 14.rsp(), color = Color.Black, fontFamily = Poppins, fontWeight = FontWeight.Normal)
+            Spacer(modifier = Modifier.width(6.rdp()))
+            Text(
+                text = text, 
+                fontSize = 14.rsp(), 
+                color = CloverDarker, 
+                fontFamily = Poppins, 
+                fontWeight = FontWeight.Normal
+            )
         }
     }
 }
