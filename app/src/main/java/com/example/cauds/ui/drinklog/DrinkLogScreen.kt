@@ -136,9 +136,9 @@ fun DrinkLogScreen(
                         }
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
                             contentDescription = "Back",
-                            modifier = Modifier.size(24.rdp()),
+                            modifier = Modifier.size(20.rdp()),
                             tint = Color.Black
                         )
                     }

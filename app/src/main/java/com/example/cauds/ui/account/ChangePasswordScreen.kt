@@ -27,8 +27,8 @@ import com.example.cauds.ui.theme.rsp
 import com.example.cauds.ui.theme.SkyDark
 
 /**
- * ChangePasswordScreen - High-fidelity implementation based on Figma Node 2355:21274.
- * Features absolute vertical centering and precise field spacing.
+ * ChangePasswordScreen
+ * Verify user's old password first and then change password
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

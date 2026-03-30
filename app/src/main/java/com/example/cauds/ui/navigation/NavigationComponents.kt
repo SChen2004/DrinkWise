@@ -60,12 +60,10 @@ fun AppBottomNavigation(navController: NavController) {
             ) {
                 items.forEach { item ->
                     val selected = currentRoute == item.route
-                    val tint = if (selected) Color(0xFF1A3720) else Color(0x661A3720)
-                    
                     Icon(
                         painter = painterResource(id = if (selected) item.selectedIconRes else item.iconRes),
                         contentDescription = null,
-                        tint = tint,
+                        tint = Color.Unspecified,
                         modifier = Modifier
                             .size(24.rdp())
                             .clickable {

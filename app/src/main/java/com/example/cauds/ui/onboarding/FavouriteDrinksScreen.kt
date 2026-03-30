@@ -82,9 +82,9 @@ fun FavouriteDrinksScreen(
                         modifier = Modifier.padding(top = 24.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(id = R.drawable.ic_arrow_left),
                             contentDescription = "Back",
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(20.dp),
                             tint = DarkGreen
                         )
                     }
