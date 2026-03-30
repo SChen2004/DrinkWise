@@ -56,7 +56,12 @@ fun WeekSummarySection(
             fontWeight = FontWeight.Normal,
             color = Color(0xFF121E30),
             textAlign = TextAlign.Left,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            style = androidx.compose.ui.text.TextStyle(
+                platformStyle = androidx.compose.ui.text.PlatformTextStyle(
+                    includeFontPadding = false
+                )
+            )
         )
 
         Column(

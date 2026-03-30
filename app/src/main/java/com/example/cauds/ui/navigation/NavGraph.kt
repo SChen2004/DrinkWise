@@ -87,7 +87,7 @@ fun NavGraph(navController: NavHostController, startDestination: String) {
         composable(Screen.FavouriteDrinks.route) { FavouriteDrinksScreen(navController, onboardingViewModel) }
 
         // Dashboard / Home
-        composable(Screen.Dashboard.route) { DashboardScreen(navController, dashboardViewModel) }
+        composable(Screen.Dashboard.route) { DashboardScreen(navController, dashboardViewModel, drinkLogViewModel) }
 
         // Main Sections (Accessible from Dashboard or Bottom Nav)
         composable(Screen.Tracking.route) { DrinkLogScreen(navController, drinkLogViewModel) }

@@ -172,6 +172,15 @@ class DrinkLogViewModel(
         }
     }
 
+    // Resets the selection to the current date (Today).
+    fun resetToToday() {
+        val today = LocalDate.now()
+        val formatted = today.format(DateTimeFormatter.ofPattern("MMM d"))
+        val isoDateStr = today.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        _uiState.update { it.copy(selectedDateObj = today, selectedDate = formatted) }
+        loadLogsForDate(isoDateStr)
+    }
+
     // Updates the currently selected date.
     fun selectDate(dateObj: LocalDate) {
         val formatted = dateObj.format(DateTimeFormatter.ofPattern("MMM d"))
