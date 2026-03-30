@@ -1,0 +1,50 @@
+[
+  { "type": "expandable", "name": "\u201cTreatment only works if someone really wants it.\u201d", "blocks": [
+    { "type": "tinyHeading", "content": "No one should be forced into treatment they don\u2019t consent to" },
+    { "type": "text", "content": "And it\u2019s true that lasting change isn\u2019t likely until a person is genuinely prepared. That said, Change is often gradual \u2014 and support along the way matters." },
+    { "type": "image", "content": "message_bubble" },
+    { "type": "tinyHeading", "content": "Fact: Readiness can be supported and built." },
+    { "type": "text", "content": "Even when someone isn\u2019t ready to stop drinking completely, we can still help create safer conditions, strengthen supports, and reduce pressure by:" },
+    { "type": "bullet_list", "items": ["Providing clear, non-judgmental information about options.", "Helping address underlying stressors \u2014 like burnout, anxiety, or isolation.", "Build alternative coping strategies so alcohol isn\u2019t the only relief."] }
+  ]},
+  { "type": "expandable", "name": "\u201cMedication is just replacing one thing with another\u201d", "blocks": [
+    { "type": "tinyHeading", "content": "Medication is not a silver bullet." },
+    { "type": "text", "content": "It is meant to complement counselling, lifestyle changes, and social supports as one part of a broader care plan." },
+    { "type": "image", "content": "doctors" },
+    { "type": "tinyHeading", "content": "Fact: Medications are tools, not substitutes." },
+    { "type": "text", "content": "Evidence-based medications for alcohol use disorder do not create a new addiction or intoxication, and are typically only taken temporarily. They work by reducing cravings, decreasing the rewarding effects of alcohol, or helping prevent heavy drinking episodes. They are intended as practical support that can make other changes more achievable by:" },
+    { "type": "bullet_list", "items": ["Clearing mental space to focus on therapy and skill-building.", "Supporting gradual reduction goals.", "Giving the brain and body time to heal.", "Helping people feel more stable and in control."] }
+  ]},
+  { "type": "expandable", "name": "\u201cIf someone relapses, the treatment failed.\u201d", "blocks": [
+    { "type": "tinyHeading", "content": "This belief comes from an outdated \u201call-or-nothing\u201d view of recovery." },
+    { "type": "text", "content": "It assumes that any return to drinking cancels out prior effort \u2014 and that success means never struggling again." },
+    { "type": "image", "content": "x_marks_the_spot" },
+    { "type": "tinyHeading", "content": "Fact: Recovery is often non-linear." },
+    { "type": "text", "content": "A return to drinking after a period of change does not erase progress. Many chronic health conditions involve flare-ups or setbacks, and alcohol use disorder is no different." },
+    { "type": "text", "content": "Relapse can signal unmet needs, new stressors, or gaps in support \u2014 not a lack of character or commitment. It can also reflect the reality that change is hard and humans are imperfect. With the right response, a setback can become information: an opportunity to adjust the care plan, strengthen coping strategies, and build more durable supports." },
+    { "type": "tinyHeading", "content": "Progress still counts. Healing is measured over time, not by a single moment." }
+  ]},
+  { "type": "expandable", "name": "\u201cQuit drinking\u2014everything is normal again\u201d", "blocks": [
+    { "type": "tinyHeading", "content": "It would be convenient if change alone fixed everything overnight" },
+    { "type": "text", "content": "Physically, emotionally, and relationally. In reality, it\u2019s rarely that simple." },
+    { "type": "image", "content": "hourglass" },
+    { "type": "tinyHeading", "content": "Fact: Healing takes time, and often requires broader change." },
+    { "type": "text", "content": "While the body begins to recover soon after alcohol use decreases, full healing can take weeks, months, or longer, depending on the person and their history. Recovery also often involves practical life adjustments: new routines, boundaries, friendships, or even changes in work or environment. Relationships may need rebuilding. Coping strategies must be practiced and maintained. The person may grow and shift in the process. It\u2019s part of building a life that supports long-term stability." }
+  ]},
+  { "type": "expandable", "name": "\u201cYou have to hit rock bottom before I can help you.\u201d", "blocks": [
+    { "type": "tinyHeading", "content": "Hitting rock bottom does not help most people change their ways." },
+    { "type": "text", "content": "Harshness does not jolt people into changing." },
+    { "type": "image", "content": "low_battery" },
+    { "type": "tinyHeading", "content": "Fact: Hitting rock bottom can be more destructive than helpful." },
+    { "type": "text", "content": "When we are supporting people who are using substances, it is important to focus on building relationships based on safety and trust. If people do not find connection in their lives with other people, they will find something to connect to \u2013 including substances. If we leave people on their own in order for them to \u2018hit rock bottom\u2019, we lose these opportunities to connect and provide support." }
+  ]},
+  { "type": "expandable", "name": "\u201cIf you really loved me, you would stop using.\u201d", "blocks": [
+    { "type": "tinyHeading", "content": "People experiencing addiction do care for their loved ones" },
+    { "type": "text", "content": "And deeply understand that their substance use causes their family, friends, and community pain and guilt." },
+    { "type": "image", "content": "helping_hand" },
+    { "type": "tinyHeading", "content": "Fact: Addiction is not a choice." },
+    { "type": "text", "content": "Ending addiction is much more complicated than \u201cjust saying no\u201d. One of the most important things we can do is support the people we care about along their healing journey" },
+    { "type": "text", "content": "Have open conversations and talk about substance use." },
+    { "type": "text", "content": "Learn more about addiction and harm reduction." }
+  ]}
+]

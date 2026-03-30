@@ -1,0 +1,21 @@
+[
+  { "type": "expandable", "name": "AUD is a Chronic Disease", "content": "Alcohol Use Disorder (AUD) is a chronic health condition that causes people to feel compelled to drink, to drink too much, and not be able to stop." },
+  { "type": "expandable", "name": "AUD is not a Choice", "content": "AUD is caused by a combination of biological, psychological, and environmental factors. Overcoming it is not just a matter of willpower or making better decisions." },
+  { "type": "expandable", "name": "AUD Doesn't Discriminate", "content": "AUD affects 18% of Canadians, age 15 and older, over their lifetime. It impacts people from all backgrounds, ages, and walks of life." },
+  { "type": "expandable", "name": "AUD Deserves Compassion", "content": "AUD is a medical condition. As such, it should be treated with compassion and without stigma." },
+  { "type": "image", "content": "what_is_aud" },
+  { "type": "subheading", "content": "How AUD is diagnosed" },
+  { "type": "numbered_list", "items": [
+    "Have there been periods when you ended up drinking more, or longer, than you intended?",
+    "Want to cut down or stop drinking, but couldn't?",
+    "Spend a lot of time drinking? Or being sick after drinking?",
+    "Want a drink so badly you couldn't think of anything else?", "Find that drinking interfered with taking care of your home or family, or getting to work or school?",
+    "Continue to drink even though it was causing trouble with your family or friends?",
+    "Not go to activities that were important or interesting to you, in order to drink?",
+    "Get into hazardous situations during or after drinking that increased your chances of getting hurt?",
+    "Continue to drink even though it was affecting your health?",
+    "Find that your usual number of drinks had much less effect than before?",
+    "Find that you experienced withdrawal symptoms, such as trouble sleeping, shakiness, restlessness, or a racing heart?"
+  ] },
+  { "type": "text", "content":  "In general, responding YES to 2-3 questions may indicate mild AUD; 4-5 may indicate moderate AUD; and 6+ may indicate severe AUD"}
+]

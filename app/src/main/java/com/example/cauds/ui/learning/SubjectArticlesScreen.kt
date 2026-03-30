@@ -1,28 +1,30 @@
 package com.example.cauds.ui.learning
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.BowlbyOne
 
-// ── Generic article list screen ─────────────────────────────────
-// Reads title and articles from the ViewModel (set before navigating).
-// Used for all 4 subjects — one composable, one NavGraph entry.
+private val Cream = Color(0xFFFEF5DC)
+private val DarkNavy = Color(0xFF121E30)
+
 @Composable
 fun SubjectArticlesScreen(
     navController: NavController,
@@ -32,39 +34,42 @@ fun SubjectArticlesScreen(
     val articles = viewModel.currentSubjectArticles
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 32.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Cream),
+        contentPadding = PaddingValues(horizontal = 28.dp, vertical = 0.dp)
     ) {
         // Back button
         item {
+            Spacer(modifier = Modifier.height(24.dp))
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = "Back",
+                    tint = DarkNavy
                 )
             }
         }
 
-        // Title and time badge
+        // Title
         item {
+            Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = title,
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                fontFamily = BowlbyOne,
+                fontSize = 52.sp,
+                color = DarkNavy,
+                lineHeight = 52.sp
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "3 minutes",
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(72.dp))
         }
 
-        // Article tiles — tapping opens the article reader
-        items(articles) { article ->
-            HorizontalDivider(thickness = 0.5.dp)
-            Spacer(modifier = Modifier.height(16.dp))
+        // Article tiles — no divider above the first one
+        itemsIndexed(articles) { index, article ->
+            if (index > 0) {
+                HorizontalDivider(thickness = 0.5.dp, color = DarkNavy)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             LearningTileCard(
                 title = article.title,
@@ -73,11 +78,15 @@ fun SubjectArticlesScreen(
                 onClick = {
                     viewModel.selectArticle(article)
                     navController.navigate(Screen.ArticlePage.route)
-                },
-                modifier = Modifier.padding(horizontal = 16.dp)
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Bottom breathing room
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
