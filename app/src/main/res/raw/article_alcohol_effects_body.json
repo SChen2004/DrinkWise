@@ -1,0 +1,21 @@
+[
+  { "type": "subheading", "content": "Acute (short-term) Risks" },
+  { "type": "text", "content": "Acute risks are the harmful effects of drinking too much alcohol in the short-term or on a single occasion (often referred to as binge drinking or heavy drinking). If you drink too much alcohol on a single occasion, you may experience these effects:" },
+  { "type": "expandable", "name": "Short Term Effects", "blocks": [
+    { "type": "bullet_list", "items": ["Impulsive behaviour", "Impaired attention, concentration, and judgement", "Drowsiness", "Aggressiveness and violent behaviour", "Slowed reaction time", "Slurred speech", "Double or blurred vision", "Flushed skin", "Nausea and vomiting", "Frequent urination", "Impaired memory or loss of memory"] }
+  ]},
+  { "type": "expandable", "name": "Alcohol Poisoning", "blocks": [
+    { "type": "bullet_list", "items": ["Stupor (when someone is not alert or responsive, and has difficulty getting up or moving around)", "Coma", "Respiratory arrest (when someone stops breathing or has trouble breathing)", "Death"] }
+  ]},
+  { "type": "subheading", "content": "Chronic (long-term) risks" },
+  { "type": "text", "content": "Chronic risks refer to the harms that happen over the long-term. If you frequently drink too much alcohol, you risk some of these long-term harms:" },
+  { "type": "expandable", "name": "Damage to Organs", "blocks": [
+    { "type": "bullet_list", "items": ["Liver", "Brain", "Heart", "Stomach"] }
+  ]},
+  { "type": "expandable", "name": "Increased Risk of Cancers", "blocks": [
+    { "type": "bullet_list", "items": ["Liver", "Breast", "Throat", "Stomach"] }
+  ]},
+  { "type": "expandable", "name": "Other Chronic Risks", "blocks": [
+    { "type": "bullet_list", "items": ["High blood pressure", "Reduced resistance to infection", "Sexual impotence", "Decreased appetite", "Malnourishment and vitamin deficiencies", "Disturbed sleep patterns", "Anxiety and depression", "Hormonal irregularities and infertility"] }
+  ]}
+]

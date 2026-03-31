@@ -1,0 +1,20 @@
+[
+  { "type": "subheading", "content": "Nutrition Tips" },
+  { "type": "text", "content": "Alcohol can affect how the body absorbs nutrients, regulates blood sugar, and maintains energy levels. Paying attention to nutrition during periods of change can help stabilize mood, support physical recovery, and make it easier to maintain healthy habits." },
+  { "type": "subheading", "content": "Eat Regular Meals" },
+  { "type": "text", "content": "Skipping meals can lead to low blood sugar, which may increase cravings for alcohol or quick sources of energy. Aim for balanced meals at regular times to keep energy levels steady." },
+  { "type": "subheading", "content": "Prioritize Protein and Fibre" },
+  { "type": "text", "content": "Foods rich in protein and fibre \u2014 such as eggs, beans, whole grains, nuts, and vegetables \u2014 help keep you full longer and support stable blood sugar throughout the day." },
+  { "type": "image", "content": "bubbly_water" },
+  { "type": "subheading", "content": "Stay Hydrated" },
+  { "type": "text", "content": "Alcohol can contribute to dehydration. Drinking enough water throughout the day can improve energy, concentration, and overall well-being." },
+  { "type": "subheading", "content": "Support Your Body with Nutrient-Rich Foods" },
+  { "type": "text", "content": "Leafy greens, fruits, whole grains, and legumes provide vitamins and minerals that support brain function, digestion, and recovery." },
+  { "type": "subheading", "content": "Limit Highly Processed Sugar" },
+  { "type": "text", "content": "Sugar cravings can increase when reducing alcohol. While occasional treats are fine, relying heavily on sugary foods can lead to energy crashes and mood swings." },
+  { "type": "image", "content": "balanced_breakfast" },
+  { "type": "subheading", "content": "Start the Day with a Balanced Breakfast" },
+  { "type": "text", "content": "A morning meal that includes protein, healthy fats, and complex carbohydrates can help regulate appetite and reduce the likelihood of cravings later in the day." },
+  { "type": "subheading", "content": "Be Patient with Your Body" },
+  { "type": "text", "content": "As alcohol use changes, appetite, digestion, and energy levels may shift. Small, consistent improvements in nutrition can make a meaningful difference over time." }
+]

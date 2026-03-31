@@ -52,8 +52,12 @@ internal val gettingHelpArticles = listOf(
     Article("supporting-those-with-aud", "Supporting Those With AUD", "How you can help support and talk to a loved one that is going through AUD.", R.drawable.helping_hand_heart, R.raw.article_supporting_those_with_aud)
 )
 
-internal val healthInfoArticles = listOf<Article>(
-    // Add articles here as content is ready
+internal val healthInfoArticles = listOf(
+    Article("nutrition-tips", "Nutrition Tips for Alcohol Recovery", "Guidance that supports energy and mood, while helping your body recover during and after changes to alcohol use.", R.drawable.brain_and_heart, R.raw.article_nutrition_tips),
+    Article("about-aud-medications", "About AUD Medications", "Information about how medication can help people recover from AUD.", R.drawable.pharmacist_reading, R.raw.article_about_aud_medications),
+    Article("medications-reduce-cravings", "Medications that Reduce Alcohol Cravings", "The types of medication that can help reduce alcohol cravings under a doctor's guidance.", R.drawable.plant_thing_2, R.raw.article_medications_reduce_cravings),
+    Article("alcohol-effects-body", "Alcohol's Effects on the Body", "How heavy drinking can cause acute and chronic risks to the body.", R.drawable.gold_and_green, R.raw.article_alcohol_effects_body),
+    Article("alcohol-effects-organs", "Alcohol's Effects on your Organs", "How alcohol affects the Brain, Heart, Lungs, Liver, Stomach, and Pancreas", R.drawable.blue_man, R.raw.article_alcohol_effects_organs)
 )
 
 internal val factsAlcoholArticles = listOf<Article>(

@@ -1,0 +1,63 @@
+[
+  { "type": "text", "content": "How alcohol affects the Brain, Heart, Lungs, Liver, Stomach, Kidneys, and Pancreas" },
+  { "type": "expandable", "name": "Brain", "blocks": [
+    { "type": "tinyHeading", "content": "Alcohol\u2019s impact on the brain is complex," },
+    { "type": "text", "content": "Furthermore, heavy drinking can have lasting consequences, including memory problems, mood disturbances, and disrupted sleep, even after someone stops consuming alcohol." },
+    { "type": "text", "content": "The brain continues to develop until around your mid-twenties. Excessive alcohol consumption can actually damage brain cells, leading to a reduction in overall brain size. This can impact how the brain develops and functions throughout adulthood." },
+    { "type": "image", "content": "brain" },
+    { "type": "tinyHeading", "content": "Specifically, alcohol disrupts the communication between brain chemicals." },
+    { "type": "text", "content": "For instance, glutamate is crucial for forming new memories. When alcohol interferes with glutamate\u2019s activity, it can cause memory lapses or blackouts. Essentially, alcohol prevents the brain from transferring information from short-term to long-term memory storage. Young brains are particularly vulnerable to this disruption." },
+    { "type": "text", "content": "Another key chemical involved is GABA, which promotes relaxation and calmness. Alcohol amplifies GABA\u2019s effects, resulting in feelings of dizziness, slowness, or excessive drowsiness, especially if someone is already tired." }
+  ]},
+  { "type": "expandable", "name": "Heart", "blocks": [
+    { "type": "tinyHeading", "content": "Drinking excessively over time can weaken your heart," },
+    { "type": "text", "content": "Leading to a condition called alcohol-related cardiomyopathy. Essentially, the heart gets stretched out and can\u2019t pump blood as well as it should. That can cause tiredness, shortness of breath, swelling in your legs or feet, and sometimes even heart failure." },
+    { "type": "text", "content": "Both binge drinking and heavy long-term drinking can also mess with your heart\u2019s rhythm, making it beat too fast or unevenly. This is called an arrhythmia." },
+    { "type": "image", "content": "heart" },
+    { "type": "tinyHeading", "content": "Too much alcohol raises your risk of stroke," },
+    { "type": "text", "content": "Especially because it can increase blood pressure and make heart problems worse." },
+    { "type": "text", "content": "It also triggers stress hormones that tighten your blood vessels, which pushes your blood pressure up. If that keeps happening, it can lead to ongoing high blood pressure and heart issues down the line." }
+  ]},
+  { "type": "expandable", "name": "Kidneys", "blocks": [
+    { "type": "tinyHeading", "content": "Drinking a lot\u2014whether it\u2019s bingeing on weekends or drinking often" },
+    { "type": "text", "content": "\u2013can mess with your kidneys. Sometimes it hits them directly, other times it\u2019s because alcohol damages other organs like the liver, heart, or blood pressure." },
+    { "type": "text", "content": "Your kidneys usually have a precise job: they filter your blood and keep the right balance of things like sodium and potassium. But if your liver isn\u2019t working well from heavy drinking, that balance can get thrown off." },
+    { "type": "image", "content": "kidneys" },
+    { "type": "tinyHeading", "content": "Alcohol also makes you pee more." },
+    { "type": "text", "content": "Within about 20 minutes, your body starts losing fluids and electrolytes, which can make you feel tired, thirsty, or give you a headache the next day\u2014that\u2019s part of what we call a hangover." },
+    { "type": "text", "content": "Most people bounce back once the alcohol wears off, but for someone with serious alcohol use disorder, the dehydration and fluid loss can be much more intense." }
+  ]},
+  { "type": "expandable", "name": "Liver", "blocks": [
+    { "type": "tinyHeading", "content": "When you drink, your liver works to break down the alcohol" },
+    { "type": "text", "content": "-using special enzymes. This process creates a harmful chemical called acetaldehyde, which can cause inflammation and damage liver cells. Drinking a lot over time makes fat build up in your liver, which makes it easier for inflammation and conditions like hepatitis to develop." },
+    { "type": "text", "content": "If the liver keeps getting irritated, scar tissue starts to form and blocks blood flow. Without enough oxygen and nutrients, liver cells die and are replaced with more scar tissue \u2014 that\u2019s what leads to cirrhosis. In the early stages, the liver can bounce back, but serious cirrhosis can cause liver failure." },
+    { "type": "image", "content": "liver" },
+    { "type": "tinyHeading", "content": "The best way to protect your liver" },
+    { "type": "text", "content": "-is to stop drinking. In severe cases, some people need a liver transplant, but staying alcohol-free is the most important part, both before and after the surgery." }
+  ]},
+  { "type": "expandable", "name": "Lungs", "blocks": [
+    { "type": "tinyHeading", "content": "Doctors have learned that heavy drinking" },
+    { "type": "text", "content": "-can make the lungs more vulnerable, especially after major injuries like car accidents or serious infections." },
+    { "type": "text", "content": "When someone drinks a lot, it\u2019s easier for things like vomit or fluids to get into the lungs, which can cause damage. Over time, alcohol also throws off the chemical balance in lung cells. This stress weakens the cells that line the airways and the immune cells that usually fight bacteria and keep the lungs clean." },
+    { "type": "image", "content": "lungs" },
+    { "type": "tinyHeading", "content": "What\u2019s surprising is that this can happen even in young, healthy people" },
+    { "type": "text", "content": "-long before they show other signs of alcohol-related disease, like liver problems. This has led scientists to talk about an \u201calcohol-impaired lung,\u201d meaning a lung that might look normal but is less able to handle infections or recover from serious injuries." }
+  ]},
+  { "type": "expandable", "name": "Pancreas", "blocks": [
+    { "type": "tinyHeading", "content": "Your pancreas makes enzymes that help you digest food." },
+    { "type": "text", "content": "But when you drink too much, that process gets messed up. The pancreas starts activating those enzymes too early, and instead of sending them to your small intestine as it should, it ends up attacking itself." },
+    { "type": "text", "content": "That causes inflammation called pancreatitis. It can hit suddenly (that\u2019s acute pancreatitis) or stick around long-term (chronic pancreatitis). Over time, that damage can lead to diabetes or pancreatic cancer\u2014and the scary part is, you might not even notice until an attack happens." },
+    { "type": "image", "content": "pancreas" },
+    { "type": "tinyHeading", "content": "When a flare-up hits, you might feel:" },
+    { "type": "bullet_list", "items": ["Bad stomach pain that moves up your back", "Nausea or vomiting", "Fever, fast heartbeat, sweating, or diarrhea"] },
+    { "type": "text", "content": "Chronic pancreatitis brings those same symptoms and can make it harder to digest food or control your blood sugar. People who drink heavily sometimes get both at once, and it is what doctors call \u201cacute on chronic\u201d." }
+  ]},
+  { "type": "expandable", "name": "Stomach", "blocks": [
+    { "type": "tinyHeading", "content": "When you drink alcohol, it goes down your throat" },
+    { "type": "text", "content": "-into your stomach. Some of it gets absorbed there, but most of it keeps moving into your small intestine, where your body takes in even more of it." },
+    { "type": "text", "content": "Alcohol irritates the lining of your stomach, makes extra acid, and can mess with digestion, so your body doesn\u2019t get all the nutrients it needs. If you drink a lot or often, it can cause things like inflammation, ulcers, or even bleeding\u2014especially if you\u2019re also taking medication like aspirin that can upset your stomach." },
+    { "type": "image", "content": "stomach" },
+    { "type": "tinyHeading", "content": "Alcohol can also make your gut \u201cleak\u201d." },
+    { "type": "text", "content": "Which means bacteria can sneak into your bloodstream and make you feel sick. Even one night of heavy drinking can do that." }
+  ]}
+]

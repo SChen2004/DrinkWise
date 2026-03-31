@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
+import com.example.cauds.R
 
 private val Cream = Color(0xFFFEF5DC)
 private val DarkNavy = Color(0xFF121E30)
@@ -139,7 +142,7 @@ fun ArticleBlockContent(block: ArticleBlock, nested: Boolean = false) {
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             color = Clover,
-            modifier = Modifier.padding(horizontal = hPadding, vertical = 8.dp)
+            modifier = Modifier.padding(start = hPadding, end = hPadding, top = 24.dp, bottom = 8.dp)
         )
 
         "note" -> Text(
@@ -232,6 +235,19 @@ fun ArticleBlockContent(block: ArticleBlock, nested: Boolean = false) {
             modifier = Modifier.padding(horizontal = hPadding, vertical = 8.dp)
         )
 
+        "bordered" -> {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = hPadding, vertical = 8.dp)
+                    .fillMaxWidth()
+                    .border(0.5.dp, Clover)
+            ) {
+                block.blocks?.forEach { innerBlock ->
+                    ArticleBlockContent(innerBlock, nested = true)
+                }
+            }
+        }
+
         "tinyHeading" -> Text(
             text = block.content ?: "",
             fontFamily = Poppins,
@@ -240,6 +256,60 @@ fun ArticleBlockContent(block: ArticleBlock, nested: Boolean = false) {
             color = Clover,
             modifier = Modifier.padding(start = hPadding, end = hPadding, top = 8.dp, bottom = 0.dp)
         )
+
+        "check_list" -> Column(
+            modifier = Modifier.padding(start = listStartPadding, end = hPadding, top = 8.dp, bottom = 8.dp)
+        ) {
+            block.items?.forEach { item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_check),
+                        contentDescription = "Check",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = item,
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        color = Clover
+                    )
+                }
+            }
+        }
+
+        "cross_list" -> Column(
+            modifier = Modifier.padding(start = listStartPadding, end = hPadding, top = 8.dp, bottom = 8.dp)
+        ) {
+            block.items?.forEach { item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_red_cross),
+                        contentDescription = "Cross",
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(28.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = item,
+                        fontFamily = Poppins,
+                        fontSize = 14.sp,
+                        color = Clover
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -352,9 +422,9 @@ fun ArticleScreen(
                 Text(
                     text = a.title,
                     fontFamily = BowlbyOne,
-                    fontSize = 48.sp,
+                    fontSize = 46.sp,
                     color = DarkNavy,
-                    lineHeight = 52.sp,
+                    lineHeight = 48.sp,
                     modifier = Modifier.padding(horizontal = 28.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
