@@ -1,0 +1,23 @@
+[
+  { "type": "expandable", "name": "What to do in an alcohol emergency", "blocks": [
+    { "type": "text", "content": "Alcohol poisoning resulting from drinking too much can be dangerous. It can lead to respiratory arrest and death." },
+    { "type": "text", "content": "It can be hard to tell the difference between someone being very drunk or when the situation is more serious and someone has alcohol poisoning." },
+    { "type": "text", "content": "A helpful acronym for remembering common symptoms of alcohol poisoning is CUPS:" },
+    { "type": "bullet_list", "items": ["Cold and sweaty skin", "Unconscious", "Puking", "Slow or irregular breathing and heart rate"] },
+    { "type": "text", "content": "If anyone around you is experiencing any of these symptoms, they may need immediate medical attention." }
+  ]},
+  { "type": "expandable", "name": "What to do when someone has alcohol poisoning", "blocks": [
+    { "type": "text", "content": "If your friend or someone around you has alcohol poisoning, you should take these steps to help them:" },
+    { "type": "numbered_list", "items": ["Check in with the person by talking to them or gently shaking them.", "If they do not respond, call for help (911). Remember that if you ask for help and have other drugs on you, you can be protected by the Good Samaritan Law.", "Sit them down, or if they are unable to sit up, lay them on their side in the recovery position (Figure 1) to prevent choking."] },
+    { "type": "image", "content": "alcohol_poisoning_men" },
+    { "type": "tinyHeading", "content": "The features of the recovery position include:" },
+    { "type": "numbered_list", "items": ["Lying down on left side", "Airway is kept clear with head supported by right hand", "Right knee bent to prevent rolling onto stomach", "Do not leave them alone.", "Try to find out if they've taken other substances and how much."] }
+  ]},
+  { "type": "expandable", "name": "Where to get help 24 hours a day, 7 days a week", "blocks": [
+    { "type": "text", "content": "Call or text Canada's suicide and crisis hotline at **988**." },
+    { "type": "text", "content": "Call Talk Suicide Canada: **1-833-456-4566** or text **45645** (4 p.m. to midnight ET)." },
+    { "type": "text", "content": "Go to the {Talk Suicide Canada|https://988.ca} website or the {Kids Help Phone|https://kidshelpphone.ca} website at for more information." },
+    { "type": "text", "content": "For 24/7 nurse advice and general health information, call Health Link at **811**." }
+  ]}
+
+]

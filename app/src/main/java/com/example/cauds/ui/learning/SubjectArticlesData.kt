@@ -43,11 +43,13 @@ internal val learningMoreArticles = listOf(
     Article("symptoms-of-aud", "What Are the Symptoms of AUD?", "In AUD, severity is based on the number of criteria a person meets based on their symptoms. These criteria range from mild, moderate, to severe.", R.drawable.symptoms_of_aud, R.raw.article_symptoms_of_aud),
     Article("treatments-for-aud", "What Treatments are Available for AUD?", "Several evidence-based treatment approaches are available for AUD. One size does not fit all, and a treatment approach that may work for one per...", R.drawable.treatments_for_aud, R.raw.article_treatments_for_aud),
     Article("myths-about-addiction", "Common Myths About Addiction", "What is AUD, what are the symptoms and risks, how can you treat it, and what can you do to help your loved ones who have it?", R.drawable.myths_about_addiction, R.raw.article_myths_about_addiction),
-//    Article("tips-to-reduce", "Tips to Reduce", "How you can keep track of how much you drink, set new goals or reduce your consumption.", R.drawable.tips_to_reduce, R.raw.article_tips_to_reduce)
+    Article("tips-to-reduce", "Tips to Reduce", "How you can keep track of how much you drink, set new goals or reduce your consumption.", R.drawable.tips_to_reduce, R.raw.article_tips_to_reduce)
 )
 
-internal val gettingHelpArticles = listOf<Article>(
-    // Add articles here as content is ready
+internal val gettingHelpArticles = listOf(
+    Article("when-should-you-call-for-help", "When Should You Call for Help?", "What to do in an alcohol emergency, and where to get help, 24 hours a day, 7 days a week", R.drawable.phone_911, R.raw.article_when_should_you_call),
+    Article("types-of-counselling", "Types of Counselling", "Helpful information regarding types of therapy available and where to access it.", R.drawable.counsellors, R.raw.article_types_of_counselling),
+    Article("supporting-those-with-aud", "Supporting Those With AUD", "How you can help support and talk to a loved one that is going through AUD.", R.drawable.helping_hand_heart, R.raw.article_supporting_those_with_aud)
 )
 
 internal val healthInfoArticles = listOf<Article>(

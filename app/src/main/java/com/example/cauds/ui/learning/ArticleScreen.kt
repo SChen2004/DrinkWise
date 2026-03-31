@@ -40,6 +40,12 @@ import com.example.cauds.data.model.ArticleBlock
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.BowlbyOne
 import com.example.cauds.ui.theme.Poppins
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 
 private val Cream = Color(0xFFFEF5DC)
 private val DarkNavy = Color(0xFF121E30)
@@ -55,13 +61,77 @@ fun ArticleBlockContent(block: ArticleBlock, nested: Boolean = false) {
     val listStartPadding = if (nested) 20.dp else 36.dp
 
     when (block.type) {
-        "text" -> Text(
-            text = block.content ?: "",
-            fontFamily = Poppins,
-            fontSize = 14.sp,
-            color = Clover,
-            modifier = Modifier.padding(horizontal = hPadding, vertical = 8.dp)
-        )
+        "text" -> {
+            val rawText = block.content ?: ""
+            val linkPattern = Regex("\\{([^|]+)\\|([^}]+)\\}")
+            val boldPattern = Regex("\\*\\*([^*]+)\\*\\*")
+            val hasLinks = linkPattern.containsMatchIn(rawText)
+            val hasBold = boldPattern.containsMatchIn(rawText)
+
+            if (!hasLinks && !hasBold) {
+                Text(
+                    text = rawText,
+                    fontFamily = Poppins,
+                    fontSize = 14.sp,
+                    color = Clover,
+                    modifier = Modifier.padding(horizontal = hPadding, vertical = 8.dp)
+                )
+            } else {
+                val annotatedString = buildAnnotatedString {
+                    // First pass: split by links
+                    val linkMatches = linkPattern.findAll(rawText).toList()
+                    var lastIndex = 0
+
+                    fun appendWithBold(text: String) {
+                        val boldMatches = boldPattern.findAll(text).toList()
+                        if (boldMatches.isEmpty()) {
+                            append(text)
+                        } else {
+                            var boldLastIndex = 0
+                            boldMatches.forEach { match ->
+                                append(text.substring(boldLastIndex, match.range.first))
+                                withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                                    append(match.groupValues[1])
+                                }
+                                boldLastIndex = match.range.last + 1
+                            }
+                            if (boldLastIndex < text.length) {
+                                append(text.substring(boldLastIndex))
+                            }
+                        }
+                    }
+
+                    linkMatches.forEach { match ->
+                        appendWithBold(rawText.substring(lastIndex, match.range.first))
+
+                        val linkText = match.groupValues[1]
+                        val url = match.groupValues[2]
+                        withLink(LinkAnnotation.Url(url)) {
+                            withStyle(SpanStyle(
+                                color = Clover,
+                                fontWeight = FontWeight.Medium,
+                                textDecoration = TextDecoration.Underline
+                            )) {
+                                append(linkText)
+                            }
+                        }
+
+                        lastIndex = match.range.last + 1
+                    }
+                    if (lastIndex < rawText.length) {
+                        appendWithBold(rawText.substring(lastIndex))
+                    }
+                }
+
+                Text(
+                    text = annotatedString,
+                    fontFamily = Poppins,
+                    fontSize = 14.sp,
+                    color = Clover,
+                    modifier = Modifier.padding(horizontal = hPadding, vertical = 8.dp)
+                )
+            }
+        }
 
         "subheading" -> Text(
             text = block.content ?: "",
@@ -282,7 +352,7 @@ fun ArticleScreen(
                 Text(
                     text = a.title,
                     fontFamily = BowlbyOne,
-                    fontSize = 50.sp,
+                    fontSize = 48.sp,
                     color = DarkNavy,
                     lineHeight = 52.sp,
                     modifier = Modifier.padding(horizontal = 28.dp)

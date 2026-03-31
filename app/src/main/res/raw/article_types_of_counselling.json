@@ -1,0 +1,12 @@
+[
+  { "type": "text", "content": "If you\u2019ve been wanting to think differently and feel better about yourself, this is such a good place to start." },
+  { "type": "text", "content": "Counseling can happen in person or online\u2014whatever\u2019s easiest for you. If it\u2019s hard to find local options or get around, you can connect with a counsellor by phone, text, or video from anywhere." },
+  { "type": "text", "content": "You\u2019ll usually pay for counseling yourself or through work benefits, but some counsellors offer sliding-scale rates or low-cost sessions through student programs. There are also free or affordable substance use counseling services in some provinces, though they often need a referral and are mostly city-based." },
+  { "type": "text", "content": "Counseling for alcohol use can be one-on-one, with your partner or family, or part of a group. It\u2019s all about finding what fits your needs\u2014and mixing counseling with medication can be extra effective. For Canada-wide support options, visit Health Canada" },
+  { "type": "expandable", "name": "Cognitive Behavioural Therapy", "content": "Cognitive behavioural therapy (CBT) is a kind of talk therapy that helps with mental health and substance use issues, including drinking. It can support you in changing your drinking habits and building healthier ways of thinking and behaving. Lots of counsellors and therapists use CBT, and you can do it one-on-one or in a group, depending on what feels right for you." },
+  { "type": "expandable", "name": "Family-based Therapy", "blocks": [
+    { "type": "text", "content": "If you\u2019re struggling with alcohol, family-based therapy can offer gentle, meaningful support. It helps you explore what\u2019s driving your drinking and involves loved ones who want to help you heal." },
+    { "type": "text", "content": "Together, you\u2019ll work on building stronger, healthier relationships that support your recovery. One approach, behavioural couples therapy, invites you and your partner to attend sessions together to improve communication, positivity, and commitment to staying alcohol-free." }
+  ]},
+  { "type": "expandable", "name": "Mindfulness-based therapy", "content": "Mindfulness isn\u2019t about being perfect \u2014 it\u2019s about getting to know yourself and showing yourself a little kindness. These programs teach you how to handle tough moments and emotions without all the self-criticism. If you\u2019ve been wanting to think differently and feel better about yourself, this is such a good place to start." }
+]
