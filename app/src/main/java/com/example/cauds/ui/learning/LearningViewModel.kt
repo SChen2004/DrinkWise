@@ -23,9 +23,13 @@ class LearningViewModel(
     var currentSubjectArticles by mutableStateOf<List<Article>>(emptyList())
         private set
 
-    fun selectSubject(title: String, articles: List<Article>) {
+    var currentSubjectTidbit by mutableStateOf("")
+        private set
+
+    fun selectSubject(title: String, articles: List<Article>, tidbit: String = "") {
         currentSubjectTitle = title
         currentSubjectArticles = articles
+        currentSubjectTidbit = tidbit
     }
 
     // ── Article selection (unchanged) ───────────────────────────

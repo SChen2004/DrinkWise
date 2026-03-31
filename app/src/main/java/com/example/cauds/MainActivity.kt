@@ -14,9 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -42,7 +39,10 @@ class MainActivity : ComponentActivity() {
                     Screen.Journal.route,
                     Screen.Calendar.route,
                     Screen.LearningPage.route,
-                    Screen.Account.route
+                    Screen.Account.route,
+                    Screen.UnderstandingAud.route,
+                    Screen.SubjectArticles.route,
+                    Screen.ArticlePage.route
                 )
                 val showBottomBar = currentRoute in bottomBarScreens
 
@@ -94,4 +94,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
+}

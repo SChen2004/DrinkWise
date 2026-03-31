@@ -5,6 +5,6 @@ data class Article(
     val title: String,
     val description: String,
     val imageRes: Int,
-    val contentRes: Int
+    val contentRes: Int,
+    val tidbit: String = ""
 )
-

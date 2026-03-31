@@ -1,0 +1,31 @@
+[
+  { "type": "subheading", "content": "Alcohol, also known as ethanol," },
+  { "type": "text", "content": "Known for its psychoactive properties. It is produced by fermenting or distilling produce or grains. Fermented beverages include beer, cider, wine and flavoured purified alcohol, which range from 0.5% to 20% alcohol by volume (ABV). Distilled beverages, often called spirits or hard liquor, include products such as vodka and whisky, which usually are 25% ABV and higher." },
+  { "type": "text", "content": "Many social gatherings feature alcoholic beverages. Nevertheless, the consumption of alcohol carries a risk of adverse health and social consequences related to its intoxicating, toxic and dependence-producing properties. To avoid harms, To avoid harms, people in Canada who choose to drink should follow {Canada\u2019s Guidance on Alcohol and Health|https://www.ccsa.ca/en/guidance-tools-resources/substance-use-and-addiction/alcohol/canadas-guidance-alcohol-and-health}." },
+  { "type": "expandable", "name": "How Alcohol Is Made", "blocks": [
+    { "type": "text", "content": "Beer, wine, and cider are made through a fermentation process. Fermentation is a natural biological process in which yeast changes sugar into alcohol. It makes drinks with lower alcohol concentration (4% to 15%)." },
+    { "type": "image", "content": "apple_wheat" },
+    { "type": "text", "content": "Spirits, such as gin, rum, vodka, and whiskey, are made through distillation. This is an industrial process that makes drinks with higher alcohol concentrations (40% or more)." }
+  ]},
+  { "type": "expandable", "name": "How Alcohol Affects You", "blocks": [
+    { "type": "text", "content": "Alcohol activates the pleasure or reward centers in the brain. It can make you feel:" },
+    { "type": "bullet_list", "items": ["A sense of well-being", "Relaxed", "Disinhibited (having less control over your actions, especially inappropriate actions)", "Euphoric (intense feeling of excitement or happiness)"] },
+    { "type": "image", "content": "cog_head" },
+    { "type": "text", "content": "Alcohol is also a central nervous system depressant. This means that alcohol slows down brain functions and thought processes. It can also affect other bodily functions such as breathing and heart rate." },
+    { "type": "text", "content": "Alcohol has the same effect no matter which alcoholic beverage you drink. Exactly how it affects you depends on factors such as:" },
+    { "type": "bullet_list", "items": ["The amount you drink", "Your gender and age", "Your body size", "How quickly you drink", "The amount and type of food you have eaten", "Medications you are taking that may interact with alcohol", "Your past experiences with drinking", "Your overall health", "Your mood"] },
+    { "type": "text", "content": "Alcohol is absorbed into your bloodstream through your mouth, stomach, and intestines. Most of your organs and tissues are exposed to the same amount of alcohol as your blood, but your liver is exposed to more." }
+  ]},
+  { "type": "expandable", "name": "How Long it Takes for Alcohol to Affect You", "blocks": [
+    { "type": "text", "content": "How long it takes alcohol to affect you varies greatly. It takes longer if you drink it with certain types of foods, such as proteins and fats. It takes much less time if you drink it on an empty stomach." },
+    { "type": "text", "content": "Alcohol continues to circulate through your body until your liver eliminates it. Some alcohol (10%) exits your body through urine, sweat and breathing." }
+  ]},
+  { "type": "expandable", "name": "Alcohol for Other Purposes", "blocks": [
+    { "type": "text", "content": "**There are two other main types of alcohol. These are not safe to drink.**" },
+    { "type": "image", "content": "hand_sanitizer" },
+    { "type": "tinyHeading", "content": "Isopropyl alcohol (known as rubbing alcohol)" },
+    { "type": "bullet_list", "items": ["Used in sterilization agents, such as hand sanitizer", "Used in everyday cleaning products and cosmetics"] },
+    { "type": "tinyHeading", "content": "Methyl alcohol (known as methanol or wood alcohol)" },
+    { "type": "bullet_list", "items": ["Used as an industrial solvent, antifreeze and fuel for camping stoves"] }
+  ]}
+]

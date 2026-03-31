@@ -1,0 +1,28 @@
+[
+  { "type": "text", "content": "A person\u2019s consumption history, medical history, and drinking goals can help determine what medication may work to reduce or eliminate cravings. The following 4 medications are listed in the Canadian Guideline for the Clinical Management of High-Risk Drinking and Alcohol Use Disorder (2023)" },
+
+  { "type": "subheading", "content": "Important Notes:" },
+
+  { "type": "bullet_list", "items": ["Medications are prescribed by a doctor or nurse practitioner.", "If alcohol use disorder is diagnosed, the provider can work with an individual to determine whether medications may be a fit.", "Like medications for other conditions, it can take a few attempts to find the right medication or combination of medications.", "Medication-assisted treatment complements other services, programs, and cultural supports.", "If prescribed a medication, monitoring of side effects and follow-up care are important.", "Not all providers know of these treatment options, so individuals may need to advocate for care.", "Visit the Canadian Alcohol Use Disorder Society** at www.cauds.org for more information."] },
+  { "type": "image", "content": "caduceus" },
+  { "type": "subheading", "content": "Naltrexone" },
+  { "type": "bordered", "blocks": [
+    { "type": "check_list", "items": ["Effects noticed within 1st hour", "Is prescribed to help reduce or stop drinking", "Can be taken at different times of day to be effective \u2013 for example, before a social occasion"] },
+    { "type": "cross_list", "items": ["Is not a safe choice if using opioids and some other medications", "Is not a safe choice if a person has severe liver disease (cirrhosis)"] }
+  ]},
+  { "type": "subheading", "content": "Acamprosate" },
+  { "type": "bordered", "blocks": [
+    { "type": "check_list", "items": ["Effects first noticed within a week", "Is prescribed to stop drinking, and works better if not drinking for 3 days before starting", "If a person relapses, they should keep taking the medication and consult their provider ASAP", "Adolescents/elderly persons may be sensitive, and should update their provider on how they are feeling"] },
+    { "type": "cross_list", "items": ["Pregnant individuals on acamprosate should discuss whether to continue this medication with their provider", "Is not a safe choice if breastfeeding or for someone with renal (kidney) impairment"] }
+  ]},
+  { "type": "subheading", "content": "Topiramate" },
+  { "type": "bordered", "blocks": [
+    { "type": "check_list", "items": ["Effects first noticed within a week", "Is prescribed to help reduce or stop drinking", "Dose often increases every week"] },
+    { "type": "cross_list", "items": ["Abrupt stopping of this medication can cause severe withdrawal. Work with your provider to taper off", "Is not a safe choice when pregnant or when planning to become pregnant"] }
+  ]},
+  { "type": "subheading", "content": "Gabapentin" },
+  { "type": "bordered", "blocks": [
+    { "type": "check_list", "items": ["Effects first noticed within a week", "Is prescribed to help reduce or stop drinking"] },
+    { "type": "cross_list", "items": ["Abrupt stopping of this medication can cause severe withdrawal. Work with your provider to taper off", "May not be safe for someone with renal (kidney) impairment"] }
+  ]}
+]

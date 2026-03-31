@@ -1,0 +1,16 @@
+[
+  { "type": "subheading", "content": "Works for almost everyone" },
+  { "type": "text", "content": "There are a number of different medications that can help reduce cravings and support changes in drinking. Because everyone\u2019s body is different, it may take time to find the medication or dosage that works best for you. If the first option doesn\u2019t work as expected, don\u2019t be discouraged!" },
+  { "type": "subheading", "content": "Can be taken temporarily" },
+  { "type": "text", "content": "Medications are usually prescribed temporarily, depending on a person\u2019s individual care plan. If required, it is safe to take medications for a longer period of time." },
+  { "type": "subheading", "content": "Make you feel better" },
+  { "type": "text", "content": "Historically, a medication called disulfiram was used to treat AUD, but it worked by making people feel sick if they drank. It is no longer a recommended medication, except in rare circumstances." },
+  { "type": "image", "content": "heart_cross" },
+  { "type": "subheading", "content": "Complement other Supports" },
+  { "type": "text", "content": "Medications are taken to ease cravings and withdrawal symptoms so that the work of healing and recovery can take place through counselling, family, or traditional and cultural supports" },
+  { "type": "subheading", "content": "Are Selected For Individuals" },
+  { "type": "text", "content": "AUD medications are prescribed by a family doctor or nurse practitioner based on a person\u2019s history and drinking goals, which can be to stop or to simply reduce the amount they drink." },
+  { "type": "subheading", "content": "Are Effective for Relapse" },
+  { "type": "text", "content": "The chance of relapse is much lower when AUD medications are used. If it does occur, medications that initially worked can be relied on again to help." },
+  { "type": "text", "content": "For more info, talk to your primary care provider or visit {Cauds.org|https://cauds.org}" }
+]

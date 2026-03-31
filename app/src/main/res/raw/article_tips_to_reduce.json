@@ -1,0 +1,46 @@
+[
+  { "type": "expandable", "name": "Strategies", "blocks": [
+    { "type": "tinyHeading", "content": "Count the number of drinks and the type of drink you are having." },
+    { "type": "text", "content": "Before you drink, decide on the maximum number of drinks you will have to stay within your goals. If it's helpful to you, let your friends know about your plan." },
+    { "type": "tinyHeading", "content": "Increase the interval between drinks." },
+    { "type": "text", "content": "Add intentional breaks between drinks to check in with how you're feeling and whether you want another." },
+    { "type": "tinyHeading", "content": "Think of an alternative activity to drinking" },
+    { "type": "text", "content": "Keep in mind the people or groups who can support you as you change your drinking habits. Consider spending more time with people who respect your boundaries." },
+    { "type": "tinyHeading", "content": "Stick to the limits you\u2019ve set for yourself" },
+    { "type": "text", "content": "Decide your limit ahead of time and try to stick to it." },
+    { "type": "image", "content": "juice_box" },
+    { "type": "tinyHeading", "content": "Drink lots of water" },
+    { "type": "text", "content": "An easy way to help your body is to drink one glass of water for every alcoholic beverage you consume. That way, you don\u2019t get dehydrated." },
+    { "type": "tinyHeading", "content": "Choose Non-Alcoholic Alternatives" },
+    { "type": "text", "content": "Choose non-alcoholic drinks in place of those with alcohol, like soda, juice, water, or non-alcoholic cocktails. If you drink alcohol, limit your alcoholic drinks to only one per hour. Alternate between the two if it is helpful." },
+    { "type": "tinyHeading", "content": "Eat before and while you\u2019re drinking" },
+    { "type": "text", "content": "If you drink, don\u2019t do it on an empty stomach. Eat food so the alcohol will be absorbed into your body more slowly." },
+    { "type": "tinyHeading", "content": "Have alcohol-free weeks or do alcohol-free activities" },
+    { "type": "text", "content": "Intentionally choose stretches of time or social events where alcohol isn\u2019t part of the plan. Explore activities with friends that don\u2019t centre on drinking." }
+  ]},
+  { "type": "expandable", "name": "Be ready to say \u201cno thanks.\u201d", "blocks": [
+    { "type": "text", "content": "Planning comfortable ways to deal with pressure can help you stay on track. Some reasons you could use include:" },
+    { "type": "bullet_list", "items": ["\u201cNo thanks. I\u2019m on medication, and my doctor has told me to keep away from alcohol\u201d.", "\u201cNo thanks, I\u2019m driving.\u201d", "\u201cNo thanks, I just finished one.\u201d", "\u201cNo thanks, I\u2019d like to wait a few minutes.\u201d", "\u201cNo thanks, I\u2019m on a diet.\u201d", "\u201cI have an exam tomorrow and want to be clear-headed.\u201d", "\u201cI have a big game tomorrow and want to be in shape.\u201d", "\u201cI told my family I would cut down."] }
+  ]},
+  { "type": "expandable", "name": "Plan Ahead", "blocks": [
+    { "type": "tinyHeading", "content": "Be Strategic" },
+    { "type": "text", "content": "If certain people or places lead you to drink more than you want to, develop strategies to help you manage or avoid drinking in these situations." },
+    { "type": "tinyHeading", "content": "Plan to get home safely" },
+    { "type": "text", "content": "When you start drinking, it\u2019s harder to think clearly and make rational decisions. This means that you should make a plan to get home safely before you start drinking." },
+    { "type": "text", "content": "For a safe night out and a safe trip home:" },
+    { "type": "bullet_list", "items": ["Remember your house keys when you leave the house", "Make sure your phone is fully charged so that you can contact friends or emergency services", "Plan to get a ride home from someone who is not drinking. This can be done using: rideshare apps, public transit, a designated driver, or campus driving services", "Talk to your friends about your plans, and look out for each other when you are out"] },
+    { "type": "tinyHeading", "content": "Be careful about mixing alcohol with other non-alcoholic drinks" },
+    { "type": "text", "content": "Mixing alcohol with other non-alcoholic drinks can make it harder to know how much alcohol you\u2019re consuming and how alcohol is affecting you." },
+    { "type": "text", "content": "For example:" },
+    { "type": "bullet_list", "items": ["Sweet drinks with lots of sugar can hide the taste of alcohol. You may not realize how much alcohol you\u2019re drinking.", "Caffeinated drinks, like coffee and energy drinks, can make you feel more alert, but you might drink more than intended."] },
+    { "type": "image", "content": "taxi_cab" },
+    { "type": "tinyHeading", "content": "Don\u2019t leave your drink unattended" },
+    { "type": "text", "content": "You should keep your drink close to you at all times and be careful when accepting drinks from others. This will help make sure that you know what type of alcohol you\u2019re drinking and that no one has added any drugs to your drink." },
+    { "type": "tinyHeading", "content": "Avoid mixing alcohol with other drugs" },
+    { "type": "text", "content": "Alcohol can interact with other drugs in unpredictable, unintended, and harmful ways. For example:" },
+    { "type": "bullet_list", "items": ["Mixing cannabis and alcohol can lead to feeling dizzy and nauseous", "Mixing prescription medications and alcohol can lead to dangerous drug interactions."] },
+    { "type": "text", "content": "To avoid the risks, it is safest to avoid mixing any substances with alcohol. If you\u2019re planning on using another drug, avoid trying it when you\u2019ve been drinking." }
+  ]},
+  { "type": "expandable", "name": "Reward Yourself", "content": "It helps to reward yourself when making hard changes. By drinking less, you are saving time and money that you could now use for other things. For example, you can spend more time with friends and family, exercising, exploring a new sport or activity, or going to a concert or movie!" }
+
+]

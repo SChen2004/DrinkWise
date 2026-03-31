@@ -1,0 +1,63 @@
+[
+  { "type": "text", "content": "Substance use can be a deeply sensitive and challenging topic to discuss with loved ones. Conversations around addiction often trigger complex emotions, opinions, and memories. Using stigmatizing language, shame, or judgment is usually hurtful and makes it almost impossible to have constructive conversations with the people in our lives who use substances." },
+  { "type": "text", "content": "To become a safe person to talk with, use extra care and respect, come from a place of empathy, and remember that all people deserve human rights and dignity, including people who use substances. Let them know that you care about them and that you value their life. When we are supporting people who are using substances, it is important to focus on building relationships based on safety and trust." },
+  { "type": "expandable", "name": "Understanding the Approach", "content": "The core of effective support lies in shifting away from judgment and shame. Instead of focusing on \u201cfixing\u201d someone or imposing solutions, we should aim to build a relationship based on trust and understanding." },
+  { "type": "expandable", "name": "Core Principles - The Foundation of Support", "blocks": [
+    { "type": "tinyHeading", "content": "Respect & Autonomy" },
+    { "type": "text", "content": "People struggling with substance use need to be treated with dignity, respect, and acknowledged as the experts on their own lives and experiences. Avoid judgment, coercion, and a paternalistic approach. The goal is to empower them, not control them." },
+    { "type": "image", "content": "supportive_community" },
+    { "type": "tinyHeading", "content": "Understanding the Context" },
+    { "type": "text", "content": "Look beyond the individual behavior and consider the broader ecosystem \u2013 the community, relationships, work/financial situation, family history, and underlying needs." },
+    { "type": "tinyHeading", "content": "Community-Based Solution" },
+    { "type": "text", "content": "True change happens within a supportive community. This means fostering inclusion, planning gatherings and activities that do not centre specifically on alcohol, ensuring people who choose not to drink feel welcome, and being mindful of the behaviours we model when consuming." }
+  ]},
+  { "type": "expandable", "name": "Practical Strategies \u2013 How to Act", "blocks": [
+    { "type": "tinyHeading", "content": "Active Listening & Empathy" },
+    { "type": "text", "content": "Truly hear the person\u2019s perspective \u2013 their fears, frustrations, and motivations. Reflect back what you\u2019ve heard to ensure understanding." },
+    { "type": "image", "content": "hugging_women" },
+    { "type": "tinyHeading", "content": "Problem-Solving, Not Confrontation" },
+    { "type": "text", "content": "Focus on solutions, not blame. When faced with a difficult situation \u2013 an episode of intoxication, for example \u2013 shift the conversation towards collaborative problem-solving. Avoid arguments or lecturing; frame the discussion as a shared effort to navigate a challenge and work together to identify manageable steps and potential resources." },
+    { "type": "tinyHeading", "content": "Develop a Shared Plan" },
+    { "type": "text", "content": "If the person is willing, help them create a realistic plan with achievable goals. They must own the plan. This shared ownership fosters a sense of responsibility and empowers them to take control of their recovery journey." }
+  ]},
+  { "type": "expandable", "name": "Practical Strategies \u2013 How to Act", "blocks": [
+    { "type": "tinyHeading", "content": "Active Listening & Empathy" },
+    { "type": "text", "content": "Truly hear the person\u2019s perspective \u2013 their fears, frustrations, and motivations. Reflect back what you\u2019ve heard to ensure understanding." },
+    { "type": "image", "content": "hugging_women" },
+    { "type": "tinyHeading", "content": "Problem-Solving, Not Confrontation" },
+    { "type": "text", "content": "Focus on solutions, not blame. When faced with a difficult situation \u2013 an episode of intoxication, for example \u2013 shift the conversation towards collaborative problem-solving. Avoid arguments or lecturing; frame the discussion as a shared effort to navigate a challenge and work together to identify manageable steps and potential resources." },
+    { "type": "tinyHeading", "content": "Develop a Shared Plan" },
+    { "type": "text", "content": "If the person is willing, help them create a realistic plan with achievable goals. They must own the plan. This shared ownership fosters a sense of responsibility and empowers them to take control of their recovery journey." }
+  ]},
+  { "type": "expandable", "name": "Managing Difficult Situations", "blocks": [
+    { "type": "tinyHeading", "content": "Safety First" },
+    { "type": "text", "content": "Always prioritize safety \u2013 the well-being of the individual and those around them. If immediate danger exists (e.g., suicidal thoughts, erratic behavior), take appropriate action, including seeking professional help." },
+    { "type": "tinyHeading", "content": "De-escalation techniques" },
+    { "type": "text", "content": "Use a calm, respectful tone of voice. Avoid escalating the situation with raised voices or accusatory language. This can be incredibly difficult, but maintaining composure is crucial for de-escalation." },
+    { "type": "tinyHeading", "content": "Be mindful of root causes" },
+    { "type": "text", "content": "Sometimes the problem isn\u2019t just the substance use; it\u2019s related to underlying issues like isolation, trauma, or lack of support. Addressing these underlying issues is critical for long-term well-being and truly lasting change." },
+    { "type": "image", "content": "supportive_woman" },
+    { "type": "tinyHeading", "content": "Preventing Violence" },
+    { "type": "text", "content": "Focus on solutions, not blame. When faced with a difficult situation \u2013 an episode of intoxication, for example \u2013 shift the conversation towards collaborative problem-solving. Avoid arguments or lecturing; frame the discussion as a shared effort to navigate a challenge and work together to identify manageable steps and potential resources." },
+    { "type": "image", "content": "plant_thing" },
+    { "type": "text", "content": "While minimizing restrictions is generally effective, an authoritative approach\u2014including safe escorting and crisis intervention\u2014is necessary when threats or violence are present. Ultimately, preventing escalation requires a holistic strategy, combining de-escalation techniques with broader efforts like teaching coping mechanisms, encouraging open communication about emotions, and identifying and discussing feelings of anger and frustration, and addressing the root causes of agitation. Early intervention and a commitment to mutual regard are therefore paramount in maintaining safety and reducing the risk of violent behavior." }
+  ]},
+  { "type": "expandable", "name": "Creating Supportive Environments", "blocks": [
+    { "type": "tinyHeading", "content": "Inclusive Policies" },
+    { "type": "text", "content": "Advocate for fair and accessible support. This involves challenging stigma and advocating for policies that remove barriers to treatment and recovery." },
+    { "type": "image", "content": "pink_feathers" },
+    { "type": "tinyHeading", "content": "Promote Social Connections" },
+    { "type": "text", "content": "Create opportunities for social connection such as joining community groups, attending events, or engaging in activities that foster a sense of belonging." },
+    { "type": "tinyHeading", "content": "Supportive Services" },
+    { "type": "text", "content": "Ensure access to medical, harm reduction, and social support services. Connecting them with appropriate professionals and organizations is essential." }
+  ]},
+  { "type": "expandable", "name": "Key Shifts in Thinking", "blocks": [
+    { "type": "tinyHeading", "content": "From Treatment to Support" },
+    { "type": "text", "content": "The focus shouldn\u2019t be solely on \u201cfixing\u201d the individual, but on providing ongoing support and enabling them to make their own choices." },
+    { "type": "image", "content": "zen_lotus" },
+    { "type": "tinyHeading", "content": "Systems Thinking" },
+    { "type": "text", "content": "Recognize that substance use is a complex issue that requires addressing individual behaviors as well as the broader environment in which the individual lives." },
+    { "type": "tinyHeading", "content": "Cultural Competence" },
+    { "type": "text", "content": "Adapt your approach to respect the unique cultural norms, values, and communication styles of the individual and community so that your message and intent are communicated clearly." }
+  ]}
+]
