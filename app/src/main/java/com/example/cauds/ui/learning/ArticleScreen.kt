@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -77,6 +78,7 @@ fun ArticleBlockContent(block: ArticleBlock, nested: Boolean = false) {
                     fontFamily = Poppins,
                     fontSize = 14.sp,
                     color = Clover,
+                    lineHeight = 22.sp,
                     modifier = Modifier.padding(horizontal = hPadding, vertical = 8.dp)
                 )
             } else {
@@ -372,6 +374,7 @@ fun ExpandableBlock(
                         fontFamily = Poppins,
                         fontSize = 14.sp,
                         color = Clover,
+                        lineHeight = 22.sp,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -408,7 +411,10 @@ fun ArticleScreen(
 
             // Back button — below the image
             item {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.offset(x = (12).dp)
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
@@ -422,12 +428,26 @@ fun ArticleScreen(
                 Text(
                     text = a.title,
                     fontFamily = BowlbyOne,
-                    fontSize = 46.sp,
+                    fontSize = 50.sp,
                     color = DarkNavy,
-                    lineHeight = 48.sp,
+                    lineHeight = 52.sp,
                     modifier = Modifier.padding(horizontal = 28.dp)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                if (a.tidbit.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = a.tidbit,
+                        fontFamily = Poppins,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp,
+                        color = DarkNavy,
+                        modifier = Modifier
+                            .padding(horizontal = 28.dp)
+                            .background(Color(0xFFAFC9DC))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(64.dp))
             }
         }
 

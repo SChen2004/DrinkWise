@@ -71,8 +71,13 @@ fun AppBottomNavigation(navController: NavController) {
                                              currentDestination?.route == Screen.DaySummary.route ||
                                              currentDestination?.route?.startsWith("day_summary") == true
 
-                    val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true || 
-                                 (item == BottomNavItem.Dashboard && isDashboardSubScreen)
+                    val isLearningSubScreen = currentDestination?.route == Screen.UnderstandingAud.route ||
+                            currentDestination?.route == Screen.SubjectArticles.route ||
+                            currentDestination?.route == Screen.ArticlePage.route
+
+                    val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true ||
+                            (item == BottomNavItem.Dashboard && isDashboardSubScreen) ||
+                            (item == BottomNavItem.LearningPage && isLearningSubScreen)
 
                     Icon(
                         painter = painterResource(id = if (selected) item.selectedIconRes else item.iconRes),
@@ -85,13 +90,19 @@ fun AppBottomNavigation(navController: NavController) {
                                 indication = null
                             ) {
                                 if (item.route == Screen.Dashboard.route) {
-                                    // SPECIAL CASE: For the Dashboard (Home) button, 
-                                    // we want to ensure we pop back to the root if we're on a sub-page.
                                     if (currentDestination?.route != Screen.Dashboard.route) {
                                         navController.popBackStack(Screen.Dashboard.route, inclusive = false)
                                     }
+                                } else if (item.route == Screen.LearningPage.route) {
+                                    // Always go to the learning landing page, never restore sub-screens
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = false
+                                    }
                                 } else if (currentDestination?.route != item.route) {
-                                    // Standard tab switching logic for other items
                                     navController.navigate(item.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
