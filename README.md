@@ -39,5 +39,14 @@ DrinkWise is an privacy-centric, non-judgmental Android application developed in
 *   **Clinical Screening:** An interactive quiz evaluating responses against clinical logic to determine risk levels (Low to High).
 *   **Supportive Feedback:** Instant baseline risk assessment with non-judgmental guidance.
 
+---
+
+## Try it Out (Demo APK)
+
+*   **Download**: You can find the latest stable version of the app in the **[Releases](https://github.com/SChen2004/CAUDS/tree/main/app/release)** section of this repository.
+*   **Installation**:
+    1. Download the `.apk` file directly to your Android device.
+    2. Open your device's File Manager and locate the downloaded file.
+    3. Tap the file to install. If prompted, allow "Install from Unknown Sources" in your Android settings.
 
 
