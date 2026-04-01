@@ -43,7 +43,7 @@ DrinkWise is an privacy-centric, non-judgmental Android application developed in
 
 ## Try it Out (Demo APK)
 
-*   **Download**: You can find the latest stable version of the app in the **[Releases](https://github.com/SChen2004/CAUDS/tree/main/app/release)** section of this repository.
+*   **Download**: You can find the latest stable version of the app in the **[Releases](https://github.com/SChen2004/DrinkWise/tree/main/app/release)** section of this repository.
 *   **Installation**:
     1. Download the `.apk` file directly to your Android device.
     2. Open your device's File Manager and locate the downloaded file.
