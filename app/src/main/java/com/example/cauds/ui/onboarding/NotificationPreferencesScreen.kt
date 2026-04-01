@@ -293,7 +293,8 @@ fun AccountNotificationLayout(
                         text = "Save",
                         fontFamily = BigShouldersDisplay,
                         fontSize = 24.rsp(),
-                        letterSpacing = 0.rsp()
+                        letterSpacing = 0.rsp(),
+                        color = Color.White
                     )
                 }
                 Spacer(modifier = Modifier.height(24.rdp()))

@@ -38,6 +38,7 @@ import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.CloverDarker
 import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.navigation.Screen
+import com.example.cauds.ui.theme.Tertiary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,20 +131,20 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.rdp()),
-                placeholder = { Text("Search", color = Color.Black.copy(alpha = 0.4f), fontFamily = Poppins, fontSize = 14.rsp()) },
-                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins, fontSize = 14.rsp(), color = Color.Black),
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.Black, modifier = Modifier.size(16.rdp())) },
+                placeholder = { Text("Search", color = CloverDarker.copy(alpha = 0.4f), fontFamily = Poppins, fontSize = 14.rsp()) },
+                textStyle = LocalTextStyle.current.copy(fontFamily = Poppins, fontSize = 14.rsp(), color = CloverDarker),
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = CloverDarker, modifier = Modifier.size(16.rdp())) },
                 trailingIcon = {
                     if (uiState.searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.updateSearchQuery("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = Color.Gray)
+                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = CloverDarker.copy(alpha = 0.5f))
                         }
                     }
                 },
                 shape = RoundedCornerShape(0.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.Black.copy(alpha = 0.5f),
-                    focusedBorderColor = Color.Black,
+                    unfocusedBorderColor = CloverDarker.copy(alpha = 0.5f),
+                    focusedBorderColor = CloverDarker,
                     unfocusedContainerColor = Color(0xFFFFEFC6).copy(alpha = 0.5f),
                     focusedContainerColor = Color(0xFFFFEFC6).copy(alpha = 0.5f)
                 ),
@@ -155,7 +156,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
             // Scrollable Section
             if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Color.Black)
+                    CircularProgressIndicator(color = CloverDarker)
                 }
             } else {
                 val filteredDrinks = if (uiState.searchQuery.isBlank()) {
@@ -192,12 +193,13 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                         "Drink not found.",
                                         fontSize = 24.rsp(),
                                         fontFamily = BigShouldersDisplay,
-                                        textAlign = TextAlign.Start
+                                        textAlign = TextAlign.Start,
+                                        color = CloverDarker
                                     )
                                     Spacer(modifier = Modifier.height(8.rdp()))
                                     Text(
                                         "Try another search or add it as a new drink.",
-                                        color = Color.Gray,
+                                        color = CloverDarker.copy(alpha = 0.6f),
                                         fontSize = 14.rsp(),
                                         fontFamily = Poppins,
                                         textAlign = TextAlign.Start
@@ -209,7 +211,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 Column(
                                     modifier = Modifier
                                         .padding(horizontal = 16.rdp(), vertical = 16.rdp())
-                                        .border(0.5.dp, Color.Black.copy(alpha = 0.5f))
+                                        .border(0.5.dp, CloverDarker.copy(alpha = 0.5f))
                                 ) {
                                     filteredDrinks.forEachIndexed { index, drink ->
                                         DrinkRowItem(
@@ -218,7 +220,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                             onDelete = { viewModel.deleteDrink(drink) }
                                         )
                                         if (index < filteredDrinks.size - 1) {
-                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
+                                            HorizontalDivider(color = CloverDarker.copy(alpha = 0.5f), thickness = 0.5.dp)
                                         }
                                     }
                                 }
@@ -238,13 +240,14 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = "Add New Drink",
-                                tint = Color.Black,
+                                tint = CloverDarker,
                                 modifier = Modifier.size(24.rdp())
                             )
                             Spacer(modifier = Modifier.height(8.rdp()))
                             Text(
                                 "Add New Drink",
                                 fontSize = 24.rsp(),
+                                color = CloverDarker,
                                 fontWeight = FontWeight.Normal,
                                 fontFamily = BigShouldersDisplay
                             )
@@ -273,7 +276,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                 Column(
                                     modifier = Modifier
                                         .padding(horizontal = 16.rdp())
-                                        .border(0.5.dp, Color.Black.copy(alpha = 0.5f))
+                                        .border(0.5.dp, CloverDarker.copy(alpha = 0.5f))
                                 ) {
                                     selectedDrinks.forEachIndexed { index, drink ->
                                         DrinkRowItem(
@@ -282,7 +285,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                             onDelete = { viewModel.deleteDrink(drink) }
                                         )
                                         if (index < selectedDrinks.size - 1) {
-                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
+                                            HorizontalDivider(color = CloverDarker.copy(alpha = 0.5f), thickness = 0.5.dp)
                                         }
                                     }
                                 }
@@ -307,7 +310,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                     Column(
                                         modifier = Modifier
                                             .padding(horizontal = 16.rdp())
-                                            .border(0.5.dp, Color.Black.copy(alpha = 0.5f))
+                                            .border(0.5.dp, CloverDarker.copy(alpha = 0.5f))
                                     ) {
                                         CategoryHeader(
                                             title = category,
@@ -316,7 +319,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                         )
                                         
                                         if (isExpanded) {
-                                            HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
+                                            HorizontalDivider(color = CloverDarker.copy(alpha = 0.5f), thickness = 0.5.dp)
                                             categoryDrinks.forEachIndexed { index, drink ->
                                                 DrinkRowItem(
                                                     drink = drink,
@@ -324,7 +327,7 @@ fun ManageDrinksScreen(navController: NavController, viewModel: ManageDrinksView
                                                     onDelete = { viewModel.deleteDrink(drink) }
                                                 )
                                                 if (index < categoryDrinks.size - 1) {
-                                                    HorizontalDivider(color = Color.Black.copy(alpha = 0.5f), thickness = 0.5.dp)
+                                                    HorizontalDivider(color = CloverDarker.copy(alpha = 0.5f), thickness = 0.5.dp)
                                                 }
                                             }
                                         }
@@ -361,6 +364,7 @@ fun SectionHeader(
         Text(
             text = title,
             fontSize = 24.rsp(),
+            color = CloverDarker,
             fontWeight = FontWeight.Normal,
             fontFamily = BigShouldersDisplay
         )
@@ -368,7 +372,7 @@ fun SectionHeader(
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, 
                 contentDescription = null, 
-                tint = Color.Black
+                tint = CloverDarker
             )
         }
     }
@@ -376,7 +380,7 @@ fun SectionHeader(
 
 @Composable
 fun CategoryHeader(title: String, isExpanded: Boolean, onClick: () -> Unit) {
-    val backgroundColor = Color(0xFFEDF5EF).copy(alpha = 0.5f) 
+    val backgroundColor = Tertiary.copy(alpha = 0.5f) 
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -391,11 +395,11 @@ fun CategoryHeader(title: String, isExpanded: Boolean, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(title, fontSize = 14.rsp(), fontWeight = FontWeight.Normal, fontFamily = Poppins)
+            Text(title, fontSize = 14.rsp(), color = CloverDarker, fontWeight = FontWeight.Normal, fontFamily = Poppins)
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = null,
-                tint = Color.Black
+                tint = CloverDarker
             )
         }
     }
@@ -411,7 +415,7 @@ fun DrinkRowItem(
     var showDelete by remember { mutableStateOf(false) }
     val backgroundColor = BackgroundSand
 
-    Box(modifier = Modifier.fillMaxWidth().height(50.rdp()).background(Color(0xFFEDF5EF).copy(alpha = 0.5f))) {
+    Box(modifier = Modifier.fillMaxWidth().height(50.rdp()).background(Tertiary.copy(alpha = 0.5f))) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -452,6 +456,7 @@ fun DrinkRowItem(
                 Text(
                     text = drink.data.name,
                     fontSize = 14.rsp(),
+                    color = CloverDarker,
                     fontWeight = FontWeight.Normal,
                     fontFamily = Poppins,
                     maxLines = 1,
@@ -465,7 +470,7 @@ fun DrinkRowItem(
                 Box(
                     modifier = Modifier
                         .size(20.rdp())
-                        .border(0.5.dp, Color.Black.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
+                        .border(0.5.dp, CloverDarker.copy(alpha = 0.5f), RoundedCornerShape(0.dp))
                         .background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
@@ -474,7 +479,7 @@ fun DrinkRowItem(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Selected",
                             modifier = Modifier.size(14.rdp()),
-                            tint = Color.Black
+                            tint = CloverDarker
                         )
                     }
                 }
