@@ -3,13 +3,13 @@ package com.example.cauds.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -91,9 +91,9 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
                     val editId = viewModel.editingEntryId
                     if (editId != null) {
                         viewModel.deleteEntry(editId)
-                        viewModel.clearEditingEntry()
-                        navController.popBackStack()
                     }
+                    viewModel.clearEditingEntry()
+                    navController.popBackStack()
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_trash),
@@ -149,7 +149,8 @@ fun CreateEntryScreen(navController: NavController, viewModel: JournalViewModel)
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(start = 16.dp, end = horizontalPad, top = 8.dp),
+                .padding(start = 16.dp, end = horizontalPad, top = 8.dp)
+                .onFocusChanged { if (it.isFocused) showDatePicker = false },
             placeholder = {
                 Text(
                     "Type something...",

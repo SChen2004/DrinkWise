@@ -64,10 +64,12 @@ fun WheelPicker(
     }
 
     LaunchedEffect(listState) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .collect { index ->
-                val i = index + padCount
-                if (i in padCount..items.size + padCount - 1) onItemSelected(i - padCount)
+        snapshotFlow { listState.isScrollInProgress }
+            .collect { scrolling ->
+                if (!scrolling) {
+                    val i = listState.firstVisibleItemIndex + padCount
+                    if (i in padCount until items.size + padCount) onItemSelected(i - padCount)
+                }
             }
     }
 

@@ -21,11 +21,6 @@ import com.example.cauds.ui.theme.BigShouldersDisplay
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ButtonDefaults
 
@@ -59,6 +54,7 @@ fun JournalEntryCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = 148.dp)
             .background(backgroundColor)
             .border(0.5.dp, Color(0x801A3720))
             .clickable { onClick() }
@@ -121,6 +117,7 @@ fun EmptyTodayCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = 148.dp)
             .background(Color(0x80EDF5EF))
             .border(0.5.dp, Color(0x801A3720))
             .clickable { onClick() }
@@ -173,6 +170,7 @@ fun JournalEntryPager(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .defaultMinSize(minHeight = 148.dp)  // same height as single cards
             .background(backgroundColor)
             .border(0.5.dp, Color(0x801A3720))
     ) {
@@ -195,7 +193,7 @@ fun JournalEntryPager(
                         Text(
                             text = entry.date,
                             fontFamily = BigShouldersDisplay,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Normal,
                             fontSize = 24.sp,
                             color = Color(0xFF121E30)
                         )
@@ -245,6 +243,7 @@ fun JournalEntryPager(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    // bottom right numbers
                     Text(
                         text = "${pagerState.currentPage + 1}/${entries.size}",
                         fontFamily = Poppins,
