@@ -4,10 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,7 +32,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.cauds.R
 
 
-private val CalendarBlue = Color(0xFFAFC9DC)
+private val CalendarBlue = Color(0xCCAFC9DC)
 private val CreamBackground = Color(0xFFFEF5DC)
 private val DarkNavy = Color(0xFF121E30)
 private val WeekendColor = Color(0x9933578A)
@@ -90,7 +86,9 @@ fun CalendarScreen(
 
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier
+                    .size(32.dp)
+                    .offset(x = (-6).dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_left),
@@ -111,7 +109,7 @@ fun CalendarScreen(
                     text = "$monthName ${currentMonth.year}",
                     fontFamily = BigShouldersDisplay,
                     fontSize = 28.sp,
-                    fontWeight = FontWeight.Normal,
+                    fontWeight = FontWeight.W300,
                     color = DarkNavy
                 )
 
@@ -122,9 +120,10 @@ fun CalendarScreen(
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        painter = painterResource(id = R.drawable.ic_chevron_left),
                         contentDescription = "Previous month",
-                        tint = DarkNavy
+                        tint = DarkNavy,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -136,9 +135,10 @@ fun CalendarScreen(
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        painter = painterResource(id = R.drawable.ic_chevron_right),
                         contentDescription = "Next month",
-                        tint = if (isCurrentMonth) DarkNavy.copy(alpha = 0.2f) else DarkNavy
+                        tint = if (isCurrentMonth) DarkNavy.copy(alpha = 0.2f) else DarkNavy,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -168,7 +168,7 @@ fun CalendarScreen(
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         fontFamily = Poppins,
-                        fontSize = calendarFontSize,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         color = if (isWeekend) WeekendColor else DarkNavy
                     )
@@ -248,6 +248,7 @@ private fun DayCell(
 ) {
     val date = cell.date
     val isBlank = date == null
+    val isFuture = date?.isAfter(LocalDate.now()) == true
     val isWeekend = date?.dayOfWeek?.value == 6 || date?.dayOfWeek?.value == 7
 
     Box(
@@ -255,7 +256,7 @@ private fun DayCell(
             .fillMaxWidth()
             .height(daycellPadding)
             .then(
-                if (!isBlank) Modifier.clickable { onClick(date) } else Modifier
+                if (!isBlank && !isFuture) Modifier.clickable { onClick(date) } else Modifier
             ),
         contentAlignment = Alignment.TopCenter
     ) {
@@ -267,13 +268,13 @@ private fun DayCell(
                 modifier = Modifier.size(36.dp),
                 contentAlignment = Alignment.Center
             ) {
-                if (!isBlank && isToday) {
+                if (!isBlank && !isFuture && isToday) {
                     Box(
                         modifier = Modifier
                             .size(32.dp)
                             .background(DarkNavy, CircleShape)
                     )
-                } else if (!isBlank && hasJournal) {
+                } else if (!isBlank && !isFuture && hasJournal) {
                     Box(
                         modifier = Modifier
                             .size(32.dp)
@@ -288,6 +289,7 @@ private fun DayCell(
                     fontWeight = FontWeight.Normal,
                     color = when {
                         isBlank -> Color.Transparent
+                        isFuture -> DarkNavy.copy(alpha = 0.2f)
                         isToday -> Color.White
                         isWeekend -> WeekendColor
                         else -> DarkNavy
@@ -296,8 +298,8 @@ private fun DayCell(
                 )
             }
 
-            if (drinkCount > 0) {
-                Spacer(modifier = Modifier.height(6.dp))
+            if (drinkCount > 0 && !isFuture) {
+                Spacer(modifier = Modifier.height(8.dp))
                 DrinkDots(count = drinkCount)
             }
         }

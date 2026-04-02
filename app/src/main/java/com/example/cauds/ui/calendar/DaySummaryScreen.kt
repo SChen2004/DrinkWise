@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,10 +45,11 @@ import com.example.cauds.ui.drinklog.DrinkLogViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.cauds.ui.theme.CloverDarker
 
 
 private val CreamBackground = Color(0xFFFEF5DC)
-private val CalendarBlue     = Color(0xFFAFC9DC)
+private val CalendarBlue     = Color(0xCCAFC9DC)
 private val DarkNavy         = Color(0xFF121E30)
 private val WeekendColor     = Color(0x9933578A)
 private val JournalCircle    = Color(0xFF9EB5C6)
@@ -128,8 +128,7 @@ fun DaySummaryScreen(
                 .fillMaxWidth()
                 .background(CalendarBlue)
                 .statusBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, top = calendarTopPadding, bottom = 36.dp)
-        ) {
+                .padding(start = 16.dp, end = 16.dp, top = calendarTopPadding, bottom = 16.dp)        ) {
             WeekHeader(
                 selectedDate = currentDate,
                 onBack = onBack,
@@ -159,7 +158,7 @@ fun DaySummaryScreen(
                         text = "Drinks",
                         fontFamily = BigShouldersDisplay,
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.W400,
                         color = DarkNavy
                     )
 
@@ -170,7 +169,7 @@ fun DaySummaryScreen(
                         fontFamily = BigShouldersDisplay,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Normal,
-                        color = DarkNavy.copy(alpha = 0.4f)
+                        color = CloverDarker.copy(alpha = 0.3f)
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -188,7 +187,7 @@ fun DaySummaryScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
 // ── Drink content: list / "I didn't drink" / "No drinks" card
                 if (totalDrinks > 0) {
@@ -196,7 +195,12 @@ fun DaySummaryScreen(
                     DaySummaryDrinkList(
                         logs = logsForDay,
                         onRemoveItem = { logId -> calendarViewModel.deleteLog(logId) },
-                        onRemoveBatch = { logIds -> logIds.forEach { calendarViewModel.deleteLog(it) } }
+                        onRemoveBatch = { logIds -> logIds.forEach { calendarViewModel.deleteLog(it) } },
+                        onItemClick = { logId ->
+                            drinkLogViewModel.selectDate(currentDate)
+                            drinkLogViewModel.enterEditMode(logId)
+                            navController.navigate(Screen.Tracking.route)
+                        }
                     )
                 } else if (didntDrink) {
                     // User explicitly marked "I didn't drink" — show the confirmation card
@@ -251,7 +255,7 @@ fun DaySummaryScreen(
                         text = "Journal",
                         fontFamily = BigShouldersDisplay,
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.Normal,
+                        fontWeight = FontWeight.W400,
                         color = DarkNavy
                     )
 
@@ -262,7 +266,7 @@ fun DaySummaryScreen(
                         fontFamily = BigShouldersDisplay,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Normal,
-                        color = DarkNavy.copy(alpha = 0.4f)
+                        color = CloverDarker.copy(alpha = 0.3f)
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -280,7 +284,7 @@ fun DaySummaryScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 if (journalEntries.isEmpty()) {
                     EmptyTodayCard(
@@ -413,18 +417,29 @@ private fun WeekHeader(
                 val isSelected = d == selectedDate
                 val count = logCountByDay[d] ?: 0
                 val hasJournal = d in journalDays
+                val isFuture = d.isAfter(LocalDate.now())
 
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .clickable { onDayClick(d) },
+                        .height(48.dp)
+                        .then(if (!isFuture) Modifier.clickable { onDayClick(d) } else Modifier),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
                         modifier = Modifier.height(32.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (isSelected) {
+                        if (isFuture) {
+                            Text(
+                                text = d.dayOfMonth.toString(),
+                                fontFamily = Poppins,
+                                fontSize = fontSize,
+                                fontWeight = FontWeight.Normal,
+                                color = DarkNavy.copy(alpha = 0.2f),
+                                textAlign = TextAlign.Center
+                            )
+                        } else if (isSelected) {
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
@@ -451,7 +466,6 @@ private fun WeekHeader(
                                 )
                             }
 
-                            // Unselected date text
                             Text(
                                 text = d.dayOfMonth.toString(),
                                 fontFamily = Poppins,
@@ -463,8 +477,8 @@ private fun WeekHeader(
                         }
                     }
 
-                    if (count > 0) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                    if (count > 0 && !isFuture) {
+                        Spacer(modifier = Modifier.height(12.dp))
                         DrinkDots(count = count)
                     }
                 }
@@ -480,7 +494,8 @@ private fun WeekHeader(
 fun DaySummaryDrinkList(
     logs: List<LogItem>,
     onRemoveItem: (String) -> Unit,
-    onRemoveBatch: (List<String>) -> Unit
+    onRemoveBatch: (List<String>) -> Unit,
+    onItemClick: (String) -> Unit
 ) {
     if (logs.isEmpty()) return
 
@@ -500,7 +515,8 @@ fun DaySummaryDrinkList(
 
             SwipeToDeleteRow(
                 height = 44.dp,
-                onDelete = { onRemoveBatch(groupIds) }
+                onDelete = { onRemoveBatch(groupIds) },
+                onClick = { onItemClick(group.first().id) }
             ) {
                 Row(
                     modifier = Modifier
@@ -581,10 +597,6 @@ fun DaySummaryDrinkList(
                     HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
                 }
             }
-
-            if (groupIndex < groupedLogs.size - 1) {
-                HorizontalDivider(color = Color(0xFF000000).copy(alpha = 0.5f), thickness = 0.5.dp)
-            }
         }
     }
 }
@@ -596,6 +608,7 @@ fun DaySummaryDrinkList(
 private fun SwipeToDeleteRow(
     height: Dp,
     onDelete: () -> Unit,
+    onClick: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     var showDelete by remember { mutableStateOf(false) }
@@ -610,7 +623,10 @@ private fun SwipeToDeleteRow(
                         else if (dragAmount > 15) showDelete = false
                     }
                 }
-                .clickable { if (showDelete) showDelete = false },
+                .clickable {
+                    if (showDelete) showDelete = false
+                    else onClick()
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(modifier = Modifier.weight(1f)) {
