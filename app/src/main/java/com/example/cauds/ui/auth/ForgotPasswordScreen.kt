@@ -29,6 +29,7 @@ import com.example.cauds.ui.navigation.Screen
 import com.example.cauds.ui.theme.BackgroundSand
 import com.example.cauds.ui.theme.BigShouldersDisplay
 import com.example.cauds.ui.theme.CobaltDarker
+import com.example.cauds.ui.theme.SkyDark
 import com.example.cauds.ui.theme.Poppins
 import com.example.cauds.ui.theme.rdp
 import com.example.cauds.ui.theme.rsp
@@ -53,7 +54,7 @@ fun ForgotPasswordScreen(
     val titleToFieldsGap = if (isShortScreen) 28.rdp() else 48.rdp()
 
     val canSend = email.isNotBlank() && viewModel.isValidEmail(email)
-    val buttonColor = if (canSend) CobaltDarker else CobaltDarker.copy(alpha = 0.5f)
+    val buttonColor = if (canSend) CobaltDarker else SkyDark
 
     Scaffold(
         containerColor = BackgroundSand,

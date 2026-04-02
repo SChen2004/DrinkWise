@@ -1,12 +1,18 @@
 package com.example.cauds.ui.auth
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -26,17 +32,35 @@ fun AuthTextField(
     passwordVisible: Boolean = false,
     onTogglePassword: () -> Unit = {}
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val strokeWidthDp = 0.5.rdp()
+    val unfocusedColor = CloverDarker.copy(alpha = 0.4f)
+
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.rdp())) {
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawBehind {
+                    val strokeWidth = strokeWidthDp.toPx()
+                    val color = if (error.isNotEmpty()) ErrorRed else if (isFocused) CloverDarker else unfocusedColor
+                    val y = size.height - (strokeWidth / 2)
+                    drawLine(
+                        color = color,
+                        start = Offset(0f, y),
+                        end = Offset(size.width, y),
+                        strokeWidth = strokeWidth
+                    )
+                },
             placeholder = {
                 Text(
                     text = placeholder,
                     fontFamily = Poppins,
                     fontSize = 16.rsp(),
-                    color = Color.Black.copy(alpha = 0.3f),
+                    color = CloverDarker.copy(alpha = 0.3f), 
                     textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -55,14 +79,15 @@ fun AuthTextField(
                     }
                 }
             },
+            interactionSource = interactionSource,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 errorContainerColor = Color.Transparent,
-                focusedIndicatorColor = if (error.isNotEmpty()) ErrorRed else CloverDarker,
-                unfocusedIndicatorColor = if (error.isNotEmpty()) ErrorRed else CloverDarker.copy(alpha = 0.3f),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = CloverDarker,
-                errorIndicatorColor = ErrorRed
+                errorIndicatorColor = Color.Transparent
             ),
             textStyle = LocalTextStyle.current.copy(
                 fontFamily = Poppins,
@@ -74,20 +99,22 @@ fun AuthTextField(
 
         if (error.isNotEmpty()) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(6.rdp())
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_alert),
                     contentDescription = "Error",
                     tint = ErrorRed,
-                    modifier = Modifier.size(12.rdp())
+                    modifier = Modifier.size(16.rdp())
                 )
                 Text(
                     text = error,
                     fontFamily = Poppins,
                     fontSize = 12.rsp(),
-                    color = ErrorRed
+                    lineHeight = 16.rsp(), 
+                    color = ErrorRed,
+                    modifier = Modifier.padding(top = 1.rdp())
                 )
             }
         }

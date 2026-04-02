@@ -161,7 +161,7 @@ fun SignUpScreen(
         Box(
             modifier = Modifier
                 .size(logoSize)
-                .background(BackgroundSand, shape = CircleShape),
+                .background(CloverNormal, shape = CircleShape),
             contentAlignment = Alignment.BottomCenter
         ) {
             Image(
@@ -271,7 +271,7 @@ fun SignUpScreen(
                     .fillMaxWidth()
                     .height(44.rdp()),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isFormValid) CobaltDarker else CobaltDarker.copy(alpha = 0.5f)
+                    containerColor = if (isFormValid) CobaltDarker else SkyDark
                 ),
                 shape = RoundedCornerShape(0.rdp()),
                 contentPadding = PaddingValues(0.dp)
